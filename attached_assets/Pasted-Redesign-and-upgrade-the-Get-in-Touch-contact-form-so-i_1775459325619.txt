@@ -1,0 +1,180 @@
+Redesign and upgrade the “Get in Touch” contact form so it is fully functional, safer, and more controlled for real business use.
+
+GOAL
+Make the contact form actually send inquiries to contact@asivanta.com, improve validation, limit abuse, add controlled file uploads, and add basic anti-spam and security protections.
+
+IMPORTANT CONTEXT
+- Emails sent to contact@asivanta.com are already forwarded to asiavanta@gmail.com.
+- The website should send form submissions to contact@asivanta.com.
+- Do NOT send directly to Gmail.
+- Keep the current premium Apple-style look and layout.
+
+FUNCTIONAL EMAIL DELIVERY
+Use a secure backend/server-side form submission.
+Use Resend as the email delivery service unless another reliable email API is already properly installed.
+
+Environment variables / secrets to use:
+- RESEND_API_KEY
+- CONTACT_TO_EMAIL=contact@asivanta.com
+- CONTACT_FROM_EMAIL=noreply@asivanta.com
+
+If domain-based sending is not fully ready yet, allow temporary fallback sender:
+- onboarding@resend.dev
+
+But structure the code so it can easily switch later to:
+- noreply@asivanta.com
+
+FORM FIELDS
+Keep these fields:
+- Full Name
+- Company Name
+- Email
+- Phone (optional)
+- Project Type
+- Message
+- Upload supporting file(s)
+
+VALIDATION RULES
+Required fields:
+- Full Name
+- Company Name
+- Email
+- Project Type
+- Message
+
+Optional:
+- Phone
+- Uploads
+
+Email:
+- validate proper email format
+
+MESSAGE FIELD RULES
+- Minimum message length: 30 characters
+- Maximum message length: 2000 characters
+- Add a live character counter under the message box
+- Display format: “0 / 2000 characters”
+- Counter updates live as user types
+- Prevent additional typing after max is reached
+- Show inline validation if under minimum
+
+FILE UPLOAD RULES
+Add a file upload section below the message field.
+
+Label:
+Upload supporting file(s)
+
+Helper text:
+Optional: spec sheet, drawing, RFQ sheet, or related document
+
+Allowed file types only:
+- .pdf
+- .xlsx
+- .png
+- .jpg
+- .jpeg
+
+Blocked file types:
+- .exe
+- .bat
+- .cmd
+- .js
+- .msi
+- .vbs
+- .ps1
+- .html
+- .svg
+- any executable, script, or unsafe file type
+
+Upload limits:
+- Maximum 2 files
+- Maximum 8 MB per file
+- Show clear validation errors if type is not allowed or file is too large
+
+FILE HANDLING / SECURITY
+- Validate file type and file size on the server side, not just the frontend
+- Rename uploaded files safely before storage
+- Do not expose uploaded files directly in public URLs if avoidable
+- Structure file handling so future malware/virus scanning can be added easily
+- Add code comments showing where virus scanning could be added later
+- Never allow dangerous file extensions to pass through
+
+ANTI-SPAM / ABUSE PROTECTION
+Add:
+- hidden honeypot field
+- basic server-side rate limiting if practical in current stack
+- server-side validation for all fields
+- server-side validation for uploads
+- Cloudflare Turnstile or similar lightweight anti-bot protection if practical
+
+FORM SUBMISSION BEHAVIOR
+On submit:
+1. Send a POST request from the form to a backend endpoint
+2. Backend validates all data
+3. Backend sends formatted email to contact@asivanta.com
+4. Show success message if send succeeds
+5. Clear form only after successful send
+6. If send fails, show error message and keep entered values
+
+EMAIL SUBJECT
+New Inquiry - [Project Type] - [Company Name]
+
+EMAIL BODY FORMAT
+Include clearly labeled fields:
+
+New website inquiry received
+
+Full Name: [full name]
+Company Name: [company name]
+Email: [email]
+Phone: [phone]
+Project Type: [project type]
+Message:
+[message]
+
+Uploaded Files:
+[file names]
+
+Submission Time: [timestamp]
+Source: Asivanta Website Contact Form
+
+SUCCESS MESSAGE
+Show:
+Thank you. Your inquiry has been received. We will respond within 24–48 hours.
+
+ERROR MESSAGE
+Show:
+Something went wrong while sending your inquiry. Please try again shortly.
+
+BUTTON BEHAVIOR
+- Keep button text: Submit Inquiry
+- While submitting, show loading state: Sending...
+- Disable button while request is in progress
+
+BACKUP / LOGGING
+Also log each contact form submission server-side.
+If practical, store a backup record in a simple JSON file or lightweight database table so submissions are not lost even if email delivery fails.
+
+UI / UX
+- Keep the current Apple-style layout
+- Keep the form clean and premium
+- Add a small note near upload:
+Accepted: PDF, XLSX, PNG, JPG • Max 2 files • 8MB each
+- Show validation messages cleanly below fields
+- Keep success and error states elegant and professional
+
+IMPORTANT
+- Do NOT use placeholder text like “to be implemented later”
+- Do NOT fake functionality
+- Do NOT expose secret keys in frontend code
+
+FINAL OUTPUT REQUIRED
+After implementing, tell me clearly:
+1. which environment variables I need to add in Replit
+2. exactly where to paste the Resend API key
+3. what file types are allowed
+4. what upload size limit is enforced
+5. what message length limit is enforced
+6. whether anti-spam is active
+7. whether uploads are fully functional now
+8. whether any final setup step still remains before the form is truly live

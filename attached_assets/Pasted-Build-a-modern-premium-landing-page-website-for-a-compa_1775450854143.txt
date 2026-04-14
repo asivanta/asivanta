@@ -1,0 +1,307 @@
+Build a modern, premium landing-page website for a company named “ASIVANTA”.
+
+IMPORTANT BRAND RULES
+- Use the uploaded ASIVANTA logo as the main brand logo.
+- Do NOT mention any personal founder name anywhere.
+- Do NOT mention “John,” “John C,” or any individual identity.
+- Company location should be shown as: Seoul, S. Korea.
+- Do NOT mention hourly pricing or any Upwork rate.
+- The business should feel like a serious Korea-based sourcing and supply chain advisory firm, not a freelancer profile.
+- Tone: credible, premium, sharp, modern, international, calm.
+- Design style: Apple-inspired clean layout, lots of white space, refined typography, strong spacing, minimal but polished motion, clean iconography, soft shadows, subtle gradients, premium enterprise feel.
+- Do NOT make it messy or crowded.
+- The final result should feel trustworthy for U.S. and global buyers who may send money to Korean suppliers and need support with sourcing, supplier verification, negotiation, and risk reduction.
+
+OVERALL GOAL
+Create a landing page for ASIVANTA that presents the company as a trusted Korea-based sourcing and supply chain partner helping global companies source safely, verify suppliers, negotiate better, and reduce operational risk in Korea and broader Asia.
+
+The page should be clean today, but also built so it can later expand with:
+- customer portal links
+- login buttons
+- quote request pages
+- inventory access
+- secure document exchange
+- embedded videos
+- case studies
+- contact forms
+- service detail pages
+
+TECH + STRUCTURE
+- Use a modern React-based single-page site inside Replit.
+- Build reusable components so future expansion is easy.
+- Use a responsive layout for desktop, tablet, and mobile.
+- Use a sticky top navigation.
+- Use smooth scrolling to sections.
+- Add tasteful micro-animations only. Keep it elegant.
+- Prepare the structure so future pages can be added easily.
+- Use a premium sans-serif font pairing similar to Apple-style sites.
+- Use strong visual hierarchy.
+- Use subtle section separators.
+- Add clean placeholders for future portal/dashboard/login features.
+
+COLOR + STYLE
+Base visual direction:
+- mostly white background
+- navy / deep slate text
+- subtle steel-blue accents inspired by the uploaded logo
+- restrained premium palette
+- no loud colors
+- avoid generic corporate blue overload
+- clean modern cards
+- soft rounded corners
+- polished premium enterprise look
+
+BRAND POSITIONING TO COMMUNICATE
+ASIVANTA helps global companies:
+- source more safely in Korea
+- verify Korean manufacturers before commitment
+- reduce supplier risk
+- negotiate pricing, MOQ, lead times, and terms
+- evaluate production readiness and quality risk
+- bridge Korean language, culture, and business communication
+- support cross-border sourcing decisions
+- reduce costly sourcing mistakes
+- protect supply continuity
+
+The site should feel relevant to:
+- U.S. companies
+- global manufacturers
+- procurement teams
+- sourcing managers
+- operations leaders
+- businesses entering Korea for the first time
+- companies that cannot afford supplier failure or disruption
+
+WEBSITE SECTIONS TO BUILD
+
+1. HEADER / NAVIGATION
+Top nav should include:
+- Logo on left
+- Nav links: Services, How It Works, Industries, Why Asivanta, Insights, Contact
+- Right side buttons:
+  - “Book a Call”
+  - “Client Portal” (for now this can link to a placeholder route or modal saying “Coming Soon”)
+Make header sticky and elegant.
+
+2. HERO SECTION
+Large, premium hero section with strong headline and subheadline.
+
+Hero headline ideas should feel stronger than the current draft.
+Use a final headline in this spirit:
+“Smarter Korea sourcing. Stronger Asia supply chains.”
+
+Support text should be rewritten into a more polished website version, not a freelancer bio.
+Suggested message direction:
+“Asivanta helps U.S. and global companies source more safely and profitably in Korea. Based in Seoul, we bridge supplier reality, negotiation strategy, quality risk, and cross-border execution.”
+
+Add 2 CTA buttons:
+- Book a Call
+- Explore Services
+
+Add 3–4 short trust statements underneath, such as:
+- Seoul-based market support
+- Supplier verification
+- Negotiation and sourcing strategy
+- Quality and readiness review
+
+Hero visual:
+- use the uploaded logo elegantly
+- optionally create a premium abstract globe / supply chain / Korea-Asia visual on the right side
+- do NOT make it look cheesy
+- no stock-photo overload
+- should feel premium and minimal
+
+3. TRUST / VALUE BAR
+Directly under hero, add a horizontal trust/value strip with short statements such as:
+- Supplier Verification
+- Risk Reduction
+- Negotiation Support
+- Korea Market Execution
+- Cross-Border Sourcing Clarity
+
+4. SERVICES SECTION
+Create premium service cards with icons.
+Services should include:
+- Supplier Sourcing
+- Korean Manufacturer Verification
+- Pricing & Term Negotiation
+- Factory Readiness & Quality Risk Review
+- Quote Comparison & Sourcing Guidance
+- Korea Market Communication Support
+
+Each card should have:
+- title
+- short description
+- “Learn More” placeholder
+
+Keep descriptions short, clean, and high-value.
+
+5. HOW IT WORKS SECTION
+Create a clean 4-step process section:
+Step 1: Define sourcing need
+Step 2: Identify and screen suppliers
+Step 3: Verify capability and commercial fit
+Step 4: Support execution and reduce risk
+
+Each step should have a short plain-English explanation.
+Design should be simple and premium.
+
+6. WHY ASIVANTA SECTION
+This is where the current profile content should evolve into stronger positioning.
+
+Create a two-column layout.
+Left side: strong copy.
+Right side: key bullet points or metrics-style statements.
+
+Messaging direction:
+- Based in Seoul, S. Korea
+- Combines Korean market access with global business understanding
+- Helps bridge language, culture, pricing logic, and supplier reality
+- Focuses on preventing expensive mistakes before money, time, and production are at risk
+- Best for companies that need clarity before committing
+
+Add a refined callout box with wording like:
+“If you are wiring money to a supplier in Korea, confidence should come before commitment.”
+
+7. INDUSTRIES SECTION
+Add a clean grid for industries served, such as:
+- Electronics
+- Industrial Components
+- Consumer Products
+- OEM / ODM Projects
+- Manufacturing Supply Chains
+- Cross-Border Procurement
+
+Keep this flexible so more industries can be added later.
+
+8. RESULTS / BUSINESS IMPACT SECTION
+Turn the current “How I Add Value” bullets into a more premium business-impact section.
+
+Do NOT present them as personal claims.
+Frame them as business outcomes.
+
+Example outcomes:
+- Improve sourcing transparency before contract signing
+- Strengthen supplier selection and qualification
+- Negotiate commercial terms with better local visibility
+- Identify production and quality risks earlier
+- Reduce costly sourcing and communication errors
+
+If numerical claims are shown, do NOT make them look fake or exaggerated.
+If using cost reduction language, keep it careful and credible.
+
+9. VIDEO + INSIGHTS SECTION
+Create a premium section for future videos and insight articles.
+For now include:
+- 1 featured video placeholder card
+- 3 insight/article cards
+Examples:
+- “How to verify a Korean supplier before signing”
+- “MOQ, lead time, and payment terms: what buyers miss”
+- “How to reduce sourcing mistakes in Korea”
+
+This section should be easy to update later with:
+- YouTube or Vimeo embeds
+- article links
+- downloadable guides
+
+10. CLIENT PORTAL PREVIEW SECTION
+Create a sleek teaser section for future client functions.
+This is important.
+
+Include cards or feature blocks for:
+- Quote Requests
+- Inventory Access
+- Secure File Exchange
+- Project Tracking
+- Customer Login
+
+This section should clearly say:
+“Client portal features coming soon”
+But visually show the future direction in a polished way.
+
+11. CTA SECTION
+Create a strong call-to-action band near the bottom:
+“Need clarity before committing to a supplier?”
+Short support line:
+“Asivanta helps global buyers move with more confidence in Korea.”
+Buttons:
+- Book a Call
+- Contact Us
+
+12. FOOTER
+Footer should include:
+- ASIVANTA logo
+- Seoul, S. Korea
+- email placeholder
+- LinkedIn placeholder
+- Client Portal placeholder
+- copyright
+- simple footer nav
+
+COPYWRITING INSTRUCTIONS
+Rewrite the original reference content into polished website copy.
+
+Use this as source meaning, but improve it:
+“I help U.S. and global companies source safely and profitably in Korea.
+Based in Korea with 15+ years inside the electronics manufacturing industry and 20+ years of U.S. business experience, I bridge language, culture, pricing strategy, and supplier reality.
+I don’t just translate. I reduce supplier risk, negotiate better terms, and protect your production line.
+If you’re wiring money to a Korean manufacturer, I make sure you’re doing it safely.”
+
+Convert that into polished business website language that sounds more premium, less personal, and more agency/consulting grade.
+
+Important copy rules:
+- No cheesy hype
+- No fake “#1”
+- No exaggerated claims
+- No buzzword stuffing
+- No cluttered paragraphs
+- Keep sentences sharp and easy to scan
+- Use premium enterprise wording
+- Sound globally credible
+
+DESIGN DETAILS
+- Make section spacing generous like Apple-style product pages
+- Use subtle reveal animations on scroll
+- Keep icons refined and consistent
+- Add premium hover effects on buttons and cards
+- Use clean visual rhythm
+- Prioritize trust, clarity, and conversion
+
+FUTURE-READY REQUIREMENTS
+Set up the code structure so I can later add:
+- /portal
+- /login
+- /quotes
+- /inventory
+- /insights
+- /contact
+- /about
+
+If a full multipage setup is not created now, at least organize components and routing so future expansion is easy.
+
+OPTIONAL NICE TOUCHES
+If tasteful, include:
+- subtle animated gradient line
+- premium globe/network visual
+- very light parallax in hero
+- smooth card hover motion
+But keep everything restrained.
+
+CONTENT PRIORITY
+The site should answer these questions fast:
+- What does Asivanta do?
+- Why should I trust it?
+- Who is it for?
+- How does it help reduce risk?
+- What can I do next?
+
+FINAL OUTPUT REQUEST
+Generate the full landing page in polished, modern code with:
+- premium design
+- real written copy
+- reusable sections
+- responsive layout
+- placeholder routes/components for future portal expansion
+- uploaded logo integrated throughout the site
+- clean Apple-like aesthetic for industrial sourcing / supply chain consulting
