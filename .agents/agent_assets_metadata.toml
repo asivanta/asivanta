@@ -1,0 +1,20 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Auu70A8diaJwBfdo5jglh"
+uri = "file://artifacts/asivanta/src/assets/hero-bg.png"
+type = "image"
+title = "Hero section abstract supply chain"
+
+[[generated]]
+id = "bD9ouifGbB92bJoycvsqO"
+uri = "file://artifacts/asivanta/src/assets/factory-abstract.png"
+type = "image"
+title = "Factory readiness abstract"
+
+[[generated]]
+id = "mD7EIw8jUcY0zCm-ed4wI"
+uri = "file://artifacts/asivanta/src/assets/logistics-abstract.png"
+type = "image"
+title = "Global logistics abstract"
