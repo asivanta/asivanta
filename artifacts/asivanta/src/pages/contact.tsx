@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+﻿import { useState, useRef } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { MapPin, Mail, Clock, ArrowLeft, CheckCircle2, Send, Upload, X, FileText, AlertCircle, Loader2 } from "lucide-react";
@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/footer";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } }
 };
 
 const staggerContainer = {
