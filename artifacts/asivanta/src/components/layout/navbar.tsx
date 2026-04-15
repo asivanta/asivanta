@@ -29,8 +29,10 @@ export function Navbar() {
           <img
             src={logoImage}
             alt="ASIVANTA"
-            className={`h-[12rem] md:h-[18rem] object-contain transition-all duration-300 ${
-              scrolled ? "" : "brightness-0 invert"
+            className={`object-contain transition-all duration-300 ${
+              scrolled
+                ? "h-[4rem] md:h-[6rem]"
+                : "h-[12rem] md:h-[18rem] brightness-0 invert"
             }`}
           />
         </Link>
