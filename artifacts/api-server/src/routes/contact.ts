@@ -92,7 +92,7 @@ async function getNotificationEmails(): Promise<string[]> {
     if (rows.length === 0) {
       return ["contact@asivanta.com"];
     }
-    return rows.map((r) => r.email);
+    return rows.map((r: { email: string }) => r.email);
   } catch {
     return ["contact@asivanta.com"];
   }
@@ -257,7 +257,7 @@ router.post(
         return res.status(400).json({ error: err.message });
       }
       if (err) return res.status(400).json({ error: err.message });
-      next();
+      return next();
     });
   },
   async (req: Request, res: Response) => {

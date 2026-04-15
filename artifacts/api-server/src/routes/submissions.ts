@@ -92,23 +92,25 @@ async function getNotificationEmails(): Promise<string[]> {
         .onConflictDoNothing();
       return ["contact@asivanta.com"];
     }
-    return rows.map((r) => r.email);
+    return rows.map((r: { email: string }) => r.email);
   } catch {
     return ["contact@asivanta.com"];
   }
 }
 
 // ─── Auth middleware ───────────────────────────────────────────────────────
-function requireAdminAuth(req: Request, res: Response, next: NextFunction) {
+function requireAdminAuth(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Authentication required." });
+    res.status(401).json({ error: "Authentication required." });
+    return;
   }
   const token = authHeader.slice(7);
   const expiresAt = activeSessions.get(token);
   if (!expiresAt || Date.now() > expiresAt) {
     activeSessions.delete(token);
-    return res.status(401).json({ error: "Session expired. Please log in again." });
+    res.status(401).json({ error: "Session expired. Please log in again." });
+    return;
   }
   next();
 }
@@ -269,7 +271,7 @@ router.get("/submissions", requireAdminAuth, async (_req: Request, res: Response
 // ─── GET /submissions/:id ──────────────────────────────────────────────────
 router.get("/submissions/:id", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid submission ID." });
 
     const [row] = await db
@@ -298,7 +300,7 @@ router.get("/submissions/:id", requireAdminAuth, async (req: Request, res: Respo
 // ─── PATCH /submissions/:id/read ──────────────────────────────────────────
 router.patch("/submissions/:id/read", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid submission ID." });
 
     const { isRead } = req.body;
@@ -321,7 +323,7 @@ router.patch("/submissions/:id/read", requireAdminAuth, async (req: Request, res
 // ─── DELETE /submissions/:id ───────────────────────────────────────────────
 router.delete("/submissions/:id", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid submission ID." });
 
     await db
@@ -392,7 +394,7 @@ router.post("/admin/notification-emails", requireAdminAuth, async (req: Request,
 // ─── DELETE /admin/notification-emails/:id ────────────────────────────────
 router.delete("/admin/notification-emails/:id", requireAdminAuth, async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(req.params.id as string, 10);
     if (isNaN(id)) return res.status(400).json({ error: "Invalid ID." });
 
     // Check at least one email remains
