@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+﻿import React, { useRef } from "react";
 import { Link } from "wouter";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { 
@@ -18,7 +18,7 @@ import logisticsAbstract from "../assets/logistics-abstract.png";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } }
 };
 
 const staggerContainer = {
@@ -137,7 +137,7 @@ export default function Home() {
                 key={i}
                 variants={{
                   hidden: { opacity: 0, y: 24 },
-                  visible: { opacity: 1, y: 0, transition: { delay: i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
+                  visible: { opacity: 1, y: 0, transition: { delay: i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } }
                 }}
                 className="bg-white p-8 md:p-10 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group"
               >
@@ -212,7 +212,7 @@ export default function Home() {
                 }}
                 className="bg-white p-8 rounded-2xl border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300"
               >
-                <div className="text-blue-600 mb-6">{React.cloneElement(service.icon as React.ReactElement, { className: "h-8 w-8 stroke-[1.5]" })}</div>
+                <div className="text-blue-600 mb-6">{React.cloneElement(service.icon as React.ReactElement<{ className?: string }>, { className: "h-8 w-8 stroke-[1.5]" })}</div>
                 <h3 className="text-xl font-medium text-gray-900 mb-3">{service.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed font-light">{service.desc}</p>
               </motion.div>
