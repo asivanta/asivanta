@@ -1,7 +1,6 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
-import path from "node:path";
-import fs from "node:fs";
-import formidable from "formidable";
+import type { IncomingMessage, ServerResponse } from "http";
+import path from "path";
+import Busboy from "busboy";
 import { Resend } from "resend";
 
 const ALLOWED_EXTENSIONS = new Set([".pdf", ".xlsx", ".png", ".jpg", ".jpeg"]);
@@ -16,6 +15,12 @@ const VALID_PROJECT_TYPES = ["Sourcing", "Supplier Verification", "Negotiation",
 const MIN_MESSAGE_LENGTH = 30;
 const MAX_MESSAGE_LENGTH = 2000;
 
+interface UploadedFile {
+  filename: string;
+  content: Buffer;
+  size: number;
+}
+
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
 }
@@ -29,18 +34,53 @@ function respond(res: ServerResponse, status: number, body: object): void {
   res.end(JSON.stringify(body));
 }
 
-function parseForm(req: IncomingMessage): Promise<[formidable.Fields, formidable.Files]> {
-  const form = new formidable.IncomingForm({
-    uploadDir: "/tmp",
-    keepExtensions: true,
-    maxFileSize: MAX_FILE_SIZE,
-    multiples: true,
-  });
+function parseMultipart(req: IncomingMessage): Promise<{ fields: Record<string, string>; files: UploadedFile[] }> {
   return new Promise((resolve, reject) => {
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      else resolve([fields, files]);
+    const fields: Record<string, string> = {};
+    const files: UploadedFile[] = [];
+
+    const bb = Busboy({
+      headers: req.headers,
+      limits: { fileSize: MAX_FILE_SIZE, files: MAX_FILES },
     });
+
+    bb.on("field", (name, val) => {
+      fields[name] = val;
+    });
+
+    bb.on("file", (name, file, info) => {
+      const ext = path.extname(info.filename || "").toLowerCase();
+      const chunks: Buffer[] = [];
+      let truncated = false;
+
+      file.on("limit", () => {
+        truncated = true;
+        file.resume();
+      });
+
+      file.on("data", (chunk: Buffer) => {
+        if (!truncated) chunks.push(chunk);
+      });
+
+      file.on("close", () => {
+        if (truncated) {
+          return reject(new Error("FILE_TOO_LARGE"));
+        }
+        if (BLOCKED_EXTENSIONS.has(ext) || (info.filename && !ALLOWED_EXTENSIONS.has(ext))) {
+          return reject(new Error(`FILE_INVALID:${ext}`));
+        }
+        if (info.filename) {
+          const content = Buffer.concat(chunks);
+          files.push({ filename: info.filename, content, size: content.length });
+        }
+      });
+    });
+
+    bb.on("filesLimit", () => reject(new Error("TOO_MANY_FILES")));
+    bb.on("error", (err: Error) => reject(err));
+    bb.on("finish", () => resolve({ fields, files }));
+
+    req.pipe(bb);
   });
 }
 
@@ -51,7 +91,7 @@ function buildEmailHtml(data: {
   phone: string;
   projectType: string;
   message: string;
-  files: Array<{ original: string; size: number }>;
+  files: Array<{ filename: string; size: number }>;
   submittedAt: string;
 }): string {
   const fileRows =
@@ -59,7 +99,7 @@ function buildEmailHtml(data: {
       ? data.files
           .map(
             (f) =>
-              `<tr><td style="padding:6px 12px;font-size:13px;color:#374151;">${f.original}</td><td style="padding:6px 12px;font-size:13px;color:#6B7280;">${(f.size / 1024).toFixed(0)} KB</td></tr>`
+              `<tr><td style="padding:6px 12px;font-size:13px;color:#374151;">${f.filename}</td><td style="padding:6px 12px;font-size:13px;color:#6B7280;">${(f.size / 1024).toFixed(0)} KB</td></tr>`
           )
           .join("")
       : `<tr><td colspan="2" style="padding:6px 12px;font-size:13px;color:#6B7280;">None</td></tr>`;
@@ -153,12 +193,12 @@ function buildEmailText(data: {
   phone: string;
   projectType: string;
   message: string;
-  files: Array<{ original: string; size: number }>;
+  files: Array<{ filename: string; size: number }>;
   submittedAt: string;
 }): string {
   const fileList =
     data.files.length > 0
-      ? data.files.map((f) => `  - ${f.original} (${(f.size / 1024).toFixed(0)} KB)`).join("\n")
+      ? data.files.map((f) => `  - ${f.filename} (${(f.size / 1024).toFixed(0)} KB)`).join("\n")
       : "  None";
 
   return `NEW ASIVANTA INQUIRY
@@ -200,36 +240,24 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     return respond(res, 405, { error: "Method not allowed" });
   }
 
-  let fields: formidable.Fields;
-  let files: formidable.Files;
+  let fields: Record<string, string>;
+  let uploadedFiles: UploadedFile[];
 
   try {
-    [fields, files] = await parseForm(req);
+    ({ fields, files: uploadedFiles } = await parseMultipart(req));
   } catch (err: unknown) {
-    const e = err as { message?: string };
-    const msg = (e.message || "").toLowerCase();
-    if (msg.includes("maxfilesize") || msg.includes("too large") || msg.includes("size")) {
-      return respond(res, 400, { error: "File exceeds the 8MB size limit." });
-    }
-    return respond(res, 400, { error: e.message || "Invalid form data." });
+    const msg = (err as Error).message || "";
+    if (msg === "FILE_TOO_LARGE") return respond(res, 400, { error: "File exceeds the 8MB size limit." });
+    if (msg === "TOO_MANY_FILES") return respond(res, 400, { error: "Maximum 2 files allowed." });
+    if (msg.startsWith("FILE_INVALID:")) return respond(res, 400, { error: `File type ${msg.slice(13) || "(unknown)"} is not allowed.` });
+    return respond(res, 400, { error: "Invalid form data." });
   }
 
-  const getField = (key: string): string => {
-    const val = fields[key];
-    return (Array.isArray(val) ? val[0] : val) || "";
-  };
-
-  const hp = fields._hp_field;
-  if (hp && (Array.isArray(hp) ? hp[0] : hp)) {
+  if (fields._hp_field) {
     return respond(res, 200, { success: true });
   }
 
-  const fullName = getField("fullName");
-  const company = getField("company");
-  const email = getField("email");
-  const phone = getField("phone");
-  const projectType = getField("projectType");
-  const message = getField("message");
+  const { fullName = "", company = "", email = "", phone = "", projectType = "", message = "" } = fields;
 
   const errors: string[] = [];
   if (!fullName || sanitize(fullName).length < 1) errors.push("Full Name is required.");
@@ -246,28 +274,6 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
   if (errors.length > 0) return respond(res, 400, { error: errors.join(" ") });
 
-  const rawFiles = Object.values(files)
-    .flatMap((f) => (Array.isArray(f) ? f : [f]))
-    .filter(Boolean) as formidable.File[];
-
-  if (rawFiles.length > MAX_FILES) {
-    for (const f of rawFiles) {
-      try { fs.unlinkSync(f.filepath); } catch { /* ignore */ }
-    }
-    return respond(res, 400, { error: "Maximum 2 files allowed." });
-  }
-
-  // Validate file extensions
-  for (const f of rawFiles) {
-    const ext = path.extname(f.originalFilename || "").toLowerCase();
-    if (!ALLOWED_EXTENSIONS.has(ext) || BLOCKED_EXTENSIONS.has(ext)) {
-      for (const file of rawFiles) {
-        try { fs.unlinkSync(file.filepath); } catch { /* ignore */ }
-      }
-      return respond(res, 400, { error: `File type ${ext || "(unknown)"} is not allowed.` });
-    }
-  }
-
   const cleanData = {
     fullName: sanitize(fullName),
     company: sanitize(company),
@@ -275,16 +281,13 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     phone: phone ? sanitize(phone) : "",
     projectType,
     message: sanitize(message),
-    files: rawFiles.map((f) => ({ original: f.originalFilename || "", size: f.size })),
+    files: uploadedFiles.map((f) => ({ filename: f.filename, size: f.size })),
     submittedAt: new Date().toISOString(),
   };
 
   const apiKey = process.env.RESEND_API_KEY;
 
   if (!apiKey) {
-    for (const f of rawFiles) {
-      try { fs.unlinkSync(f.filepath); } catch { /* ignore */ }
-    }
     return respond(res, 200, { success: true });
   }
 
@@ -292,23 +295,21 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   const toEmail = process.env.CONTACT_TO_EMAIL || "contact@asivanta.com";
   const resend = new Resend(apiKey);
 
-  const attachments = rawFiles.map((f) => ({
-    filename: f.originalFilename || "attachment",
-    content: fs.readFileSync(f.filepath),
-  }));
-
   const { error: sendError } = await resend.emails.send({
     from: fromEmail,
     to: [toEmail],
     subject: `New Asivanta Inquiry — ${cleanData.company}`,
     text: buildEmailText(cleanData),
     html: buildEmailHtml(cleanData),
-    ...(attachments.length > 0 ? { attachments } : {}),
+    ...(uploadedFiles.length > 0
+      ? {
+          attachments: uploadedFiles.map((f) => ({
+            filename: f.filename,
+            content: f.content,
+          })),
+        }
+      : {}),
   });
-
-  for (const f of rawFiles) {
-    try { fs.unlinkSync(f.filepath); } catch { /* ignore */ }
-  }
 
   if (sendError) {
     return respond(res, 500, { error: "Something went wrong while sending your inquiry. Please try again shortly." });
