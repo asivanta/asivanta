@@ -2,5 +2,11 @@
   "buildCommand": "pnpm run typecheck && PORT=3000 BASE_PATH=/ pnpm --filter @workspace/asivanta run build",
   "outputDirectory": "artifacts/asivanta/dist/public",
   "framework": null,
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
+  "functions": {
+    "api/contact.ts": {
+      "memory": 512,
+      "maxDuration": 15
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
