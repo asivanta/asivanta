@@ -20,7 +20,7 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
         scrolled
-          ? "bg-white/90 backdrop-blur-md border-gray-200 py-3 shadow-sm"
+          ? "bg-[#0a1128]/95 backdrop-blur-md border-white/10 py-3 shadow-sm"
           : "bg-transparent border-transparent py-5"
       }`}
     >
@@ -29,22 +29,20 @@ export function Navbar() {
           <img
             src={logoImage}
             alt="ASIVANTA"
-            className={`object-contain transition-all duration-300 ${
-              scrolled
-                ? "h-[4rem] md:h-[6rem]"
-                : "h-[12rem] md:h-[18rem] brightness-0 invert"
+            className={`object-contain transition-all duration-300 brightness-0 invert ${
+              scrolled ? "h-[4rem] md:h-[6rem]" : "h-[12rem] md:h-[18rem]"
             }`}
           />
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
-          <a href="#services" className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-600 hover:text-primary" : "text-gray-300 hover:text-white"}`}>Services</a>
-          <a href="#how-it-works" className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-600 hover:text-primary" : "text-gray-300 hover:text-white"}`}>How It Works</a>
-          <a href="#industries" className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-600 hover:text-primary" : "text-gray-300 hover:text-white"}`}>Industries</a>
-          <Link href="/insights" className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-600 hover:text-primary" : "text-gray-300 hover:text-white"}`}>Insights</Link>
-          <div className={`h-4 w-px mx-2 ${scrolled ? "bg-gray-300" : "bg-gray-600"}`}></div>
-          <Link href="/portal" className={`text-sm font-medium transition-colors flex items-center gap-1 ${scrolled ? "text-gray-600 hover:text-primary" : "text-gray-300 hover:text-white"}`}>
+          <a href="#services" className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}>Services</a>
+          <a href="#how-it-works" className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}>How It Works</a>
+          <a href="#industries" className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}>Industries</a>
+          <Link href="/insights" className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}>Insights</Link>
+          <div className={`h-4 w-px mx-2 ${scrolled ? "bg-gray-600" : "bg-gray-600"}`}></div>
+          <Link href="/portal" className={`text-sm font-medium transition-colors flex items-center gap-1 ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}>
             Client Portal
           </Link>
           <Link href="/contact">
@@ -59,7 +57,7 @@ export function Navbar() {
           className="md:hidden relative z-50 p-2 -mr-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? <X className="h-6 w-6 text-gray-900" /> : <Menu className={`h-6 w-6 ${scrolled ? "text-gray-900" : "text-white"}`} />}
+          {mobileMenuOpen ? <X className="h-6 w-6 text-gray-900" /> : <Menu className={`h-6 w-6 ${scrolled ? "text-white" : "text-white"}`} />}
         </button>
 
         {/* Mobile Menu */}
