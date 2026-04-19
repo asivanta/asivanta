@@ -20,7 +20,7 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
         scrolled
-          ? "bg-[#0a1128]/95 backdrop-blur-md border-white/10 py-3 shadow-sm"
+          ? "bg-[#0a1128]/95 backdrop-blur-md border-white/10 py-2 shadow-sm"
           : "bg-transparent border-transparent py-5"
       }`}
     >
@@ -30,7 +30,7 @@ export function Navbar() {
             src={logoImage}
             alt="ASIVANTA"
             className={`object-contain transition-all duration-300 brightness-0 invert ${
-              scrolled ? "h-[4rem] md:h-[6rem]" : "h-[12rem] md:h-[18rem]"
+              scrolled ? "h-[12rem] md:h-[18rem]" : "h-[12rem] md:h-[18rem]"
             }`}
           />
         </Link>
