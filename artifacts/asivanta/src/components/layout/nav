@@ -30,7 +30,7 @@ scrolled
             src={logoImage}
             alt="ASIVANTA"
             className={`object-contain transition-all duration-300 brightness-0 invert ${
-              scrolled ? "h-[6rem] md:h-[8rem]" : "h-[12rem] md:h-[18rem]"
+              scrolled ? "h-[4rem] md:h-[5rem]" : "h-[5rem] md:h-[6rem]"
             }`}
           />
         </Link>
