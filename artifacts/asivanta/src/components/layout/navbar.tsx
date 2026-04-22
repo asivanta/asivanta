@@ -19,18 +19,18 @@ export function Navbar() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
-        scrolled
-          ? "bg-[#0a1128]/95 backdrop-blur-md border-white/10 py-2 shadow-sm"
-          : "bg-transparent border-transparent py-5"
+scrolled
+  ? "bg-[#0a1128]/95 backdrop-blur-md border-white/10 py-2 shadow-sm"
+  : "bg-transparent border-transparent py-3"
       }`}
     >
-      <div className="container mx-auto px-6 flex items-center justify-between">
+      <div className="container mx-auto px-10 flex items-center justify-between">
         <Link href="/" className="flex items-center z-50 relative py-1">
           <img
             src={logoImage}
             alt="ASIVANTA"
             className={`object-contain transition-all duration-300 brightness-0 invert ${
-              scrolled ? "h-[12rem] md:h-[18rem]" : "h-[12rem] md:h-[18rem]"
+              scrolled ? "h-[3rem] md:h-[4rem]" : "h-[12rem] md:h-[18rem]"
             }`}
           />
         </Link>
