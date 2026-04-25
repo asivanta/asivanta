@@ -2,6 +2,7 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import TelegramChatButton from "@/components/TelegramChatButton";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Contact from "@/pages/contact";
@@ -40,6 +41,7 @@ function App() {
           <Router />
         </WouterRouter>
         <Toaster />
+        <TelegramChatButton />
       </TooltipProvider>
     </QueryClientProvider>
   );
