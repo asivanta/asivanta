@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ArrowRight } from "lucide-react";
-import logoImage from "../../assets/logo-new-transparent.png";
+import logoImage from "../../assets/logo-nav.png";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -21,29 +21,29 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
         mobileMenuOpen
-          ? "bg-white border-gray-100 py-1.5 shadow-sm"
+          ? "bg-white border-gray-100 py-1 shadow-sm"
           : scrolled
-            ? "bg-[#0a1128]/95 backdrop-blur-md border-white/10 py-1 shadow-sm"
-            : "bg-transparent border-transparent py-1.5 md:py-2"
+            ? "bg-[#0a1128]/95 backdrop-blur-md border-white/10 py-0.5 shadow-sm"
+            : "bg-transparent border-transparent py-1"
       }`}
     >
-      <div className="container mx-auto px-6 md:px-10 flex items-center justify-between">
-        <Link href="/" className="flex items-center z-50 relative">
+      <div className="container mx-auto px-5 md:px-8 lg:px-10 flex items-center">
+        <Link href="/" className="flex items-center z-50 relative shrink-0">
           <img
             src={logoImage}
             alt="ASIVANTA"
             className={`object-contain transition-all duration-300 ${
               mobileMenuOpen
-                ? "h-9 md:h-10 brightness-0"
+                ? "h-14 md:h-16 brightness-0"
                 : scrolled
-                  ? "h-7 md:h-8 brightness-0 invert"
-                  : "h-9 md:h-11 brightness-0 invert"
+                  ? "h-12 md:h-14 brightness-0 invert"
+                  : "h-16 md:h-20 brightness-0 invert"
             }`}
           />
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex flex-1 items-center justify-end gap-8 lg:gap-12 xl:gap-14 ml-10 lg:ml-16">
           <a
             href="#services"
             className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
@@ -68,19 +68,11 @@ export function Navbar() {
           >
             Insights
           </Link>
-          <div
-            className={`h-4 w-px mx-2 ${scrolled ? "bg-gray-600" : "bg-gray-600"}`}
-          ></div>
           <Link
             href="/portal"
             className={`text-sm font-medium transition-colors flex items-center gap-1 ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
           >
             Client Portal
-          </Link>
-          <Link href="/contact">
-            <Button className="rounded-full shadow-sm" size="sm">
-              Get in Touch
-            </Button>
           </Link>
         </nav>
 
