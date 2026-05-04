@@ -141,13 +141,13 @@ export default function Home() {
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Link href="/contact">
+                <Link href="/instant-quote">
                   <Button
                     size="lg"
                     variant="outline"
                     className="rounded-full h-14 px-8 text-base border-gray-600 text-gray-300 hover:bg-white/5 hover:text-white hover:-translate-y-0.5 bg-transparent backdrop-blur-sm transition-all duration-300"
                   >
-                    Send RFQ Details
+                    Instant Quote
                   </Button>
                 </Link>
               </motion.div>
@@ -815,13 +815,13 @@ export default function Home() {
                   Get in Touch
                 </Button>
               </Link>
-              <Link href="/contact">
+              <Link href="/instant-quote">
                 <Button
                   variant="outline"
                   size="lg"
                   className="rounded-full border-gray-500 text-blue-200 hover:text-white hover:bg-blue-900/30 hover:-translate-y-0.5 h-14 px-8 w-full sm:w-auto transition-all duration-300"
                 >
-                  Send RFQ Details
+                  Instant Quote
                 </Button>
               </Link>
             </div>
