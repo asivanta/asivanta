@@ -7,11 +7,28 @@ export const config = {
 };
 
 const ALLOWED_EXTENSIONS = new Set([".pdf", ".xlsx", ".png", ".jpg", ".jpeg"]);
+const ALLOWED_MIME_TYPES = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "image/png",
+  "image/jpeg",
+]);
 const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const MAX_FILES = 2;
-const VALID_PROJECT_TYPES = ["Sourcing", "Supplier Verification", "Negotiation", "Other"];
+const MAX_TOTAL_FILE_SIZE = 14 * 1024 * 1024;
+const VALID_PROJECT_TYPES = [
+  "Sourcing",
+  "Supplier Shortlist",
+  "Supplier Verification",
+  "Quote / RFQ Comparison",
+  "Negotiation",
+  "Negotiation Support",
+  "Factory Readiness Review",
+  "Managed Sourcing",
+  "Other",
+];
 const MIN_MESSAGE = 30;
-const MAX_MESSAGE = 2000;
+const MAX_MESSAGE = 8000;
 
 function isValidEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e.length <= 254;
@@ -38,7 +55,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: err.message || "Invalid form data." });
   }
 
-  const get = (k) => (Array.isArray(fields[k]) ? fields[k][0] : fields[k]) || "";
+  const get = (k) =>
+    (Array.isArray(fields[k]) ? fields[k][0] : fields[k]) || "";
 
   // Honeypot
   if (get("_hp_field")) return res.status(200).json({ success: true });
@@ -53,23 +71,52 @@ export default async function handler(req, res) {
   const errors = [];
   if (!fullName) errors.push("Full Name is required.");
   if (!company) errors.push("Company Name is required.");
-  if (!email || !isValidEmail(email)) errors.push("A valid email address is required.");
-  if (!VALID_PROJECT_TYPES.includes(projectType)) errors.push("Please select a valid project type.");
+  if (!email || !isValidEmail(email))
+    errors.push("A valid email address is required.");
+  if (!VALID_PROJECT_TYPES.includes(projectType))
+    errors.push("Please select a valid project type.");
   if (!message) errors.push("Message is required.");
-  else if (message.length < MIN_MESSAGE) errors.push(`Message must be at least ${MIN_MESSAGE} characters.`);
-  else if (message.length > MAX_MESSAGE) errors.push(`Message must not exceed ${MAX_MESSAGE} characters.`);
+  else if (message.length < MIN_MESSAGE)
+    errors.push(`Message must be at least ${MIN_MESSAGE} characters.`);
+  else if (message.length > MAX_MESSAGE)
+    errors.push(`Message must not exceed ${MAX_MESSAGE} characters.`);
 
-  if (errors.length > 0) return res.status(400).json({ error: errors.join(" ") });
+  if (errors.length > 0)
+    return res.status(400).json({ error: errors.join(" ") });
 
   // Validate uploaded files
   const uploadedFiles = files.files
-    ? Array.isArray(files.files) ? files.files : [files.files]
+    ? Array.isArray(files.files)
+      ? files.files
+      : [files.files]
     : [];
 
+  if (uploadedFiles.length > MAX_FILES) {
+    return res
+      .status(400)
+      .json({ error: `Maximum ${MAX_FILES} files allowed.` });
+  }
+
+  const totalFileSize = uploadedFiles.reduce(
+    (sum, file) => sum + (file.size || 0),
+    0,
+  );
+  if (totalFileSize > MAX_TOTAL_FILE_SIZE) {
+    return res.status(400).json({ error: "Total upload size is too large." });
+  }
+
   for (const file of uploadedFiles) {
-    const ext = "." + file.originalFilename.split(".").pop().toLowerCase();
+    const originalFilename = file.originalFilename || "";
+    const ext = "." + originalFilename.split(".").pop().toLowerCase();
     if (!ALLOWED_EXTENSIONS.has(ext)) {
-      return res.status(400).json({ error: `File type ${ext} is not allowed.` });
+      return res
+        .status(400)
+        .json({ error: `File type ${ext} is not allowed.` });
+    }
+    if (!ALLOWED_MIME_TYPES.has(file.mimetype || "")) {
+      return res
+        .status(400)
+        .json({ error: "Uploaded file type is not allowed." });
     }
   }
 
@@ -82,11 +129,16 @@ export default async function handler(req, res) {
   const toEmail = process.env.CONTACT_TO_EMAIL || "contact@asivanta.com";
   const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
 
-  const fileList = uploadedFiles.length > 0
-    ? uploadedFiles.map(f => `- ${f.originalFilename} (${(f.size / 1024).toFixed(0)} KB)`).join("\n")
-    : "None";
+  const fileList =
+    uploadedFiles.length > 0
+      ? uploadedFiles
+          .map(
+            (f) => `- ${f.originalFilename} (${(f.size / 1024).toFixed(0)} KB)`,
+          )
+          .join("\n")
+      : "None";
 
-  const attachments = uploadedFiles.map(f => ({
+  const attachments = uploadedFiles.map((f) => ({
     filename: f.originalFilename,
     content: fs.readFileSync(f.filepath),
   }));
@@ -118,12 +170,17 @@ Source: ASIVANTA Website Contact Form`,
 
   // Clean up temp files
   for (const file of uploadedFiles) {
-    try { fs.unlinkSync(file.filepath); } catch {}
+    try {
+      fs.unlinkSync(file.filepath);
+    } catch {}
   }
 
   if (sendError) {
     console.error("Resend error:", sendError);
-    return res.status(500).json({ error: "Something went wrong while sending your inquiry. Please try again shortly." });
+    return res.status(500).json({
+      error:
+        "Something went wrong while sending your inquiry. Please try again shortly.",
+    });
   }
 
   return res.status(200).json({ success: true });

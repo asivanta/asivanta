@@ -6,6 +6,7 @@ import TelegramChatButton from "@/components/TelegramChatButton";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Contact from "@/pages/contact";
+import InstantQuote from "@/pages/instant-quote";
 import Portal from "@/pages/portal";
 import Insights from "@/pages/insights";
 import About from "@/pages/about";
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/insights" component={Insights} />
       <Route path="/contact" component={Contact} />
+      <Route path="/instant-quote" component={InstantQuote} />
       <Route path="/about" component={About} />
       <Route path="/admin" component={Admin} />
       <Route path="/privacy" component={Privacy} />

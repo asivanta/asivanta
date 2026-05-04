@@ -69,10 +69,10 @@ export function Navbar() {
             Insights
           </Link>
           <Link
-            href="/portal"
+            href="/instant-quote"
             className={`text-sm font-medium transition-colors flex items-center gap-1 ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
           >
-            Client Portal
+            Instant Quote
           </Link>
         </nav>
 
@@ -126,11 +126,11 @@ export function Navbar() {
               Insights <ArrowRight className="h-4 w-4 text-gray-400" />
             </Link>
             <Link
-              href="/portal"
+              href="/instant-quote"
               onClick={() => setMobileMenuOpen(false)}
               className="text-gray-900 py-2 border-b border-gray-100 flex justify-between items-center"
             >
-              Client Portal <ArrowRight className="h-4 w-4 text-gray-400" />
+              Instant Quote <ArrowRight className="h-4 w-4 text-gray-400" />
             </Link>
 
             <div className="mt-8">
