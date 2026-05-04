@@ -27,7 +27,7 @@ export function Navbar() {
             : "bg-transparent border-transparent py-1"
       }`}
     >
-      <div className="container mx-auto px-5 md:px-8 lg:px-10 flex items-center">
+      <div className="w-full px-6 md:px-10 lg:px-12 flex items-center">
         <Link href="/" className="flex items-center z-50 relative shrink-0">
           <img
             src={logoImage}
@@ -36,14 +36,14 @@ export function Navbar() {
               mobileMenuOpen
                 ? "h-14 md:h-16 brightness-0"
                 : scrolled
-                  ? "h-12 md:h-14 brightness-0 invert"
-                  : "h-16 md:h-20 brightness-0 invert"
+                  ? "h-12 md:h-16 brightness-0 invert"
+                  : "h-16 md:h-24 brightness-0 invert"
             }`}
           />
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex flex-1 items-center justify-end gap-8 lg:gap-12 xl:gap-14 ml-10 lg:ml-16">
+        <nav className="hidden md:flex flex-1 items-center justify-end gap-8 lg:gap-12 xl:gap-16 ml-10 lg:ml-20">
           <a
             href="#services"
             className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
