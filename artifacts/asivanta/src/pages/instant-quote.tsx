@@ -14,6 +14,8 @@ import {
   Loader2,
   PackageCheck,
   Plus,
+  RotateCcw,
+  Save,
   Send,
   ShieldCheck,
   Trash2,
@@ -71,6 +73,7 @@ const MAX_FILE_SIZE = 8 * 1024 * 1024;
 const MAX_FILES = 2;
 const MAX_TOTAL_SIZE = 14 * 1024 * 1024;
 const MIN_MESSAGE = 30;
+const DRAFT_KEY = "asivanta_instant_quote_draft";
 
 function generateQuoteId() {
   const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -157,6 +160,7 @@ export default function InstantQuote() {
   const [bulkText, setBulkText] = useState("");
   const [bulkMessage, setBulkMessage] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
+  const [draftMessage, setDraftMessage] = useState("");
   const [serverError, setServerError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -228,6 +232,36 @@ export default function InstantQuote() {
         notes: line.notes,
       })),
     [usableLines],
+  );
+
+  const quoteRecord = useMemo(
+    () => ({
+      quoteId,
+      source: "Instant Quote",
+      mode: mode === "upload" ? "Upload List" : "Build List",
+      quoteType: form.quoteType,
+      readiness: quoteCompleteness,
+      customer: {
+        fullName: form.fullName.trim(),
+        company: form.company.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+      },
+      logistics: {
+        destination: form.destination.trim(),
+        timeline: form.timeline.trim(),
+      },
+      message: form.message.trim(),
+      files: files.map((file) => ({
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      })),
+      lines: structuredQuoteLines,
+      createdAt: new Date().toISOString(),
+      adminStatus: "new",
+    }),
+    [files, form, mode, quoteCompleteness, quoteId, structuredQuoteLines],
   );
 
   const updateForm = (
@@ -447,6 +481,49 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
     }
   };
 
+  const saveDraft = () => {
+    const draft = {
+      quoteId,
+      mode,
+      form,
+      lines,
+      savedAt: new Date().toISOString(),
+    };
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    setDraftMessage("Draft saved on this browser.");
+  };
+
+  const restoreDraft = () => {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) {
+      setDraftMessage("No saved draft found on this browser.");
+      return;
+    }
+    try {
+      const draft = JSON.parse(raw);
+      if (draft.quoteId) setQuoteId(String(draft.quoteId));
+      if (draft.mode === "upload" || draft.mode === "build")
+        setMode(draft.mode);
+      if (draft.form) setForm((current) => ({ ...current, ...draft.form }));
+      if (Array.isArray(draft.lines) && draft.lines.length > 0) {
+        setLines(draft.lines.slice(0, 12));
+      }
+      setDraftMessage(
+        "Draft restored. Attached files must be reselected for browser security.",
+      );
+    } catch {
+      setDraftMessage("Saved draft could not be restored.");
+    }
+  };
+
+  const downloadQuoteRecord = () => {
+    downloadTextFile(
+      `${quoteId}-admin-record.json`,
+      JSON.stringify(quoteRecord, null, 2),
+      "application/json;charset=utf-8",
+    );
+  };
+
   const selectFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFileError("");
     const selected = Array.from(e.target.files || []);
@@ -584,6 +661,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
         mode === "upload" ? "Upload List" : "Build List",
       );
       formData.append("quoteLinesJson", JSON.stringify(structuredQuoteLines));
+      formData.append("quoteRecordJson", JSON.stringify(quoteRecord));
       formData.append("message", buildMessage());
       files.forEach((file) => formData.append("files", file));
 
@@ -767,6 +845,41 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
               </div>
 
               <div className="rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_12px_32px_rgba(15,23,42,0.08)] md:p-8">
+                <div className="mb-7 flex flex-col gap-3 rounded-2xl border border-gray-100 bg-[#f8fafc] p-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Draft tools</p>
+                    <p className="mt-1 text-xs text-gray-400">
+                      Save long RFQs locally before submitting. Files must be
+                      reselected after restore.
+                    </p>
+                    {draftMessage && (
+                      <p className="mt-2 text-xs text-blue-700">
+                        {draftMessage}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-9 rounded-full px-4"
+                      onClick={saveDraft}
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Draft
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-9 rounded-full px-4"
+                      onClick={restoreDraft}
+                    >
+                      <RotateCcw className="mr-2 h-4 w-4" />
+                      Restore
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="mb-7 grid gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm font-medium">
@@ -1300,6 +1413,15 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Download Packet
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-12 rounded-full px-7"
+                    onClick={downloadQuoteRecord}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Admin JSON
                   </Button>
                   <Link href="/contact">
                     <Button
