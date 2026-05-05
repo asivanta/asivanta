@@ -7,6 +7,7 @@ import {
   ArrowRight,
   CheckCircle2,
   ClipboardList,
+  Copy,
   Download,
   FileSpreadsheet,
   FileText,
@@ -133,6 +134,18 @@ function csvCell(value: string | number) {
   return `"${String(value).replace(/"/g, '""')}"`;
 }
 
+function downloadTextFile(filename: string, content: string, type: string) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 const inputClass =
   "h-11 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-[#0F172A] outline-none transition-all focus:border-blue-400 focus:ring-2 focus:ring-blue-500/15";
 
@@ -143,6 +156,7 @@ export default function InstantQuote() {
   const [fileError, setFileError] = useState("");
   const [bulkText, setBulkText] = useState("");
   const [bulkMessage, setBulkMessage] = useState("");
+  const [copyMessage, setCopyMessage] = useState("");
   const [serverError, setServerError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -336,6 +350,103 @@ export default function InstantQuote() {
     URL.revokeObjectURL(url);
   };
 
+  const downloadRfqTemplate = () => {
+    const template = [
+      [
+        "Customer Part Number",
+        "Quantity",
+        "Description / Spec",
+        "Manufacturer",
+        "Target Price",
+        "Notes",
+      ],
+      [
+        "ABC-123",
+        "1000",
+        "Material, size, tolerance, finish, certification",
+        "Preferred maker or Open",
+        "USD target",
+        "Annual volume, sample need, destination",
+      ],
+    ]
+      .map((row) => row.map(csvCell).join(","))
+      .join("\n");
+    downloadTextFile(
+      "asivanta-rfq-template.csv",
+      template,
+      "text/csv;charset=utf-8",
+    );
+  };
+
+  const buildQuotePacketText = () => {
+    const lineSummary =
+      structuredQuoteLines.length > 0
+        ? structuredQuoteLines
+            .map((line) =>
+              [
+                `${line.line}. ${line.asvPartNumber}`,
+                `Customer Part: ${line.customerPartNumber || "Not provided"}`,
+                `Description: ${line.description || "Not provided"}`,
+                `Quantity: ${line.quantity || "Not provided"}`,
+                `Manufacturer: ${line.manufacturer || "Open"}`,
+                `Target Price: ${line.targetPrice || "Not provided"}`,
+                `Notes: ${line.notes || "None"}`,
+              ].join("\n"),
+            )
+            .join("\n\n")
+        : "No built part lines. Uploaded files are the source list.";
+
+    return `ASIVANTA INSTANT QUOTE PACKET
+Quote ID: ${quoteId}
+Mode: ${mode === "upload" ? "Upload List" : "Build List"}
+Quote Type: ${form.quoteType}
+Company: ${form.company || "Not provided"}
+Contact: ${form.fullName || "Not provided"}
+Email: ${form.email || "Not provided"}
+Destination: ${form.destination || "Not provided"}
+Timeline: ${form.timeline || "Not provided"}
+Readiness: ${quoteCompleteness}%
+
+CUSTOMER NOTES
+${form.message || "Not provided"}
+
+ASV LINE DATA
+${lineSummary}
+
+FILES
+${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.size)})`).join("\n") : "None attached in browser"}
+`;
+  };
+
+  const downloadQuotePacket = () => {
+    downloadTextFile(
+      `${quoteId}-quote-packet.txt`,
+      buildQuotePacketText(),
+      "text/plain;charset=utf-8",
+    );
+  };
+
+  const copyAsvNumbers = async () => {
+    if (structuredQuoteLines.length === 0) {
+      setCopyMessage("Add at least one part line before copying.");
+      return;
+    }
+    const value = structuredQuoteLines
+      .map(
+        (line) =>
+          `${line.asvPartNumber}\t${line.customerPartNumber}\t${line.quantity}`,
+      )
+      .join("\n");
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopyMessage(
+        `${structuredQuoteLines.length} ASV number${structuredQuoteLines.length === 1 ? "" : "s"} copied.`,
+      );
+    } catch {
+      setCopyMessage("Copy was blocked by the browser. Export CSV instead.");
+    }
+  };
+
   const selectFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFileError("");
     const selected = Array.from(e.target.files || []);
@@ -455,7 +566,12 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
     setServerError("");
 
     try {
+      const nativeFormData = new FormData(e.currentTarget as HTMLFormElement);
       const formData = new FormData();
+      formData.append(
+        "_hp_field",
+        String(nativeFormData.get("_hp_field") || ""),
+      );
       formData.append("fullName", form.fullName.trim());
       formData.append("company", form.company.trim());
       formData.append("email", form.email.trim());
@@ -598,6 +714,13 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
           </section>
         ) : (
           <form onSubmit={submitQuote} className="grid gap-8 lg:grid-cols-12">
+            <input
+              type="text"
+              name="_hp_field"
+              className="hidden"
+              tabIndex={-1}
+              autoComplete="off"
+            />
             <section className="lg:col-span-8">
               <div className="mb-5 grid gap-4 md:grid-cols-2">
                 <button
@@ -766,9 +889,20 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
 
                 {mode === "upload" ? (
                   <div className="mb-7">
-                    <label className="mb-2 block text-sm font-medium">
-                      Upload List
-                    </label>
+                    <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <label className="block text-sm font-medium">
+                        Upload List
+                      </label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="h-9 rounded-full px-4"
+                        onClick={downloadRfqTemplate}
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        RFQ Template
+                      </Button>
+                    </div>
                     <label className="flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-[#f8fafc] p-8 text-center transition-all hover:border-blue-300 hover:bg-blue-50/40">
                       <Upload className="mb-4 h-8 w-8 text-blue-500" />
                       <span className="text-sm font-medium">
@@ -832,6 +966,16 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                           type="button"
                           variant="outline"
                           className="h-9 rounded-full px-4"
+                          onClick={copyAsvNumbers}
+                          disabled={usableLines.length === 0}
+                        >
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy ASV
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-9 rounded-full px-4"
                           onClick={exportAsvCsv}
                           disabled={usableLines.length === 0}
                         >
@@ -850,6 +994,11 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                         </Button>
                       </div>
                     </div>
+                    {copyMessage && (
+                      <p className="mb-3 text-xs text-blue-700">
+                        {copyMessage}
+                      </p>
+                    )}
 
                     <div className="mb-4 rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
                       <div className="mb-3 flex items-center gap-2">
@@ -885,7 +1034,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                     </div>
 
                     <div className="overflow-x-auto rounded-2xl border border-gray-200">
-                      <table className="min-w-[980px] w-full border-collapse text-sm">
+                      <table className="min-w-[1120px] w-full border-collapse text-sm">
                         <thead className="bg-[#e9eef7] text-xs uppercase tracking-wide text-[#0F172A]">
                           <tr>
                             <th className="w-12 px-3 py-3 text-left">#</th>
@@ -897,6 +1046,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                             <th className="px-3 py-3 text-left">Description</th>
                             <th className="px-3 py-3 text-left">Qty</th>
                             <th className="px-3 py-3 text-left">Target</th>
+                            <th className="px-3 py-3 text-left">Notes</th>
                             <th className="w-12 px-3 py-3"></th>
                           </tr>
                         </thead>
@@ -996,6 +1146,16 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                                   }
                                   className="h-10 w-28 rounded-md border border-gray-200 px-2 text-sm outline-none focus:border-blue-400"
                                   placeholder="$ / unit"
+                                />
+                              </td>
+                              <td className="px-3 py-3">
+                                <input
+                                  value={line.notes}
+                                  onChange={(e) =>
+                                    updateLine(line.id, "notes", e.target.value)
+                                  }
+                                  className="h-10 w-36 rounded-md border border-gray-200 px-2 text-sm outline-none focus:border-blue-400"
+                                  placeholder="Alt, cert, sample"
                                 />
                               </td>
                               <td className="px-3 py-3 text-right">
@@ -1131,6 +1291,15 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                         <Send className="ml-2 h-4 w-4" />
                       </>
                     )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-12 rounded-full px-7"
+                    onClick={downloadQuotePacket}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Packet
                   </Button>
                   <Link href="/contact">
                     <Button
