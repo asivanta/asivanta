@@ -8,12 +8,12 @@ export function Footer() {
     <footer className="bg-[#0a1128] text-white pt-24 pb-12 border-t border-[#1a233a]">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
-          <div className="lg:col-span-4 flex flex-col">
-            <Link href="/" className="mb-6 inline-block">
+          <div className="lg:col-span-5 flex flex-col">
+            <Link href="/" className="mb-8 inline-block">
               <img
                 src={logoImage}
                 alt="ASIVANTA"
-                className="h-12 object-contain brightness-0 invert opacity-90"
+                className="h-32 w-auto max-w-full object-contain brightness-0 invert opacity-95 md:h-40 lg:h-44"
               />
             </Link>
             <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-sm">
