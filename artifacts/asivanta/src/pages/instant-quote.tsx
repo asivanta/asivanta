@@ -35,7 +35,12 @@ type QuoteLine = {
   customerPart: string;
   description: string;
   quantity: string;
+  annualVolume: string;
   targetPrice: string;
+  leadTime: string;
+  bufferPercent: string;
+  packaging: string;
+  referenceDesignator: string;
   notes: string;
 };
 
@@ -128,7 +133,12 @@ function emptyLine(id: number): QuoteLine {
     customerPart: "",
     description: "",
     quantity: "",
+    annualVolume: "",
     targetPrice: "",
+    leadTime: "",
+    bufferPercent: "",
+    packaging: "",
+    referenceDesignator: "",
     notes: "",
   };
 }
@@ -228,7 +238,12 @@ export default function InstantQuote() {
         customerPartNumber: line.customerPart,
         description: line.description,
         quantity: line.quantity,
+        annualVolume: line.annualVolume,
         targetPrice: line.targetPrice,
+        leadTime: line.leadTime,
+        bufferPercent: line.bufferPercent,
+        packaging: line.packaging,
+        referenceDesignator: line.referenceDesignator,
         notes: line.notes,
       })),
     [usableLines],
@@ -321,6 +336,8 @@ export default function InstantQuote() {
         description = "",
         manufacturer = "",
         targetPrice = "",
+        leadTime = "",
+        packaging = "",
       ] = cells;
       return {
         ...emptyLine(index + 1),
@@ -329,6 +346,8 @@ export default function InstantQuote() {
         description: description.slice(0, 180),
         manufacturer: manufacturer.slice(0, 180),
         targetPrice: targetPrice.slice(0, 180),
+        leadTime: leadTime.slice(0, 180),
+        packaging: packaging.slice(0, 180),
       };
     });
 
@@ -355,7 +374,12 @@ export default function InstantQuote() {
       "Customer Part Number",
       "Description",
       "Quantity",
+      "Annual Volume",
       "Target Price",
+      "Lead Time Target",
+      "Buffer %",
+      "Packaging",
+      "Reference Designator",
       "Notes",
     ];
     const rows = structuredQuoteLines.map((line) => [
@@ -367,7 +391,12 @@ export default function InstantQuote() {
       line.customerPartNumber,
       line.description,
       line.quantity,
+      line.annualVolume,
       line.targetPrice,
+      line.leadTime,
+      line.bufferPercent,
+      line.packaging,
+      line.referenceDesignator,
       line.notes,
     ]);
     const csv = [header, ...rows]
@@ -392,6 +421,11 @@ export default function InstantQuote() {
         "Description / Spec",
         "Manufacturer",
         "Target Price",
+        "Lead Time Target",
+        "Packaging",
+        "Reference Designator",
+        "Buffer %",
+        "Annual Volume",
         "Notes",
       ],
       [
@@ -400,7 +434,12 @@ export default function InstantQuote() {
         "Material, size, tolerance, finish, certification",
         "Preferred maker or Open",
         "USD target",
-        "Annual volume, sample need, destination",
+        "4 weeks",
+        "Tape/reel, box, bulk, pallet",
+        "R1 R2 C7 or assembly area",
+        "5",
+        "12000",
+        "Sample need, alternates allowed, compliance needs",
       ],
     ]
       .map((row) => row.map(csvCell).join(","))
@@ -422,8 +461,13 @@ export default function InstantQuote() {
                 `Customer Part: ${line.customerPartNumber || "Not provided"}`,
                 `Description: ${line.description || "Not provided"}`,
                 `Quantity: ${line.quantity || "Not provided"}`,
+                `Annual Volume: ${line.annualVolume || "Not provided"}`,
                 `Manufacturer: ${line.manufacturer || "Open"}`,
                 `Target Price: ${line.targetPrice || "Not provided"}`,
+                `Lead Time Target: ${line.leadTime || "Not provided"}`,
+                `Buffer / Attrition: ${line.bufferPercent || "Not provided"}%`,
+                `Packaging: ${line.packaging || "Not provided"}`,
+                `Reference Designator: ${line.referenceDesignator || "Not provided"}`,
                 `Notes: ${line.notes || "None"}`,
               ].join("\n"),
             )
@@ -603,7 +647,12 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
                 `Customer Part: ${line.customerPart || "Not provided"}`,
                 `Description: ${line.description || "Not provided"}`,
                 `Quantity: ${line.quantity || "Not provided"}`,
+                `Annual Volume: ${line.annualVolume || "Not provided"}`,
                 `Target Price: ${line.targetPrice || "Not provided"}`,
+                `Lead Time Target: ${line.leadTime || "Not provided"}`,
+                `Buffer / Attrition: ${line.bufferPercent || "Not provided"}%`,
+                `Packaging: ${line.packaging || "Not provided"}`,
+                `Reference Designator: ${line.referenceDesignator || "Not provided"}`,
                 `Notes: ${line.notes || "None"}`,
               ].join("\n");
             })
@@ -1123,7 +1172,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                         onChange={(e) => setBulkText(e.target.value)}
                         rows={3}
                         className="w-full resize-none rounded-xl border border-blue-100 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/15"
-                        placeholder="Paste rows: part number, quantity, description, manufacturer, target price"
+                        placeholder="Paste rows: part number, quantity, description, manufacturer, target price, lead time, packaging"
                       />
                       <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <p className="text-xs text-gray-500">
@@ -1147,7 +1196,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                     </div>
 
                     <div className="overflow-x-auto rounded-2xl border border-gray-200">
-                      <table className="min-w-[1120px] w-full border-collapse text-sm">
+                      <table className="min-w-[1580px] w-full border-collapse text-sm">
                         <thead className="bg-[#e9eef7] text-xs uppercase tracking-wide text-[#0F172A]">
                           <tr>
                             <th className="w-12 px-3 py-3 text-left">#</th>
@@ -1158,7 +1207,12 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                             </th>
                             <th className="px-3 py-3 text-left">Description</th>
                             <th className="px-3 py-3 text-left">Qty</th>
+                            <th className="px-3 py-3 text-left">Annual</th>
                             <th className="px-3 py-3 text-left">Target</th>
+                            <th className="px-3 py-3 text-left">Lead</th>
+                            <th className="px-3 py-3 text-left">Buffer %</th>
+                            <th className="px-3 py-3 text-left">Pack</th>
+                            <th className="px-3 py-3 text-left">Ref Des</th>
                             <th className="px-3 py-3 text-left">Notes</th>
                             <th className="w-12 px-3 py-3"></th>
                           </tr>
@@ -1249,6 +1303,20 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                               </td>
                               <td className="px-3 py-3">
                                 <input
+                                  value={line.annualVolume}
+                                  onChange={(e) =>
+                                    updateLine(
+                                      line.id,
+                                      "annualVolume",
+                                      e.target.value.replace(/[^0-9]/g, ""),
+                                    )
+                                  }
+                                  className="h-10 w-24 rounded-md border border-gray-200 px-2 text-sm outline-none focus:border-blue-400"
+                                  placeholder="12000"
+                                />
+                              </td>
+                              <td className="px-3 py-3">
+                                <input
                                   value={line.targetPrice}
                                   onChange={(e) =>
                                     updateLine(
@@ -1259,6 +1327,62 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                                   }
                                   className="h-10 w-28 rounded-md border border-gray-200 px-2 text-sm outline-none focus:border-blue-400"
                                   placeholder="$ / unit"
+                                />
+                              </td>
+                              <td className="px-3 py-3">
+                                <input
+                                  value={line.leadTime}
+                                  onChange={(e) =>
+                                    updateLine(
+                                      line.id,
+                                      "leadTime",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="h-10 w-28 rounded-md border border-gray-200 px-2 text-sm outline-none focus:border-blue-400"
+                                  placeholder="4 weeks"
+                                />
+                              </td>
+                              <td className="px-3 py-3">
+                                <input
+                                  value={line.bufferPercent}
+                                  onChange={(e) =>
+                                    updateLine(
+                                      line.id,
+                                      "bufferPercent",
+                                      e.target.value.replace(/[^0-9.]/g, ""),
+                                    )
+                                  }
+                                  className="h-10 w-24 rounded-md border border-gray-200 px-2 text-sm outline-none focus:border-blue-400"
+                                  placeholder="5"
+                                />
+                              </td>
+                              <td className="px-3 py-3">
+                                <input
+                                  value={line.packaging}
+                                  onChange={(e) =>
+                                    updateLine(
+                                      line.id,
+                                      "packaging",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="h-10 w-28 rounded-md border border-gray-200 px-2 text-sm outline-none focus:border-blue-400"
+                                  placeholder="Bulk"
+                                />
+                              </td>
+                              <td className="px-3 py-3">
+                                <input
+                                  value={line.referenceDesignator}
+                                  onChange={(e) =>
+                                    updateLine(
+                                      line.id,
+                                      "referenceDesignator",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className="h-10 w-32 rounded-md border border-gray-200 px-2 text-sm outline-none focus:border-blue-400"
+                                  placeholder="R1 C4"
                                 />
                               </td>
                               <td className="px-3 py-3">

@@ -54,7 +54,15 @@ function parseQuoteLines(raw) {
       customerPartNumber: sanitize(line.customerPartNumber || "").slice(0, 120),
       description: sanitize(line.description || "").slice(0, 240),
       quantity: sanitize(line.quantity || "").slice(0, 40),
+      annualVolume: sanitize(line.annualVolume || "").slice(0, 40),
       targetPrice: sanitize(line.targetPrice || "").slice(0, 80),
+      leadTime: sanitize(line.leadTime || "").slice(0, 80),
+      bufferPercent: sanitize(line.bufferPercent || "").slice(0, 40),
+      packaging: sanitize(line.packaging || "").slice(0, 80),
+      referenceDesignator: sanitize(line.referenceDesignator || "").slice(
+        0,
+        120,
+      ),
       notes: sanitize(line.notes || "").slice(0, 240),
     }));
   } catch {
@@ -83,7 +91,12 @@ function quoteLinesToCsv(quoteId, quoteLines) {
     "Customer Part Number",
     "Description",
     "Quantity",
+    "Annual Volume",
     "Target Price",
+    "Lead Time Target",
+    "Buffer %",
+    "Packaging",
+    "Reference Designator",
     "Notes",
   ];
   const rows = quoteLines.map((line) => [
@@ -95,10 +108,22 @@ function quoteLinesToCsv(quoteId, quoteLines) {
     line.customerPartNumber,
     line.description,
     line.quantity,
+    line.annualVolume,
     line.targetPrice,
+    line.leadTime,
+    line.bufferPercent,
+    line.packaging,
+    line.referenceDesignator,
     line.notes,
   ]);
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+}
+function cleanupUploadedFiles(uploadedFiles) {
+  for (const file of uploadedFiles) {
+    try {
+      fs.unlinkSync(file.filepath);
+    } catch {}
+  }
 }
 
 export default async function handler(req, res) {
@@ -122,8 +147,17 @@ export default async function handler(req, res) {
   const get = (k) =>
     (Array.isArray(fields[k]) ? fields[k][0] : fields[k]) || "";
 
+  const uploadedFiles = files.files
+    ? Array.isArray(files.files)
+      ? files.files
+      : [files.files]
+    : [];
+
   // Honeypot
-  if (get("_hp_field")) return res.status(200).json({ success: true });
+  if (get("_hp_field")) {
+    cleanupUploadedFiles(uploadedFiles);
+    return res.status(200).json({ success: true });
+  }
 
   const fullName = sanitize(get("fullName"));
   const company = sanitize(get("company"));
@@ -150,17 +184,14 @@ export default async function handler(req, res) {
   else if (message.length > MAX_MESSAGE)
     errors.push(`Message must not exceed ${MAX_MESSAGE} characters.`);
 
-  if (errors.length > 0)
+  if (errors.length > 0) {
+    cleanupUploadedFiles(uploadedFiles);
     return res.status(400).json({ error: errors.join(" ") });
+  }
 
   // Validate uploaded files
-  const uploadedFiles = files.files
-    ? Array.isArray(files.files)
-      ? files.files
-      : [files.files]
-    : [];
-
   if (uploadedFiles.length > MAX_FILES) {
+    cleanupUploadedFiles(uploadedFiles);
     return res
       .status(400)
       .json({ error: `Maximum ${MAX_FILES} files allowed.` });
@@ -171,6 +202,7 @@ export default async function handler(req, res) {
     0,
   );
   if (totalFileSize > MAX_TOTAL_FILE_SIZE) {
+    cleanupUploadedFiles(uploadedFiles);
     return res.status(400).json({ error: "Total upload size is too large." });
   }
 
@@ -178,11 +210,13 @@ export default async function handler(req, res) {
     const originalFilename = file.originalFilename || "";
     const ext = "." + originalFilename.split(".").pop().toLowerCase();
     if (!ALLOWED_EXTENSIONS.has(ext)) {
+      cleanupUploadedFiles(uploadedFiles);
       return res
         .status(400)
         .json({ error: `File type ${ext} is not allowed.` });
     }
     if (!ALLOWED_MIME_TYPES.has(file.mimetype || "")) {
+      cleanupUploadedFiles(uploadedFiles);
       return res
         .status(400)
         .json({ error: "Uploaded file type is not allowed." });
@@ -192,6 +226,7 @@ export default async function handler(req, res) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.error("RESEND_API_KEY not set");
+    cleanupUploadedFiles(uploadedFiles);
     return res.status(500).json({ error: "Email service not configured." });
   }
 
@@ -256,12 +291,7 @@ Source: ${source}`,
     ...(attachments.length > 0 ? { attachments } : {}),
   });
 
-  // Clean up temp files
-  for (const file of uploadedFiles) {
-    try {
-      fs.unlinkSync(file.filepath);
-    } catch {}
-  }
+  cleanupUploadedFiles(uploadedFiles);
 
   if (sendError) {
     console.error("Resend error:", sendError);
