@@ -6,6 +6,8 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
+  ClipboardList,
+  Download,
   FileSpreadsheet,
   FileText,
   Loader2,
@@ -69,6 +71,12 @@ const MAX_FILES = 2;
 const MAX_TOTAL_SIZE = 14 * 1024 * 1024;
 const MIN_MESSAGE = 30;
 
+function generateQuoteId() {
+  const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+  const random = Math.random().toString(36).slice(2, 7).toUpperCase();
+  return `ASVQ-${stamp}-${random}`;
+}
+
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -121,13 +129,20 @@ function emptyLine(id: number): QuoteLine {
   };
 }
 
+function csvCell(value: string | number) {
+  return `"${String(value).replace(/"/g, '""')}"`;
+}
+
 const inputClass =
   "h-11 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-[#0F172A] outline-none transition-all focus:border-blue-400 focus:ring-2 focus:ring-blue-500/15";
 
 export default function InstantQuote() {
+  const [quoteId, setQuoteId] = useState(() => generateQuoteId());
   const [mode, setMode] = useState<Mode>("upload");
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
+  const [bulkText, setBulkText] = useState("");
+  const [bulkMessage, setBulkMessage] = useState("");
   const [serverError, setServerError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -219,6 +234,92 @@ export default function InstantQuote() {
     );
   };
 
+  const parseBulkLines = () => {
+    const rows = bulkText
+      .split(/\r?\n/)
+      .map((row) => row.trim())
+      .filter(Boolean)
+      .slice(0, 12);
+
+    if (rows.length === 0) {
+      setBulkMessage("Paste at least one line to add parts.");
+      return;
+    }
+
+    const parsed = rows.map((row, index) => {
+      const cells = row
+        .split(/\t|,|;/)
+        .map((cell) => cell.trim())
+        .filter(Boolean);
+      const [
+        customerPart = "",
+        quantity = "",
+        description = "",
+        manufacturer = "",
+        targetPrice = "",
+      ] = cells;
+      return {
+        ...emptyLine(index + 1),
+        customerPart: customerPart.slice(0, 180),
+        quantity: quantity.replace(/[^0-9]/g, "").slice(0, 12),
+        description: description.slice(0, 180),
+        manufacturer: manufacturer.slice(0, 180),
+        targetPrice: targetPrice.slice(0, 180),
+      };
+    });
+
+    setMode("build");
+    setLines(parsed.length > 0 ? parsed : [emptyLine(1)]);
+    setBulkText("");
+    setBulkMessage(
+      `${parsed.length} part line${parsed.length === 1 ? "" : "s"} added.`,
+    );
+  };
+
+  const exportAsvCsv = () => {
+    if (usableLines.length === 0) {
+      setBulkMessage("Add at least one part line before exporting.");
+      return;
+    }
+
+    const header = [
+      "Quote ID",
+      "Line",
+      "ASV Part Number",
+      "Category",
+      "Manufacturer",
+      "Customer Part Number",
+      "Description",
+      "Quantity",
+      "Target Price",
+      "Notes",
+    ];
+    const rows = usableLines.map((line, index) => [
+      quoteId,
+      index + 1,
+      generatedAsivantaNumber(line, index),
+      line.category,
+      line.manufacturer || "Open",
+      line.customerPart,
+      line.description,
+      line.quantity,
+      line.targetPrice,
+      line.notes,
+    ]);
+    const csv = [header, ...rows]
+      .map((row) => row.map(csvCell).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${quoteId}-asv-lines.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const selectFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFileError("");
     const selected = Array.from(e.target.files || []);
@@ -306,6 +407,7 @@ export default function InstantQuote() {
         : "Quote list uploaded as attachment.";
 
     return `INSTANT QUOTE REQUEST
+Quote ID: ${quoteId}
 Mode: ${mode === "upload" ? "Upload List" : "Build List"}
 Quote Type: ${form.quoteType}
 Destination: ${form.destination || "Not provided"}
@@ -343,6 +445,8 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
       formData.append("email", form.email.trim());
       formData.append("phone", form.phone.trim());
       formData.append("projectType", "Quote / RFQ Comparison");
+      formData.append("quoteId", quoteId);
+      formData.append("source", "Instant Quote");
       formData.append("message", buildMessage());
       files.forEach((file) => formData.append("files", file));
 
@@ -402,7 +506,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
               <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
                 <div className="mb-4 flex items-center justify-between">
                   <span className="text-sm font-medium text-blue-100">
-                    Quote readiness
+                    Quote {quoteId}
                   </span>
                   <span className="text-2xl font-semibold">
                     {quoteCompleteness}%
@@ -446,8 +550,11 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   className="h-11 rounded-full px-6"
                   onClick={() => {
                     setSubmitted(false);
+                    setQuoteId(generateQuoteId());
                     setFiles([]);
                     setLines([emptyLine(1)]);
+                    setBulkText("");
+                    setBulkMessage("");
                     setForm({
                       fullName: "",
                       company: "",
@@ -699,16 +806,61 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                       <label className="block text-sm font-medium">
                         Part Lines
                       </label>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="h-9 rounded-full px-4"
-                        onClick={addLine}
-                        disabled={lines.length >= 12}
-                      >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Part
-                      </Button>
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-9 rounded-full px-4"
+                          onClick={exportAsvCsv}
+                          disabled={usableLines.length === 0}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Export ASV CSV
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-9 rounded-full px-4"
+                          onClick={addLine}
+                          disabled={lines.length >= 12}
+                        >
+                          <Plus className="mr-2 h-4 w-4" />
+                          Add Part
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="mb-4 rounded-2xl border border-blue-100 bg-blue-50/60 p-4">
+                      <div className="mb-3 flex items-center gap-2">
+                        <ClipboardList className="h-4 w-4 text-blue-600" />
+                        <p className="text-sm font-medium">Bulk Add</p>
+                      </div>
+                      <textarea
+                        value={bulkText}
+                        onChange={(e) => setBulkText(e.target.value)}
+                        rows={3}
+                        className="w-full resize-none rounded-xl border border-blue-100 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/15"
+                        placeholder="Paste rows: part number, quantity, description, manufacturer, target price"
+                      />
+                      <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="text-xs text-gray-500">
+                          Supports comma, tab, or semicolon separated rows. Max
+                          12 lines.
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="h-9 rounded-full px-4"
+                          onClick={parseBulkLines}
+                        >
+                          Parse Into List
+                        </Button>
+                      </div>
+                      {bulkMessage && (
+                        <p className="mt-2 text-xs text-blue-700">
+                          {bulkMessage}
+                        </p>
+                      )}
                     </div>
 
                     <div className="overflow-x-auto rounded-2xl border border-gray-200">
@@ -980,6 +1132,14 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                     <h3 className="font-medium tracking-tight">
                       ASV Part Number Preview
                     </h3>
+                  </div>
+                  <div className="mb-4 rounded-xl border border-gray-100 bg-[#f8fafc] p-4">
+                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                      Quote ID
+                    </p>
+                    <p className="mt-1 font-mono text-sm font-semibold">
+                      {quoteId}
+                    </p>
                   </div>
                   {previewLines.length > 0 ? (
                     <div className="space-y-3">

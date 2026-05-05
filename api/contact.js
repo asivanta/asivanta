@@ -66,6 +66,8 @@ export default async function handler(req, res) {
   const email = sanitize(get("email"));
   const phone = sanitize(get("phone"));
   const projectType = get("projectType");
+  const quoteId = sanitize(get("quoteId"));
+  const source = sanitize(get("source")) || "ASIVANTA Website Contact Form";
   const message = sanitize(get("message"));
 
   const errors = [];
@@ -144,11 +146,15 @@ export default async function handler(req, res) {
   }));
 
   const resend = new Resend(apiKey);
+  const subjectPrefix =
+    projectType === "Quote / RFQ Comparison"
+      ? "New Asivanta Instant Quote"
+      : "New Asivanta Inquiry";
 
   const { error: sendError } = await resend.emails.send({
     from: fromEmail,
     to: [toEmail],
-    subject: `New Asivanta Inquiry — ${projectType} — ${company}`,
+    subject: `${subjectPrefix}${quoteId ? ` ${quoteId}` : ""} — ${company}`,
     text: `NEW ASIVANTA INQUIRY
 ----------------------------------------
 Company:      ${company}
@@ -156,6 +162,7 @@ Name:         ${fullName}
 Email:        ${email}
 Phone:        ${phone || "Not provided"}
 Project Type: ${projectType}
+Quote ID:     ${quoteId || "Not provided"}
 
 MESSAGE:
 ${message}
@@ -164,7 +171,7 @@ FILES:
 ${fileList}
 
 Submitted: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" })} KST
-Source: ASIVANTA Website Contact Form`,
+Source: ${source}`,
     ...(attachments.length > 0 ? { attachments } : {}),
   });
 
