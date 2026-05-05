@@ -29,12 +29,63 @@ const VALID_PROJECT_TYPES = [
 ];
 const MIN_MESSAGE = 30;
 const MAX_MESSAGE = 8000;
+const MAX_QUOTE_LINES = 12;
 
 function isValidEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e.length <= 254;
 }
 function sanitize(s) {
   return String(s).replace(/[<>]/g, "").trim();
+}
+function csvCell(value) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+function parseQuoteLines(raw) {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.slice(0, MAX_QUOTE_LINES).map((line, index) => ({
+      line: Number(line.line) || index + 1,
+      asvPartNumber: sanitize(line.asvPartNumber || "").slice(0, 80),
+      category: sanitize(line.category || "").slice(0, 80),
+      manufacturer: sanitize(line.manufacturer || "").slice(0, 120),
+      customerPartNumber: sanitize(line.customerPartNumber || "").slice(0, 120),
+      description: sanitize(line.description || "").slice(0, 240),
+      quantity: sanitize(line.quantity || "").slice(0, 40),
+      targetPrice: sanitize(line.targetPrice || "").slice(0, 80),
+      notes: sanitize(line.notes || "").slice(0, 240),
+    }));
+  } catch {
+    return [];
+  }
+}
+function quoteLinesToCsv(quoteId, quoteLines) {
+  const header = [
+    "Quote ID",
+    "Line",
+    "ASV Part Number",
+    "Category",
+    "Manufacturer",
+    "Customer Part Number",
+    "Description",
+    "Quantity",
+    "Target Price",
+    "Notes",
+  ];
+  const rows = quoteLines.map((line) => [
+    quoteId || "Not provided",
+    line.line,
+    line.asvPartNumber,
+    line.category,
+    line.manufacturer,
+    line.customerPartNumber,
+    line.description,
+    line.quantity,
+    line.targetPrice,
+    line.notes,
+  ]);
+  return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
 }
 
 export default async function handler(req, res) {
@@ -68,6 +119,8 @@ export default async function handler(req, res) {
   const projectType = get("projectType");
   const quoteId = sanitize(get("quoteId"));
   const source = sanitize(get("source")) || "ASIVANTA Website Contact Form";
+  const quoteMode = sanitize(get("quoteMode"));
+  const quoteLines = parseQuoteLines(get("quoteLinesJson"));
   const message = sanitize(get("message"));
 
   const errors = [];
@@ -144,6 +197,12 @@ export default async function handler(req, res) {
     filename: f.originalFilename,
     content: fs.readFileSync(f.filepath),
   }));
+  if (quoteLines.length > 0) {
+    attachments.push({
+      filename: `${quoteId || "asivanta"}-asv-lines.csv`,
+      content: Buffer.from(quoteLinesToCsv(quoteId, quoteLines)),
+    });
+  }
 
   const resend = new Resend(apiKey);
   const subjectPrefix =
@@ -163,6 +222,8 @@ Email:        ${email}
 Phone:        ${phone || "Not provided"}
 Project Type: ${projectType}
 Quote ID:     ${quoteId || "Not provided"}
+Quote Mode:   ${quoteMode || "Not provided"}
+Quote Lines:  ${quoteLines.length}
 
 MESSAGE:
 ${message}
@@ -188,6 +249,35 @@ Source: ${source}`,
       error:
         "Something went wrong while sending your inquiry. Please try again shortly.",
     });
+  }
+
+  const canSendCustomerAck =
+    projectType === "Quote / RFQ Comparison" &&
+    (process.env.QUOTE_SEND_CUSTOMER_ACK === "true" ||
+      !fromEmail.includes("onboarding@resend.dev"));
+
+  if (canSendCustomerAck) {
+    const { error: ackError } = await resend.emails.send({
+      from: fromEmail,
+      to: [email],
+      subject: `ASIVANTA received your quote request${quoteId ? ` ${quoteId}` : ""}`,
+      text: `Hello ${fullName},
+
+Thank you for sending your ASIVANTA quote request.
+
+Quote ID: ${quoteId || "Not provided"}
+Company: ${company}
+Quote Mode: ${quoteMode || "Not provided"}
+Submitted: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" })} KST
+
+We received your information and will review the list, uploaded files, and any ASV part numbers generated from the request. If anything is unclear, we will contact you before preparing the quote packet.
+
+ASIVANTA Advisory
+contact@asivanta.com`,
+    });
+    if (ackError) {
+      console.error("Resend acknowledgement error:", ackError);
+    }
   }
 
   return res.status(200).json({ success: true });

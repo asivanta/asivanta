@@ -200,6 +200,22 @@ export default function InstantQuote() {
     [mode, usableLines],
   );
 
+  const structuredQuoteLines = useMemo(
+    () =>
+      usableLines.map((line, index) => ({
+        line: index + 1,
+        asvPartNumber: generatedAsivantaNumber(line, index),
+        category: line.category,
+        manufacturer: line.manufacturer || "Open",
+        customerPartNumber: line.customerPart,
+        description: line.description,
+        quantity: line.quantity,
+        targetPrice: line.targetPrice,
+        notes: line.notes,
+      })),
+    [usableLines],
+  );
+
   const updateForm = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -294,13 +310,13 @@ export default function InstantQuote() {
       "Target Price",
       "Notes",
     ];
-    const rows = usableLines.map((line, index) => [
+    const rows = structuredQuoteLines.map((line) => [
       quoteId,
-      index + 1,
-      generatedAsivantaNumber(line, index),
+      line.line,
+      line.asvPartNumber,
       line.category,
-      line.manufacturer || "Open",
-      line.customerPart,
+      line.manufacturer,
+      line.customerPartNumber,
       line.description,
       line.quantity,
       line.targetPrice,
@@ -447,6 +463,11 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
       formData.append("projectType", "Quote / RFQ Comparison");
       formData.append("quoteId", quoteId);
       formData.append("source", "Instant Quote");
+      formData.append(
+        "quoteMode",
+        mode === "upload" ? "Upload List" : "Build List",
+      );
+      formData.append("quoteLinesJson", JSON.stringify(structuredQuoteLines));
       formData.append("message", buildMessage());
       files.forEach((file) => formData.append("files", file));
 
