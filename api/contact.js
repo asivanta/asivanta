@@ -30,6 +30,7 @@ const VALID_PROJECT_TYPES = [
 const MIN_MESSAGE = 30;
 const MAX_MESSAGE = 8000;
 const MAX_QUOTE_LINES = 12;
+const MAX_QUOTE_RECORD_BYTES = 32 * 1024;
 
 function isValidEmail(e) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e.length <= 254;
@@ -58,6 +59,18 @@ function parseQuoteLines(raw) {
     }));
   } catch {
     return [];
+  }
+}
+function parseQuoteRecord(raw) {
+  if (!raw || Buffer.byteLength(raw, "utf8") > MAX_QUOTE_RECORD_BYTES)
+    return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      return null;
+    return parsed;
+  } catch {
+    return null;
   }
 }
 function quoteLinesToCsv(quoteId, quoteLines) {
@@ -121,6 +134,7 @@ export default async function handler(req, res) {
   const source = sanitize(get("source")) || "ASIVANTA Website Contact Form";
   const quoteMode = sanitize(get("quoteMode"));
   const quoteLines = parseQuoteLines(get("quoteLinesJson"));
+  const quoteRecord = parseQuoteRecord(get("quoteRecordJson"));
   const message = sanitize(get("message"));
 
   const errors = [];
@@ -201,6 +215,12 @@ export default async function handler(req, res) {
     attachments.push({
       filename: `${quoteId || "asivanta"}-asv-lines.csv`,
       content: Buffer.from(quoteLinesToCsv(quoteId, quoteLines)),
+    });
+  }
+  if (quoteRecord) {
+    attachments.push({
+      filename: `${quoteId || "asivanta"}-admin-record.json`,
+      content: Buffer.from(JSON.stringify(quoteRecord, null, 2)),
     });
   }
 
