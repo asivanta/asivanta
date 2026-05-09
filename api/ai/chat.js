@@ -11,7 +11,7 @@ const siteLinks = {
   methodology: { label: "How It Works", href: "/#how-it-works" },
   industries: { label: "Industries", href: "/#industries" },
   contact: { label: "Sourcing Review", href: "/contact" },
-  quote: { label: "Instant Quote", href: "/instant-quote" },
+  quote: { label: "Quote Now", href: "/instant-quote" },
   insights: { label: "Insights", href: "/insights" },
   about: { label: "About ASIVANTA", href: "/about" },
   portal: { label: "Client Portal", href: "/portal" },
@@ -24,7 +24,7 @@ const siteMap = [
   "Home /: ASIVANTA overview, Seoul-based Korea sourcing, services, methodology, industries.",
   "Services /#services: supplier sourcing, verification, negotiation, factory readiness, quote comparison, market communication.",
   "Contact /contact: sourcing review intake for advisory help.",
-  "Instant Quote /instant-quote: upload BOM/RFQ/spec files or build a part list for quote review.",
+  "Quote Now /instant-quote: guided Sunny-style component builder, BOM/RFQ/spec upload, or manual part list for quote review.",
   "Insights /insights: articles on Korean supplier verification, commercial terms, and risk reduction.",
   "About /about: ASIVANTA background, buyer-side model, Seoul presence, no hidden supplier commissions.",
   "Portal /portal and /login: client sourcing dashboard and access.",
@@ -70,7 +70,7 @@ function keywordFallback(message, pathName = "") {
   if (/quote|rfq|bom|price|pricing|part|spec|upload|drawing/.test(text)) {
     return {
       answer:
-        "For a quote or RFQ, use Instant Quote. You can upload a BOM, RFQ, supplier quote, drawing, or spec sheet, or build a part list directly on the page.",
+        "For a quote or RFQ, use Quote Now. Start with the guided component builder, upload a BOM/RFQ/spec sheet, or build a part list directly on the page.",
       links: [siteLinks.quote],
     };
   }
@@ -129,7 +129,7 @@ function keywordFallback(message, pathName = "") {
 
   return {
     answer:
-      "I can help you find the right ASIVANTA path for Korea sourcing, supplier verification, quote comparison, factory readiness, or client portal access. For an RFQ, use Instant Quote; for advisory help, start a sourcing review.",
+      "I can help you find the right ASIVANTA path for Korea sourcing, supplier verification, quote comparison, factory readiness, or client portal access. For an RFQ, use Quote Now; for advisory help, start a sourcing review.",
     links: [siteLinks.quote, siteLinks.contact, siteLinks.services],
   };
 }
@@ -197,7 +197,8 @@ async function callBridge(payload) {
 function linksForAnswer(answer, fallbackLinks) {
   const lower = answer.toLowerCase();
   const links = [];
-  if (/instant quote|rfq|quote|bom/.test(lower)) links.push(siteLinks.quote);
+  if (/quote now|instant quote|rfq|quote|bom/.test(lower))
+    links.push(siteLinks.quote);
   if (/contact|sourcing review|advisory|supplier|verification/.test(lower))
     links.push(siteLinks.contact);
   if (/service|capabilit/.test(lower)) links.push(siteLinks.services);

@@ -18,7 +18,7 @@ Last updated: 2026-05-09
 
 - [x] `/` home, services, methodology, industries
 - [x] `/contact` sourcing review
-- [x] `/instant-quote` RFQ, BOM, spec upload, part-list builder
+- [x] `/instant-quote` Quote Now RFQ, BOM, spec upload, guided component builder, part-list builder
 - [x] `/insights` articles
 - [x] `/about` firm background and buyer-side model
 - [x] `/portal` client portal preview
@@ -38,4 +38,4 @@ Last updated: 2026-05-09
 
 - [ ] Add chat lead capture when visitor asks for human help
 - [ ] Log anonymized chat questions into the future admin dashboard
-- [ ] Add escalation from chat to Instant Quote or contact form with prefilled context
+- [ ] Add escalation from chat to Quote Now or contact form with prefilled context

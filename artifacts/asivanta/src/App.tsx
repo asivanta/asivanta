@@ -25,6 +25,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/insights" component={Insights} />
       <Route path="/contact" component={Contact} />
+      <Route path="/quote-now" component={InstantQuote} />
       <Route path="/instant-quote" component={InstantQuote} />
       <Route path="/about" component={About} />
       <Route path="/admin" component={Admin} />

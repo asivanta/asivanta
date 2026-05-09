@@ -8,25 +8,40 @@ import {
   CheckCircle2,
   ClipboardList,
   Copy,
+  Cpu,
   Download,
   FileSpreadsheet,
   FileText,
+  Gauge,
+  HelpCircle,
   Loader2,
   PackageCheck,
   Plus,
+  RadioReceiver,
   RotateCcw,
   Save,
   Send,
   ShieldCheck,
+  Sparkles,
+  Timer,
   Trash2,
   Upload,
+  Waves,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 
-type Mode = "upload" | "build";
+type Mode = "guided" | "upload" | "build";
+type ProductFamily =
+  | "ats"
+  | "smdCrystal"
+  | "smdOscillator"
+  | "vcxo"
+  | "tcxo"
+  | "tuningFork"
+  | "other";
 
 type QuoteLine = {
   id: number;
@@ -41,6 +56,12 @@ type QuoteLine = {
   bufferPercent: string;
   packaging: string;
   referenceDesignator: string;
+  sourceCatalog: string;
+  family: string;
+  packageType: string;
+  frequency: string;
+  supplierPartNumber: string;
+  spec: string;
   notes: string;
 };
 
@@ -67,10 +88,200 @@ const categories = [
 ];
 
 const quoteTypes = [
+  "Guided component quote",
   "Upload BOM / RFQ list",
   "Build part list",
   "Supplier quote comparison",
   "Spec sheet review",
+];
+
+const guidedFamilies = [
+  {
+    id: "ats" as ProductFamily,
+    name: "ATS-type",
+    summary:
+      "Lead crystal and ATS SMD paths for legacy or industrial programs.",
+    icon: Cpu,
+  },
+  {
+    id: "smdCrystal" as ProductFamily,
+    name: "SMD crystal",
+    summary:
+      "MHz crystal units such as SX-21, SX-32, SX-8, and automotive variants.",
+    icon: Gauge,
+  },
+  {
+    id: "smdOscillator" as ProductFamily,
+    name: "SMD oscillator",
+    summary:
+      "XO / SPXO timing modules with voltage, stability, and output options.",
+    icon: Timer,
+  },
+  {
+    id: "vcxo" as ProductFamily,
+    name: "VCXO",
+    summary:
+      "Voltage controlled oscillator RFQs with pulling/deviation review.",
+    icon: Waves,
+  },
+  {
+    id: "tcxo" as ProductFamily,
+    name: "TCXO",
+    summary:
+      "Temperature compensated oscillator requests for tighter stability.",
+    icon: ShieldCheck,
+  },
+  {
+    id: "tuningFork" as ProductFamily,
+    name: "T/F tuning fork",
+    summary: "32.768 kHz clock crystal packages such as CS-2012 and CS-3215.",
+    icon: RadioReceiver,
+  },
+  {
+    id: "other" as ProductFamily,
+    name: "Not sure",
+    summary:
+      "Start with partial information and ASIVANTA will route the review.",
+    icon: HelpCircle,
+  },
+];
+
+const packageOptions: Record<
+  ProductFamily,
+  { label: string; code: string; hint: string }[]
+> = {
+  ats: [
+    { label: "ATS-25/U", code: "C", hint: "Lead crystal" },
+    { label: "ATS-49/U", code: "D", hint: "Common through-hole" },
+    { label: "SX-1", code: "J", hint: "ATS SMD" },
+    { label: "SX-3", code: "K", hint: "Low-profile ATS SMD" },
+  ],
+  smdCrystal: [
+    { label: "SX-7", code: "M", hint: "7.0 x 5.0 mm" },
+    { label: "SX-8", code: "O", hint: "5.0 x 3.2 mm" },
+    { label: "SX-32", code: "P", hint: "3.2 x 2.5 mm" },
+    { label: "SX-22", code: "Q", hint: "2.5 x 2.0 mm" },
+    { label: "SX-21", code: "R", hint: "2.0 x 1.6 mm" },
+    { label: "SX-16", code: "S", hint: "1.6 x 1.2 mm" },
+    { label: "SX-A21", code: "T", hint: "Automotive 2.0 x 1.6" },
+    { label: "SX-A22", code: "U", hint: "Automotive 2.5 x 2.0" },
+    { label: "SX-A32", code: "V", hint: "Automotive 3.2 x 2.5" },
+    { label: "SX-A8", code: "W", hint: "Automotive 5.0 x 3.2" },
+  ],
+  smdOscillator: [
+    { label: "SCO-10", code: "SCO-10", hint: "XO / SPXO" },
+    { label: "SCO-32", code: "SCO-32", hint: "XO / SPXO" },
+    { label: "SCO-53", code: "SCO-53", hint: "XO / SPXO" },
+    { label: "SCO-22", code: "SCO-22", hint: "Compact XO" },
+    { label: "SCO-06", code: "SCO-06", hint: "Compact XO" },
+  ],
+  vcxo: [{ label: "SVH", code: "SVH", hint: "VCXO review path" }],
+  tcxo: [
+    { label: "STA", code: "STA", hint: "TCXO / VCTCXO" },
+    { label: "STV", code: "STV", hint: "VCTCXO review path" },
+  ],
+  tuningFork: [
+    { label: "CS-306", code: "TC", hint: "32.768 kHz" },
+    { label: "CS-519", code: "TJ", hint: "32.768 kHz" },
+    { label: "CS-146", code: "TK", hint: "32.768 kHz" },
+    { label: "CS-3215", code: "TL", hint: "32.768 kHz" },
+    { label: "CS-2012", code: "TM", hint: "32.768 kHz" },
+    { label: "CS-1610", code: "TN", hint: "32.768 kHz" },
+    { label: "CS-406", code: "TD", hint: "32.768 kHz" },
+    { label: "CS-405", code: "TF", hint: "32.768 kHz" },
+  ],
+  other: [{ label: "Review needed", code: "OPEN", hint: "ASIVANTA routes it" }],
+};
+
+const loadCapacitanceOptions = [
+  "06",
+  "07",
+  "08",
+  "09",
+  "10",
+  "12",
+  "16",
+  "18",
+  "20",
+  "30",
+];
+const toleranceOptions = ["10", "15", "20", "30", "50"];
+const tempOptions = [
+  { code: "D", label: "-10~70C" },
+  { code: "E", label: "-20~70C" },
+  { code: "G", label: "-20~85C" },
+  { code: "J", label: "-40~85C" },
+  { code: "L", label: "-40~105C" },
+  { code: "M", label: "-40~125C" },
+];
+const stabilityOptions = [
+  { code: "3", label: "+/-10ppm" },
+  { code: "4", label: "+/-15ppm" },
+  { code: "5", label: "+/-20ppm" },
+  { code: "6", label: "+/-30ppm" },
+  { code: "7", label: "+/-50ppm" },
+  { code: "8", label: "+/-100ppm" },
+];
+const voltageOptions = [
+  { code: "18", label: "1.8 V" },
+  { code: "25", label: "2.5 V" },
+  { code: "33", label: "3.3 V" },
+  { code: "50", label: "5.0 V" },
+];
+
+const oscillatorStabilityOptions = [
+  { code: "25", label: "+/-25ppm" },
+  { code: "50", label: "+/-50ppm" },
+  { code: "100", label: "+/-100ppm" },
+];
+
+const oscillatorTempOptions = [
+  { code: "A", label: "-10~70C" },
+  { code: "B", label: "-40~85C" },
+  { code: "C", label: "-40~105C" },
+];
+
+const outputOptions = [
+  { code: "M", label: "CMOS" },
+  { code: "C", label: "Clipped sine" },
+  { code: "L", label: "LVDS / review" },
+];
+
+const pullingOptions = [
+  { code: "5", label: "+/-5ppm" },
+  { code: "8", label: "+/-8ppm" },
+  { code: "10", label: "+/-10ppm" },
+];
+
+const tuningForkCapacitanceOptions = [
+  { code: "125", label: "12.5 pF" },
+  { code: "90", label: "9.0 pF" },
+  { code: "70", label: "7.0 pF" },
+];
+
+const tuningForkTempOptions = [
+  { code: "A", label: "-10~60C" },
+  { code: "B", label: "-40~85C" },
+];
+
+const crystalCatalogSpecs = {
+  frequencyRange: "8.000 to 54.000 MHz",
+  temperatureRange: "-40 to +105C / -40 to +125C",
+  tolerance: "+/-15, +/-30, +/-50ppm standard",
+  stability: "+/-30 to +/-100ppm, or +/-50 to +/-100ppm at wider temp",
+  loadCapacitance: "18 pF standard; custom CL >= 10 pF or series resonant",
+  driveLevel: "10 uW typical, 100 uW max",
+  aging: "+/-5 ppm/year max",
+};
+
+const crystalEsrBands = [
+  { min: 8, max: 9.999, esr: "100 ohm max" },
+  { min: 10, max: 11.999, esr: "70 ohm max" },
+  { min: 12, max: 14.999, esr: "70 ohm max" },
+  { min: 15, max: 19.999, esr: "60 ohm max" },
+  { min: 20, max: 34.999, esr: "50 ohm max" },
+  { min: 35, max: 43.999, esr: "40 ohm max" },
+  { min: 44, max: 54, esr: "40 ohm max" },
 ];
 
 const ALLOWED_EXTENSIONS = [".pdf", ".xlsx", ".png", ".jpg", ".jpeg"];
@@ -94,6 +305,80 @@ function formatFileSize(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function formatMHz(value: string, digits = 4) {
+  const parsed = Number(value.replace(/[^\d.]/g, ""));
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return digits === 3 ? "0.000" : "0.0000";
+  }
+  return parsed.toFixed(digits);
+}
+
+function formatKHz(value: string) {
+  const parsed = Number(value.replace(/[^\d.]/g, ""));
+  if (!Number.isFinite(parsed) || parsed <= 0) return "32.768";
+  return parsed.toFixed(3);
+}
+
+function modeLabel(mode: Mode) {
+  if (mode === "guided") return "Quote Now Builder";
+  if (mode === "upload") return "Upload List";
+  return "Build List";
+}
+
+function optionLabel(
+  items: { code: string; label: string }[],
+  code: string,
+  fallback = code,
+) {
+  return items.find((option) => option.code === code)?.label || fallback;
+}
+
+function voltageLabel(code: string) {
+  return optionLabel(voltageOptions, code, `${code} V`);
+}
+
+function cleanQuantity(value: string) {
+  return value.replace(/[^0-9]/g, "").slice(0, 12);
+}
+
+function numberFromSpec(value: string) {
+  const parsed = Number(value.replace(/[^\d.]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function crystalEsrLabel(frequency: string) {
+  const mhz = numberFromSpec(frequency);
+  const band = crystalEsrBands.find(
+    (range) => mhz >= range.min && mhz <= range.max,
+  );
+  return band ? band.esr : "ESR needs catalog review";
+}
+
+function catalogRangeNote(family: ProductFamily, frequency: string) {
+  if (family === "ats" || family === "smdCrystal") {
+    const mhz = numberFromSpec(frequency);
+    if (mhz > 0 && (mhz < 8 || mhz > 54)) {
+      return "Frequency outside 8.000-54.000 MHz crystal catalog range; ASIVANTA will review.";
+    }
+    return `Catalog guide: ${crystalCatalogSpecs.frequencyRange}, ${crystalEsrLabel(frequency)}, fundamental mode.`;
+  }
+  if (family === "tuningFork") {
+    return "Catalog guide: 32.768 kHz tuning fork package path.";
+  }
+  if (family === "other") {
+    return "Catalog guide: ASIVANTA will identify the closest supplier/spec path.";
+  }
+  return "Catalog guide: oscillator path requires voltage, output, stability, and package review.";
+}
+
+function ppmLabel(code: string) {
+  return stabilityOptions.find((option) => option.code === code)?.label || code;
+}
+
+function tempLabel(code: string) {
+  return tempOptions.find((option) => option.code === code)?.label || code;
 }
 
 function cleanToken(value: string, fallback: string) {
@@ -139,8 +424,24 @@ function emptyLine(id: number): QuoteLine {
     bufferPercent: "",
     packaging: "",
     referenceDesignator: "",
+    sourceCatalog: "",
+    family: "",
+    packageType: "",
+    frequency: "",
+    supplierPartNumber: "",
+    spec: "",
     notes: "",
   };
+}
+
+function quoteLineHasData(line: QuoteLine) {
+  return Boolean(
+    line.customerPart.trim() ||
+    line.description.trim() ||
+    line.quantity.trim() ||
+    line.manufacturer.trim() ||
+    line.supplierPartNumber.trim(),
+  );
 }
 
 function csvCell(value: string | number) {
@@ -164,11 +465,12 @@ const inputClass =
 
 export default function InstantQuote() {
   const [quoteId, setQuoteId] = useState(() => generateQuoteId());
-  const [mode, setMode] = useState<Mode>("upload");
+  const [mode, setMode] = useState<Mode>("guided");
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState("");
   const [bulkText, setBulkText] = useState("");
   const [bulkMessage, setBulkMessage] = useState("");
+  const [guidedMessage, setGuidedMessage] = useState("");
   const [copyMessage, setCopyMessage] = useState("");
   const [draftMessage, setDraftMessage] = useState("");
   const [serverError, setServerError] = useState("");
@@ -176,6 +478,23 @@ export default function InstantQuote() {
   const [submitting, setSubmitting] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [lines, setLines] = useState<QuoteLine[]>([emptyLine(1)]);
+  const [guidedFamily, setGuidedFamily] = useState<ProductFamily>("ats");
+  const [guidedPackage, setGuidedPackage] = useState("D");
+  const [guidedFrequency, setGuidedFrequency] = useState("25");
+  const [guidedQuantity, setGuidedQuantity] = useState("1000");
+  const [guidedAnnualVolume, setGuidedAnnualVolume] = useState("");
+  const [guidedCapacitance, setGuidedCapacitance] = useState("12");
+  const [guidedTolerance, setGuidedTolerance] = useState("30");
+  const [guidedTemperature, setGuidedTemperature] = useState("J");
+  const [guidedStability, setGuidedStability] = useState("6");
+  const [guidedModeCode, setGuidedModeCode] = useState("1");
+  const [guidedVoltage, setGuidedVoltage] = useState("33");
+  const [guidedOscStability, setGuidedOscStability] = useState("50");
+  const [guidedOscTemp, setGuidedOscTemp] = useState("B");
+  const [guidedOutput, setGuidedOutput] = useState("M");
+  const [guidedPulling, setGuidedPulling] = useState("5");
+  const [guidedReference, setGuidedReference] = useState("");
+  const [guidedNote, setGuidedNote] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
@@ -183,7 +502,7 @@ export default function InstantQuote() {
     company: "",
     email: "",
     phone: "",
-    quoteType: "Upload BOM / RFQ list",
+    quoteType: "Guided component quote",
     destination: "",
     timeline: "",
     message: "",
@@ -195,14 +514,7 @@ export default function InstantQuote() {
   );
 
   const usableLines = useMemo(
-    () =>
-      lines.filter(
-        (line) =>
-          line.customerPart.trim() ||
-          line.description.trim() ||
-          line.quantity.trim() ||
-          line.manufacturer.trim(),
-      ),
+    () => lines.filter((line) => quoteLineHasData(line)),
     [lines],
   );
 
@@ -224,7 +536,7 @@ export default function InstantQuote() {
   }, [files.length, form, mode, usableLines.length]);
 
   const previewLines = useMemo(
-    () => (mode === "build" ? usableLines : []),
+    () => (mode === "upload" ? [] : usableLines),
     [mode, usableLines],
   );
 
@@ -244,6 +556,12 @@ export default function InstantQuote() {
         bufferPercent: line.bufferPercent,
         packaging: line.packaging,
         referenceDesignator: line.referenceDesignator,
+        sourceCatalog: line.sourceCatalog,
+        family: line.family,
+        packageType: line.packageType,
+        frequency: line.frequency,
+        supplierPartNumber: line.supplierPartNumber,
+        spec: line.spec,
         notes: line.notes,
       })),
     [usableLines],
@@ -252,8 +570,8 @@ export default function InstantQuote() {
   const quoteRecord = useMemo(
     () => ({
       quoteId,
-      source: "Instant Quote",
-      mode: mode === "upload" ? "Upload List" : "Build List",
+      source: "Quote Now",
+      mode: modeLabel(mode),
       quoteType: form.quoteType,
       readiness: quoteCompleteness,
       customer: {
@@ -278,6 +596,196 @@ export default function InstantQuote() {
     }),
     [files, form, mode, quoteCompleteness, quoteId, structuredQuoteLines],
   );
+
+  const selectedGuidedFamily = useMemo(
+    () =>
+      guidedFamilies.find((family) => family.id === guidedFamily) ||
+      guidedFamilies[0],
+    [guidedFamily],
+  );
+
+  const selectedGuidedPackage = useMemo(
+    () =>
+      packageOptions[guidedFamily].find(
+        (option) => option.code === guidedPackage,
+      ) || packageOptions[guidedFamily][0],
+    [guidedFamily, guidedPackage],
+  );
+
+  const isCrystalGuide =
+    guidedFamily === "ats" || guidedFamily === "smdCrystal";
+  const isOscillatorGuide =
+    guidedFamily === "smdOscillator" ||
+    guidedFamily === "vcxo" ||
+    guidedFamily === "tcxo";
+  const isTuningForkGuide = guidedFamily === "tuningFork";
+
+  const frequencyPresets = useMemo(() => {
+    if (guidedFamily === "tuningFork") return ["32.768"];
+    if (guidedFamily === "vcxo" || guidedFamily === "tcxo") {
+      return ["10", "12.8", "19.2", "20", "24.576", "26", "38.4"];
+    }
+    return ["12", "16", "24", "25", "26", "27", "32", "40"];
+  }, [guidedFamily]);
+
+  const guidedPartNumber = useMemo(() => {
+    if (isCrystalGuide) {
+      return `S${guidedPackage}${guidedCapacitance}${guidedModeCode}${guidedTolerance}${guidedTemperature}${guidedStability}-${formatMHz(guidedFrequency)}`;
+    }
+    if (isTuningForkGuide) {
+      return `S${guidedPackage}${guidedCapacitance}20${guidedTemperature}-${formatKHz(guidedFrequency)}-TR`;
+    }
+    if (guidedFamily === "smdOscillator") {
+      return `${guidedPackage}${guidedVoltage}${guidedOscStability}${guidedOscTemp}DSR${formatMHz(guidedFrequency, 3)}M`;
+    }
+    if (guidedFamily === "vcxo") {
+      return `SVH${guidedVoltage}30GDDER${formatMHz(guidedFrequency, 3)}M`;
+    }
+    if (guidedFamily === "tcxo") {
+      return `${guidedPackage}${guidedVoltage}20J${guidedOutput}${guidedPulling}R${formatMHz(guidedFrequency, 3)}M`;
+    }
+    return `ASV-REVIEW-${checksum(
+      `${selectedGuidedFamily.name}-${guidedFrequency}-${guidedNote}`,
+    )}`;
+  }, [
+    guidedCapacitance,
+    guidedFamily,
+    guidedFrequency,
+    guidedModeCode,
+    guidedNote,
+    guidedOscStability,
+    guidedOscTemp,
+    guidedOutput,
+    guidedPackage,
+    guidedPulling,
+    guidedStability,
+    guidedTemperature,
+    guidedTolerance,
+    guidedVoltage,
+    isCrystalGuide,
+    isTuningForkGuide,
+    selectedGuidedFamily.name,
+  ]);
+
+  const guidedFrequencyDisplay = isTuningForkGuide
+    ? `${formatKHz(guidedFrequency)} kHz`
+    : `${formatMHz(guidedFrequency, isOscillatorGuide ? 3 : 4)} MHz`;
+
+  const guidedSpecSummary = useMemo(() => {
+    const base = [
+      selectedGuidedFamily.name,
+      selectedGuidedPackage.label,
+      guidedFrequencyDisplay,
+    ];
+    if (isCrystalGuide) {
+      base.push(
+        `CL ${guidedCapacitance} pF`,
+        `Tolerance +/-${guidedTolerance}ppm`,
+        `Stability ${ppmLabel(guidedStability)}`,
+        `Temp ${tempLabel(guidedTemperature)}`,
+        `ESR ${crystalEsrLabel(guidedFrequency)}`,
+      );
+    } else if (isTuningForkGuide) {
+      base.push(
+        `CL ${optionLabel(tuningForkCapacitanceOptions, guidedCapacitance)}`,
+        `Temp ${optionLabel(tuningForkTempOptions, guidedTemperature)}`,
+      );
+    } else if (isOscillatorGuide) {
+      base.push(
+        `Voltage ${voltageLabel(guidedVoltage)}`,
+        `Stability ${optionLabel(oscillatorStabilityOptions, guidedOscStability)}`,
+        `Temp ${optionLabel(oscillatorTempOptions, guidedOscTemp)}`,
+      );
+      if (guidedFamily === "tcxo") {
+        base.push(
+          `Output ${optionLabel(outputOptions, guidedOutput)}`,
+          `Pulling ${optionLabel(pullingOptions, guidedPulling)}`,
+        );
+      }
+    } else {
+      base.push("ASIVANTA review required");
+    }
+    base.push(catalogRangeNote(guidedFamily, guidedFrequency));
+    return base.join(" | ");
+  }, [
+    guidedCapacitance,
+    guidedFamily,
+    guidedFrequencyDisplay,
+    guidedOscStability,
+    guidedOscTemp,
+    guidedOutput,
+    guidedPulling,
+    guidedStability,
+    guidedTemperature,
+    guidedTolerance,
+    guidedVoltage,
+    isCrystalGuide,
+    isOscillatorGuide,
+    isTuningForkGuide,
+    selectedGuidedFamily.name,
+    selectedGuidedPackage.label,
+  ]);
+
+  const selectGuidedFamily = (family: ProductFamily) => {
+    setGuidedFamily(family);
+    setGuidedPackage(packageOptions[family][0].code);
+    setGuidedMessage("");
+    if (family === "tuningFork") {
+      setGuidedFrequency("32.768");
+      setGuidedCapacitance("125");
+      setGuidedTemperature("B");
+    } else if (family === "ats" || family === "smdCrystal") {
+      setGuidedFrequency("25");
+      setGuidedCapacitance("12");
+      setGuidedTemperature("J");
+    } else if (family === "other") {
+      setGuidedFrequency("");
+    } else {
+      setGuidedFrequency("25");
+      setGuidedTemperature("J");
+    }
+  };
+
+  const addGuidedLine = () => {
+    if (usableLines.length >= 12) {
+      setGuidedMessage("Maximum 12 quote lines for one request.");
+      return;
+    }
+    const quantity = cleanQuantity(guidedQuantity) || "1";
+    const nextLine: QuoteLine = {
+      ...emptyLine(Date.now()),
+      category: "Electronics",
+      manufacturer: "Sunny Electronics / Open market",
+      customerPart: guidedPartNumber,
+      description: `${selectedGuidedFamily.name} ${selectedGuidedPackage.label} ${guidedFrequencyDisplay}`,
+      quantity,
+      annualVolume: cleanQuantity(guidedAnnualVolume),
+      packaging:
+        guidedFamily === "ats" || guidedFamily === "other"
+          ? "Review needed"
+          : "Tape and reel",
+      referenceDesignator: guidedReference,
+      sourceCatalog: "Sunny frequency-control reference",
+      family: selectedGuidedFamily.name,
+      packageType: selectedGuidedPackage.label,
+      frequency: guidedFrequencyDisplay,
+      supplierPartNumber: guidedPartNumber,
+      spec: guidedSpecSummary,
+      notes: ["Guided Quote Now builder", guidedSpecSummary, guidedNote.trim()]
+        .filter(Boolean)
+        .join(" | "),
+    };
+    setLines((current) => {
+      const existing = current.filter((line) => quoteLineHasData(line));
+      return [...existing, nextLine].slice(0, 12);
+    });
+    setForm((current) => ({
+      ...current,
+      quoteType: "Guided component quote",
+    }));
+    setGuidedMessage(`${guidedPartNumber} added to the quote list.`);
+    setTouched((current) => ({ ...current, quoteSource: true }));
+  };
 
   const updateForm = (
     e: React.ChangeEvent<
@@ -380,6 +888,12 @@ export default function InstantQuote() {
       "Buffer %",
       "Packaging",
       "Reference Designator",
+      "Source Catalog",
+      "Family",
+      "Package",
+      "Frequency",
+      "Supplier Part Number",
+      "Generated Spec",
       "Notes",
     ];
     const rows = structuredQuoteLines.map((line) => [
@@ -397,6 +911,12 @@ export default function InstantQuote() {
       line.bufferPercent,
       line.packaging,
       line.referenceDesignator,
+      line.sourceCatalog,
+      line.family,
+      line.packageType,
+      line.frequency,
+      line.supplierPartNumber,
+      line.spec,
       line.notes,
     ]);
     const csv = [header, ...rows]
@@ -426,6 +946,7 @@ export default function InstantQuote() {
         "Reference Designator",
         "Buffer %",
         "Annual Volume",
+        "Known Specs",
         "Notes",
       ],
       [
@@ -439,6 +960,7 @@ export default function InstantQuote() {
         "R1 R2 C7 or assembly area",
         "5",
         "12000",
+        "Package, frequency, voltage, tolerance, stability",
         "Sample need, alternates allowed, compliance needs",
       ],
     ]
@@ -468,15 +990,20 @@ export default function InstantQuote() {
                 `Buffer / Attrition: ${line.bufferPercent || "Not provided"}%`,
                 `Packaging: ${line.packaging || "Not provided"}`,
                 `Reference Designator: ${line.referenceDesignator || "Not provided"}`,
+                `Catalog Source: ${line.sourceCatalog || "Not provided"}`,
+                `Family / Package: ${line.family || "Not provided"} / ${line.packageType || "Not provided"}`,
+                `Frequency: ${line.frequency || "Not provided"}`,
+                `Supplier Part: ${line.supplierPartNumber || "Not provided"}`,
+                `Generated Spec: ${line.spec || "Not provided"}`,
                 `Notes: ${line.notes || "None"}`,
               ].join("\n"),
             )
             .join("\n\n")
         : "No built part lines. Uploaded files are the source list.";
 
-    return `ASIVANTA INSTANT QUOTE PACKET
+    return `ASIVANTA QUOTE NOW PACKET
 Quote ID: ${quoteId}
-Mode: ${mode === "upload" ? "Upload List" : "Build List"}
+Mode: ${modeLabel(mode)}
 Quote Type: ${form.quoteType}
 Company: ${form.company || "Not provided"}
 Contact: ${form.fullName || "Not provided"}
@@ -546,7 +1073,11 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
     try {
       const draft = JSON.parse(raw);
       if (draft.quoteId) setQuoteId(String(draft.quoteId));
-      if (draft.mode === "upload" || draft.mode === "build")
+      if (
+        draft.mode === "guided" ||
+        draft.mode === "upload" ||
+        draft.mode === "build"
+      )
         setMode(draft.mode);
       if (draft.form) setForm((current) => ({ ...current, ...draft.form }));
       if (Array.isArray(draft.lines) && draft.lines.length > 0) {
@@ -619,7 +1150,7 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
     if (name === "quoteSource") {
       if (mode === "upload" && files.length === 0)
         return "Upload at least one file.";
-      if (mode === "build" && usableLines.length === 0)
+      if (mode !== "upload" && usableLines.length === 0)
         return "Add at least one part line.";
     }
     if (name === "message" && form.message.trim().length < MIN_MESSAGE) {
@@ -637,7 +1168,7 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
 
   const buildMessage = () => {
     const quoteLines =
-      mode === "build"
+      mode !== "upload"
         ? usableLines
             .map((line, index) => {
               return [
@@ -653,15 +1184,20 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
                 `Buffer / Attrition: ${line.bufferPercent || "Not provided"}%`,
                 `Packaging: ${line.packaging || "Not provided"}`,
                 `Reference Designator: ${line.referenceDesignator || "Not provided"}`,
+                `Catalog Source: ${line.sourceCatalog || "Not provided"}`,
+                `Family / Package: ${line.family || "Not provided"} / ${line.packageType || "Not provided"}`,
+                `Frequency: ${line.frequency || "Not provided"}`,
+                `Supplier Part: ${line.supplierPartNumber || "Not provided"}`,
+                `Generated Spec: ${line.spec || "Not provided"}`,
                 `Notes: ${line.notes || "None"}`,
               ].join("\n");
             })
             .join("\n\n")
         : "Quote list uploaded as attachment.";
 
-    return `INSTANT QUOTE REQUEST
+    return `QUOTE NOW REQUEST
 Quote ID: ${quoteId}
-Mode: ${mode === "upload" ? "Upload List" : "Build List"}
+Mode: ${modeLabel(mode)}
 Quote Type: ${form.quoteType}
 Destination: ${form.destination || "Not provided"}
 Timeline: ${form.timeline || "Not provided"}
@@ -704,11 +1240,8 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
       formData.append("phone", form.phone.trim());
       formData.append("projectType", "Quote / RFQ Comparison");
       formData.append("quoteId", quoteId);
-      formData.append("source", "Instant Quote");
-      formData.append(
-        "quoteMode",
-        mode === "upload" ? "Upload List" : "Build List",
-      );
+      formData.append("source", "Quote Now");
+      formData.append("quoteMode", modeLabel(mode));
       formData.append("quoteLinesJson", JSON.stringify(structuredQuoteLines));
       formData.append("quoteRecordJson", JSON.stringify(quoteRecord));
       formData.append("message", buildMessage());
@@ -754,16 +1287,16 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                 <div className="mb-5 flex items-center gap-3">
                   <div className="h-px w-8 bg-blue-400"></div>
                   <span className="text-xs font-semibold uppercase tracking-widest text-blue-300">
-                    Instant Quote
+                    Quote Now
                   </span>
                 </div>
                 <h1 className="max-w-4xl text-4xl font-light tracking-tight md:text-6xl">
-                  Build a quote-ready sourcing list in minutes.
+                  Build a quote-ready part request in minutes.
                 </h1>
                 <p className="mt-6 max-w-2xl text-base font-light leading-relaxed text-blue-100/75 md:text-lg">
-                  Upload a BOM, RFQ, or spec sheet, or build a part list from
-                  scratch. ASIVANTA converts the request into standardized ASV
-                  part numbers for faster pricing and supplier comparison.
+                  Start with one guided component path, upload a BOM, or build a
+                  list manually. ASIVANTA turns partial specs into cleaner RFQ
+                  data for faster pricing and supplier comparison.
                 </p>
               </div>
 
@@ -783,8 +1316,8 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   ></div>
                 </div>
                 <div className="mt-5 grid grid-cols-3 gap-3 text-xs text-blue-100/70">
-                  <span>ASV numbers</span>
-                  <span>File guardrails</span>
+                  <span>Guided specs</span>
+                  <span>Upload guardrails</span>
                   <span>PDF-ready packet</span>
                 </div>
               </div>
@@ -824,7 +1357,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                       company: "",
                       email: "",
                       phone: "",
-                      quoteType: "Upload BOM / RFQ list",
+                      quoteType: "Guided component quote",
                       destination: "",
                       timeline: "",
                       message: "",
@@ -849,10 +1382,43 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
               autoComplete="off"
             />
             <section className="lg:col-span-8">
-              <div className="mb-5 grid gap-4 md:grid-cols-2">
+              <div className="mb-5 grid gap-4 md:grid-cols-3">
                 <button
                   type="button"
-                  onClick={() => setMode("upload")}
+                  onClick={() => {
+                    setMode("guided");
+                    setForm((current) => ({
+                      ...current,
+                      quoteType: "Guided component quote",
+                    }));
+                  }}
+                  className={`rounded-2xl border p-6 text-left transition-all ${
+                    mode === "guided"
+                      ? "border-blue-500 bg-white shadow-[0_8px_30px_rgba(37,99,235,0.12)]"
+                      : "border-gray-200 bg-white hover:border-blue-200"
+                  }`}
+                >
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50">
+                    <Sparkles className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <h2 className="text-xl font-medium tracking-tight">
+                    Quote Now
+                  </h2>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-500">
+                    Choose a component family, package, frequency, and specs
+                    with guided options.
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("upload");
+                    setForm((current) => ({
+                      ...current,
+                      quoteType: "Upload BOM / RFQ list",
+                    }));
+                  }}
                   className={`rounded-2xl border p-6 text-left transition-all ${
                     mode === "upload"
                       ? "border-blue-500 bg-white shadow-[0_8px_30px_rgba(37,99,235,0.12)]"
@@ -873,7 +1439,13 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
 
                 <button
                   type="button"
-                  onClick={() => setMode("build")}
+                  onClick={() => {
+                    setMode("build");
+                    setForm((current) => ({
+                      ...current,
+                      quoteType: "Build part list",
+                    }));
+                  }}
                   className={`rounded-2xl border p-6 text-left transition-all ${
                     mode === "build"
                       ? "border-blue-500 bg-white shadow-[0_8px_30px_rgba(37,99,235,0.12)]"
@@ -1049,7 +1621,589 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   </div>
                 </div>
 
-                {mode === "upload" ? (
+                {mode === "guided" ? (
+                  <div className="mb-7 space-y-6">
+                    <div>
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <label className="block text-sm font-medium">
+                          Start with one component family
+                        </label>
+                        <span className="text-xs text-gray-400">
+                          Sunny catalog reference, ASIVANTA review
+                        </span>
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                        {guidedFamilies.map((family) => {
+                          const Icon = family.icon;
+                          const active = guidedFamily === family.id;
+                          return (
+                            <button
+                              type="button"
+                              key={family.id}
+                              onClick={() => selectGuidedFamily(family.id)}
+                              className={`group rounded-2xl border p-4 text-left transition-all ${
+                                active
+                                  ? "border-blue-500 bg-blue-50 shadow-[0_8px_24px_rgba(37,99,235,0.12)]"
+                                  : "border-gray-200 bg-white hover:border-blue-200 hover:bg-blue-50/40"
+                              }`}
+                            >
+                              <div className="mb-3 flex items-center justify-between">
+                                <span
+                                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${
+                                    active ? "bg-blue-600" : "bg-gray-100"
+                                  }`}
+                                >
+                                  <Icon
+                                    className={`h-5 w-5 ${
+                                      active ? "text-white" : "text-blue-600"
+                                    }`}
+                                  />
+                                </span>
+                                <ArrowRight
+                                  className={`h-4 w-4 transition-transform group-hover:translate-x-1 ${
+                                    active ? "text-blue-600" : "text-gray-300"
+                                  }`}
+                                />
+                              </div>
+                              <p className="text-sm font-semibold text-[#0F172A]">
+                                {family.name}
+                              </p>
+                              <p className="mt-1 text-xs leading-relaxed text-gray-500">
+                                {family.summary}
+                              </p>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-5">
+                      <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                        <div>
+                          <p className="text-sm font-semibold text-[#0F172A]">
+                            {selectedGuidedFamily.name} option path
+                          </p>
+                          <p className="mt-1 text-xs leading-relaxed text-gray-500">
+                            Choose what the customer knows. Unknown details can
+                            stay in the note for ASIVANTA review.
+                          </p>
+                        </div>
+                        <div className="rounded-full border border-blue-200 bg-white px-4 py-2 font-mono text-xs font-semibold text-blue-700">
+                          {guidedPartNumber}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+                        <div className="space-y-5">
+                          <div>
+                            <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                              Package
+                            </label>
+                            <div className="grid gap-2 sm:grid-cols-2">
+                              {packageOptions[guidedFamily].map((option) => (
+                                <button
+                                  type="button"
+                                  key={option.code}
+                                  onClick={() => setGuidedPackage(option.code)}
+                                  className={`rounded-xl border px-3 py-3 text-left transition-all ${
+                                    guidedPackage === option.code
+                                      ? "border-blue-500 bg-white text-blue-700 shadow-sm"
+                                      : "border-gray-200 bg-white/70 text-gray-700 hover:border-blue-200"
+                                  }`}
+                                >
+                                  <span className="block text-sm font-semibold">
+                                    {option.label}
+                                  </span>
+                                  <span className="mt-0.5 block text-xs text-gray-400">
+                                    {option.hint}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-3">
+                            <div>
+                              <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                Frequency
+                              </label>
+                              <input
+                                value={guidedFrequency}
+                                onChange={(e) =>
+                                  setGuidedFrequency(
+                                    e.target.value.replace(/[^0-9.]/g, ""),
+                                  )
+                                }
+                                className={inputClass}
+                                placeholder={
+                                  isTuningForkGuide ? "32.768" : "25"
+                                }
+                              />
+                              <p className="mt-1 text-xs text-gray-400">
+                                {isTuningForkGuide ? "kHz" : "MHz"}
+                              </p>
+                            </div>
+                            <div>
+                              <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                Quantity
+                              </label>
+                              <input
+                                value={guidedQuantity}
+                                onChange={(e) =>
+                                  setGuidedQuantity(
+                                    cleanQuantity(e.target.value),
+                                  )
+                                }
+                                className={inputClass}
+                                placeholder="1000"
+                              />
+                            </div>
+                            <div>
+                              <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                Annual Volume
+                              </label>
+                              <input
+                                value={guidedAnnualVolume}
+                                onChange={(e) =>
+                                  setGuidedAnnualVolume(
+                                    cleanQuantity(e.target.value),
+                                  )
+                                }
+                                className={inputClass}
+                                placeholder="Optional"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            {frequencyPresets.map((frequency) => (
+                              <button
+                                type="button"
+                                key={frequency}
+                                onClick={() => setGuidedFrequency(frequency)}
+                                className="rounded-full border border-blue-100 bg-white px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:border-blue-300"
+                              >
+                                {frequency} {isTuningForkGuide ? "kHz" : "MHz"}
+                              </button>
+                            ))}
+                          </div>
+
+                          {isCrystalGuide && (
+                            <div className="grid gap-4 md:grid-cols-2">
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Load capacitance
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {loadCapacitanceOptions.map((option) => (
+                                    <button
+                                      type="button"
+                                      key={option}
+                                      onClick={() =>
+                                        setGuidedCapacitance(option)
+                                      }
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedCapacitance === option
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      {option} pF
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Mode
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {[
+                                    ["1", "Fundamental"],
+                                    ["3", "3rd overtone"],
+                                  ].map(([code, label]) => (
+                                    <button
+                                      type="button"
+                                      key={code}
+                                      onClick={() => setGuidedModeCode(code)}
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedModeCode === code
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      {label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Tolerance
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {toleranceOptions.map((option) => (
+                                    <button
+                                      type="button"
+                                      key={option}
+                                      onClick={() => setGuidedTolerance(option)}
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedTolerance === option
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      +/-{option}ppm
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Stability
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {stabilityOptions.map((option) => (
+                                    <button
+                                      type="button"
+                                      key={option.code}
+                                      onClick={() =>
+                                        setGuidedStability(option.code)
+                                      }
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedStability === option.code
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Temperature
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {tempOptions.map((option) => (
+                                    <button
+                                      type="button"
+                                      key={option.code}
+                                      onClick={() =>
+                                        setGuidedTemperature(option.code)
+                                      }
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedTemperature === option.code
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {isTuningForkGuide && (
+                            <div className="grid gap-4 md:grid-cols-2">
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Load capacitance
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {tuningForkCapacitanceOptions.map(
+                                    (option) => (
+                                      <button
+                                        type="button"
+                                        key={option.code}
+                                        onClick={() =>
+                                          setGuidedCapacitance(option.code)
+                                        }
+                                        className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                          guidedCapacitance === option.code
+                                            ? "border-blue-500 bg-blue-600 text-white"
+                                            : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                        }`}
+                                      >
+                                        {option.label}
+                                      </button>
+                                    ),
+                                  )}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Temperature
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {tuningForkTempOptions.map((option) => (
+                                    <button
+                                      type="button"
+                                      key={option.code}
+                                      onClick={() =>
+                                        setGuidedTemperature(option.code)
+                                      }
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedTemperature === option.code
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {isOscillatorGuide && (
+                            <div className="grid gap-4 md:grid-cols-2">
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Voltage
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {voltageOptions.map((option) => (
+                                    <button
+                                      type="button"
+                                      key={option.code}
+                                      onClick={() =>
+                                        setGuidedVoltage(option.code)
+                                      }
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedVoltage === option.code
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Stability
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {oscillatorStabilityOptions.map((option) => (
+                                    <button
+                                      type="button"
+                                      key={option.code}
+                                      onClick={() =>
+                                        setGuidedOscStability(option.code)
+                                      }
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedOscStability === option.code
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                  Temperature
+                                </label>
+                                <div className="flex flex-wrap gap-2">
+                                  {oscillatorTempOptions.map((option) => (
+                                    <button
+                                      type="button"
+                                      key={option.code}
+                                      onClick={() =>
+                                        setGuidedOscTemp(option.code)
+                                      }
+                                      className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                        guidedOscTemp === option.code
+                                          ? "border-blue-500 bg-blue-600 text-white"
+                                          : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              {guidedFamily === "tcxo" && (
+                                <>
+                                  <div>
+                                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                      Output
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                      {outputOptions.map((option) => (
+                                        <button
+                                          type="button"
+                                          key={option.code}
+                                          onClick={() =>
+                                            setGuidedOutput(option.code)
+                                          }
+                                          className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                            guidedOutput === option.code
+                                              ? "border-blue-500 bg-blue-600 text-white"
+                                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                          }`}
+                                        >
+                                          {option.label}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                                      Pulling
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                      {pullingOptions.map((option) => (
+                                        <button
+                                          type="button"
+                                          key={option.code}
+                                          onClick={() =>
+                                            setGuidedPulling(option.code)
+                                          }
+                                          className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+                                            guidedPulling === option.code
+                                              ? "border-blue-500 bg-blue-600 text-white"
+                                              : "border-gray-200 bg-white text-gray-600 hover:border-blue-200"
+                                          }`}
+                                        >
+                                          {option.label}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="rounded-2xl border border-white bg-white p-5">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                            Generated request
+                          </p>
+                          <p className="mt-3 break-all font-mono text-lg font-semibold text-[#0F172A]">
+                            {guidedPartNumber}
+                          </p>
+                          <p className="mt-3 text-sm leading-relaxed text-gray-600">
+                            {guidedSpecSummary}
+                          </p>
+                          {isCrystalGuide && (
+                            <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50/60 p-3 text-xs leading-relaxed text-gray-600">
+                              <p className="font-semibold text-[#0F172A]">
+                                Catalog reference
+                              </p>
+                              <p className="mt-1">
+                                {crystalCatalogSpecs.frequencyRange};{" "}
+                                {crystalCatalogSpecs.tolerance};{" "}
+                                {crystalCatalogSpecs.stability};{" "}
+                                {crystalCatalogSpecs.loadCapacitance}.
+                              </p>
+                            </div>
+                          )}
+                          <div className="mt-4 grid gap-3">
+                            <input
+                              value={guidedReference}
+                              onChange={(e) =>
+                                setGuidedReference(e.target.value.slice(0, 80))
+                              }
+                              className={inputClass}
+                              placeholder="Reference designator or project name"
+                            />
+                            <textarea
+                              rows={4}
+                              value={guidedNote}
+                              onChange={(e) =>
+                                setGuidedNote(e.target.value.slice(0, 500))
+                              }
+                              className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/15"
+                              placeholder="Anything unknown? Add target price, equivalent part, spec sheet note, or sample need."
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            className="mt-4 h-11 w-full rounded-full"
+                            onClick={addGuidedLine}
+                          >
+                            Add to Quote List
+                            <Plus className="ml-2 h-4 w-4" />
+                          </Button>
+                          {guidedMessage && (
+                            <p className="mt-3 text-xs text-blue-700">
+                              {guidedMessage}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-dashed border-gray-200 bg-[#f8fafc] p-4">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p className="text-sm font-medium">
+                            Optional spec sheet or drawing
+                          </p>
+                          <p className="mt-1 text-xs text-gray-400">
+                            Upload only helpful support files. Limits protect
+                            the form from abuse.
+                          </p>
+                        </div>
+                        {files.length < MAX_FILES && (
+                          <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white px-4 text-sm font-medium transition-colors hover:border-blue-300 hover:text-blue-600">
+                            <Upload className="mr-2 h-4 w-4" />
+                            Add File
+                            <input
+                              ref={fileInputRef}
+                              type="file"
+                              className="hidden"
+                              accept=".pdf,.xlsx,.png,.jpg,.jpeg"
+                              multiple
+                              onChange={selectFiles}
+                            />
+                          </label>
+                        )}
+                      </div>
+                      {files.length > 0 && (
+                        <div className="mt-4 space-y-2">
+                          {files.map((file, index) => (
+                            <div
+                              key={`${file.name}-${index}`}
+                              className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3"
+                            >
+                              <FileText className="h-4 w-4 text-blue-600" />
+                              <span className="flex-1 truncate text-sm">
+                                {file.name}
+                              </span>
+                              <span className="text-xs text-gray-400">
+                                {formatFileSize(file.size)}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => removeFile(index)}
+                                className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
+                              >
+                                <X className="h-3.5 w-3.5 text-gray-500" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {(fileError || errorFor("quoteSource")) && (
+                        <p className="mt-2 flex items-center gap-1 text-xs text-red-500">
+                          <AlertCircle className="h-3 w-3" />
+                          {fileError || errorFor("quoteSource")}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : mode === "upload" ? (
                   <div className="mb-7">
                     <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <label className="block text-sm font-medium">
@@ -1524,7 +2678,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                       </>
                     ) : (
                       <>
-                        Send Instant Quote Request
+                        Send Quote Now Request
                         <Send className="ml-2 h-4 w-4" />
                       </>
                     )}

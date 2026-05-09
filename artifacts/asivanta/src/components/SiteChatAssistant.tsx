@@ -21,7 +21,7 @@ type ChatMessage = {
 };
 
 const starterLinks: ChatLink[] = [
-  { label: "Instant Quote", href: "/instant-quote" },
+  { label: "Quote Now", href: "/instant-quote" },
   { label: "Sourcing Review", href: "/contact" },
   { label: "Services", href: "/#services" },
 ];
@@ -36,8 +36,8 @@ function clientFallback(message: string): ChatMessage {
     return {
       id: Date.now() + 1,
       role: "assistant",
-      text: "For a quote or RFQ, start with Instant Quote. You can upload a BOM/spec file or build a part list, and ASIVANTA will review it for pricing and supplier comparison.",
-      links: [{ label: "Start Instant Quote", href: "/instant-quote" }],
+      text: "For a quote or RFQ, start with Quote Now. You can use the guided Sunny-style component builder, upload a BOM/spec file, or build a part list for ASIVANTA review.",
+      links: [{ label: "Start Quote Now", href: "/instant-quote" }],
     };
   }
   if (

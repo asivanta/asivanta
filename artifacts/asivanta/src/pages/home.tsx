@@ -145,9 +145,9 @@ export default function Home() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="rounded-full h-14 px-8 text-base border-gray-600 text-gray-300 hover:bg-white/5 hover:text-white hover:-translate-y-0.5 bg-transparent backdrop-blur-sm transition-all duration-300"
+                    className="rounded-full h-14 px-8 text-lg font-semibold border-blue-300/60 text-blue-100 hover:bg-blue-500/15 hover:text-white hover:-translate-y-0.5 bg-blue-500/10 backdrop-blur-sm shadow-lg shadow-blue-500/10 transition-all duration-300"
                   >
-                    Instant Quote
+                    Quote Now
                   </Button>
                 </Link>
               </motion.div>
@@ -819,9 +819,9 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="rounded-full border-gray-500 text-blue-200 hover:text-white hover:bg-blue-900/30 hover:-translate-y-0.5 h-14 px-8 w-full sm:w-auto transition-all duration-300"
+                  className="rounded-full border-blue-300/60 bg-blue-500/10 text-blue-100 hover:text-white hover:bg-blue-500/20 hover:-translate-y-0.5 h-14 px-8 w-full sm:w-auto text-lg font-semibold shadow-lg shadow-blue-500/10 transition-all duration-300"
                 >
-                  Instant Quote
+                  Quote Now
                 </Button>
               </Link>
             </div>
