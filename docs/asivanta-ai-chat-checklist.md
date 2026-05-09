@@ -31,8 +31,8 @@ Last updated: 2026-05-09
 - [x] Local frontend chat bubble opens on mobile width
 - [x] Local `/api/ai/chat` returns a useful ASIVANTA answer
 - [x] Local production build passes with `PORT=5173 BASE_PATH=/`
-- [ ] Production `/api/ai/chat` returns a useful ASIVANTA answer
-- [ ] Production chat bubble sends page/path and displays links
+- [x] Production `/api/ai/chat` returns a useful ASIVANTA answer
+- [x] Production chat bubble sends page/path and displays links
 
 ## Future Admin Backend Notes
 
