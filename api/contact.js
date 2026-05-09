@@ -63,7 +63,13 @@ function parseQuoteLines(raw) {
         0,
         120,
       ),
-      notes: sanitize(line.notes || "").slice(0, 240),
+      sourceCatalog: sanitize(line.sourceCatalog || "").slice(0, 120),
+      family: sanitize(line.family || "").slice(0, 80),
+      packageType: sanitize(line.packageType || "").slice(0, 80),
+      frequency: sanitize(line.frequency || "").slice(0, 80),
+      supplierPartNumber: sanitize(line.supplierPartNumber || "").slice(0, 120),
+      spec: sanitize(line.spec || "").slice(0, 300),
+      notes: sanitize(line.notes || "").slice(0, 360),
     }));
   } catch {
     return [];
@@ -97,6 +103,12 @@ function quoteLinesToCsv(quoteId, quoteLines) {
     "Buffer %",
     "Packaging",
     "Reference Designator",
+    "Source Catalog",
+    "Family",
+    "Package",
+    "Frequency",
+    "Supplier Part Number",
+    "Generated Spec",
     "Notes",
   ];
   const rows = quoteLines.map((line) => [
@@ -114,6 +126,12 @@ function quoteLinesToCsv(quoteId, quoteLines) {
     line.bufferPercent,
     line.packaging,
     line.referenceDesignator,
+    line.sourceCatalog,
+    line.family,
+    line.packageType,
+    line.frequency,
+    line.supplierPartNumber,
+    line.spec,
     line.notes,
   ]);
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
@@ -262,7 +280,7 @@ export default async function handler(req, res) {
   const resend = new Resend(apiKey);
   const subjectPrefix =
     projectType === "Quote / RFQ Comparison"
-      ? "New Asivanta Instant Quote"
+      ? "New Asivanta Quote Now RFQ"
       : "New Asivanta Inquiry";
 
   const { error: sendError } = await resend.emails.send({
