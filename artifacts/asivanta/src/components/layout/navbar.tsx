@@ -32,9 +32,9 @@ export function Navbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
           mobileMenuOpen
-            ? "bg-white border-gray-100 py-1 shadow-sm"
+            ? "bg-white/86 border-white/60 py-1 shadow-sm backdrop-blur-2xl"
             : scrolled
-              ? "bg-[#0a1128]/95 backdrop-blur-md border-white/10 py-0.5 shadow-sm"
+              ? "bg-[#0a1128]/58 backdrop-blur-2xl border-white/15 py-0.5 shadow-[0_18px_55px_rgba(0,0,0,0.18)]"
               : "bg-transparent border-transparent py-1"
         }`}
       >
@@ -83,8 +83,8 @@ export function Navbar() {
               href="/instant-quote"
               className={`asivanta-quote-now-link flex items-center gap-1 rounded-full border px-4 py-2 text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
                 scrolled
-                  ? "border-blue-300/60 bg-blue-500/15 text-blue-50 hover:border-blue-200 hover:bg-blue-500/25 hover:text-white"
-                  : "border-blue-200/55 bg-white/10 text-blue-50 hover:border-blue-100 hover:bg-white/15 hover:text-white"
+                  ? "border-white/25 bg-white/12 text-blue-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl hover:border-blue-200/70 hover:bg-white/18 hover:text-white"
+                  : "border-white/30 bg-white/12 text-blue-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_12px_34px_rgba(15,23,42,0.16)] backdrop-blur-xl hover:border-blue-100/80 hover:bg-white/18 hover:text-white"
               }`}
               style={{
                 animation: "asivantaQuoteNowPulse 6.5s ease-in-out infinite",

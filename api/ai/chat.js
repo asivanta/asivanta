@@ -3,7 +3,7 @@ import path from "path";
 
 const MAX_MESSAGE_LENGTH = 700;
 const MAX_HISTORY_ITEMS = 6;
-const BRIDGE_TIMEOUT_MS = 5500;
+const BRIDGE_TIMEOUT_MS = 15000;
 
 const siteLinks = {
   home: { label: "Home", href: "/" },
@@ -61,7 +61,7 @@ function parseBody(req) {
 }
 
 function isPupCareLeak(text) {
-  return /pupcare|pet|dog|cat|veterinary|grooming|walking/i.test(text);
+  return /\b(pupcare|pet|dog|cat|veterinary|grooming|walking)\b/i.test(text);
 }
 
 function keywordFallback(message, pathName = "") {
@@ -134,23 +134,28 @@ function keywordFallback(message, pathName = "") {
   };
 }
 
-function buildPrompt({ message, pagePath, pageTitle, history }) {
-  return `${readPersonality()}
+function isGuideOnlyIntent(message, pathName = "") {
+  const text = `${message} ${pathName}`.toLowerCase();
+  return /quote|rfq|bom|price|pricing|part|spec|upload|drawing|sourcing review|supplier|verification|factory|service|capabilit|portal|login|about|contact|insight|article/.test(
+    text,
+  );
+}
 
-Current page: ${pagePath || "/"}
+function buildBridgeGuide({ pagePath, pageTitle, history }) {
+  return `Current page: ${pagePath || "/"}
 Page title: ${pageTitle || "ASIVANTA"}
 
 Site map:
-${siteMap.map((item) => `- ${item}`).join("\n")}
+${siteMap
+  .map((item) => `- ${item}`)
+  .join("\n")
+  .slice(0, 900)}
 
 Recent conversation:
 ${history
   .slice(-MAX_HISTORY_ITEMS)
-  .map((item) => `${item.role}: ${sanitize(item.text).slice(0, 400)}`)
+  .map((item) => `${item.role}: ${sanitize(item.text).slice(0, 180)}`)
   .join("\n")}
-
-Visitor question:
-${message}
 
 Return only the answer text. Keep it concise and include the best path as plain text if useful.`;
 }
@@ -232,13 +237,19 @@ export default async function handler(req, res) {
   }
 
   const fallback = keywordFallback(message, pagePath);
-  const prompt = buildPrompt({ message, pagePath, pageTitle, history });
+  if (isGuideOnlyIntent(message, pagePath)) {
+    return res.status(200).json({
+      answer: fallback.answer,
+      links: linksForAnswer(fallback.answer, fallback.links),
+      fallback: false,
+      source: "guide",
+    });
+  }
+
   const bridgeAnswer = await callBridge({
     message,
-    prompt,
-    system: readPersonality(),
+    systemGuide: buildBridgeGuide({ pagePath, pageTitle, history }),
     pagePath,
-    siteMap,
     history: history.slice(-MAX_HISTORY_ITEMS),
   });
 
@@ -251,5 +262,7 @@ export default async function handler(req, res) {
     answer: safeAnswer,
     links: linksForAnswer(safeAnswer, fallback.links),
     fallback: !bridgeAnswer || isPupCareLeak(bridgeAnswer),
+    source:
+      bridgeAnswer && !isPupCareLeak(bridgeAnswer) ? "bridge" : "fallback",
   });
 }

@@ -62,13 +62,13 @@ export default function Home() {
   const opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen overflow-x-hidden bg-white text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-900">
       <Navbar />
 
       {/* 1. HERO SECTION */}
       <section
         ref={heroRef}
-        className="relative h-[90vh] md:h-screen min-h-[600px] flex items-center justify-center overflow-hidden bg-[#0a1128]"
+        className="relative flex h-[90vh] min-h-[600px] items-center justify-center overflow-hidden bg-[#0a1128] md:h-screen"
       >
         <motion.div style={{ y, opacity }} className="absolute inset-0 z-0">
           <img
@@ -76,96 +76,184 @@ export default function Home() {
             alt="Abstract Supply Chain"
             className="w-full h-full object-cover opacity-60 mix-blend-luminosity"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0a1128]/50 via-[#0a1128]/40 to-[#0a1128]"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_65%_12%,rgba(96,165,250,0.22),transparent_30%),linear-gradient(to_bottom,rgba(10,17,40,0.38),rgba(10,17,40,0.48),#0a1128)]"></div>
+          <div className="asv-liquid-sheen absolute inset-0"></div>
         </motion.div>
 
         <div className="container relative z-10 mx-auto px-6 pt-20">
-          <div className="max-w-4xl">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="max-w-4xl">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={staggerContainer}
+              >
+                <motion.div
+                  variants={fadeIn}
+                  className="flex items-center gap-3 mb-8"
+                >
+                  <div className="h-px w-8 bg-blue-400"></div>
+                  <span className="text-blue-400 uppercase tracking-widest text-xs font-semibold">
+                    Seoul, South Korea
+                  </span>
+                </motion.div>
+
+                <motion.h1
+                  variants={fadeIn}
+                  className="mb-6 max-w-full overflow-hidden text-[2.38rem] font-light leading-[1.15] tracking-tight text-white min-[520px]:text-6xl md:text-7xl md:leading-[1.1]"
+                >
+                  <span className="md:hidden">
+                    Transparent
+                    <br />
+                    <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-100 to-blue-400">
+                      Korea
+                    </span>{" "}
+                    sourcing
+                    <br />
+                    across{" "}
+                    <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-blue-400">
+                      Asia
+                    </span>
+                    <br />
+                    <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-blue-400">
+                      supply chains.
+                    </span>
+                  </span>
+                  <span className="hidden md:inline">
+                    Transparent{" "}
+                    <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-100 to-blue-400">
+                      Korea
+                    </span>{" "}
+                    sourcing
+                    <br />
+                    across{" "}
+                    <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-blue-400">
+                      Asia supply chains.
+                    </span>
+                  </span>
+                </motion.h1>
+
+                <motion.p
+                  variants={fadeIn}
+                  className="max-w-[20rem] text-xl font-medium tracking-tight text-white mb-6 min-[430px]:max-w-none md:text-2xl"
+                >
+                  No hidden costs. No cultural gaps. No
+                  <br className="md:hidden" /> surprises.
+                </motion.p>
+
+                <motion.p
+                  variants={fadeIn}
+                  className="max-w-[17.5rem] text-base font-light leading-relaxed text-gray-300/80 mb-10 min-[520px]:max-w-2xl md:text-lg"
+                >
+                  We help global buyers verify Korean suppliers, compare quotes,
+                  and negotiate with local context before money, timelines, or
+                  quality are put at risk.
+                </motion.p>
+
+                <motion.div
+                  variants={fadeIn}
+                  className="flex flex-col sm:flex-row gap-4"
+                >
+                  <Link href="/contact">
+                    <Button
+                      size="lg"
+                      className="asv-glass-button h-14 rounded-full px-8 text-base text-[#0a1128] transition-all duration-300 group hover:-translate-y-0.5 hover:bg-white"
+                    >
+                      Start a Sourcing Review
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Link href="/instant-quote">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="h-14 rounded-full border-white/30 bg-white/8 px-8 text-lg font-semibold text-blue-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.20),0_16px_44px_rgba(37,99,235,0.12)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/14 hover:text-white"
+                    >
+                      Quote Now
+                    </Button>
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </div>
+            <motion.aside
+              initial={{ opacity: 0, y: 28, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{
+                delay: 0.28,
+                duration: 0.7,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="asv-glass-panel asv-glass-panel-dark hidden rounded-[2.25rem] p-5 text-white lg:block"
+              aria-label="ASIVANTA sourcing workflow preview"
             >
-              <motion.div
-                variants={fadeIn}
-                className="flex items-center gap-3 mb-8"
-              >
-                <div className="h-px w-8 bg-blue-400"></div>
-                <span className="text-blue-400 uppercase tracking-widest text-xs font-semibold">
-                  Seoul, South Korea
-                </span>
-              </motion.div>
-
-              <motion.h1
-                variants={fadeIn}
-                className="text-5xl md:text-7xl font-light text-white tracking-tight leading-[1.1] mb-6"
-              >
-                Transparent{" "}
-                <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-100 to-blue-400">
-                  Korea
-                </span>{" "}
-                sourcing
-                <br />
-                across{" "}
-                <span className="font-medium text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-blue-400">
-                  Asia supply chains.
-                </span>
-              </motion.h1>
-
-              <motion.p
-                variants={fadeIn}
-                className="text-xl md:text-2xl text-white font-medium tracking-tight mb-6"
-              >
-                No hidden costs. No cultural gaps. No surprises.
-              </motion.p>
-
-              <motion.p
-                variants={fadeIn}
-                className="text-base md:text-lg text-gray-300/80 max-w-2xl font-light leading-relaxed mb-10"
-              >
-                We help global buyers verify Korean suppliers, compare quotes,
-                and negotiate with local context before money, timelines, or
-                quality are put at risk.
-              </motion.p>
-
-              <motion.div
-                variants={fadeIn}
-                className="flex flex-col sm:flex-row gap-4"
-              >
-                <Link href="/contact">
-                  <Button
-                    size="lg"
-                    className="rounded-full bg-white text-[#0a1128] hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-xl h-14 px-8 text-base shadow-lg shadow-white/10 group transition-all duration-300"
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-200/80">
+                    Review Layer
+                  </p>
+                  <h2 className="mt-1 text-2xl font-light tracking-tight">
+                    Before the PO.
+                  </h2>
+                </div>
+                <div className="asv-glass-icon asv-glass-icon-dark h-12 w-12 rounded-2xl">
+                  <ShieldCheck className="h-6 w-6 stroke-[1.5]" />
+                </div>
+              </div>
+              <div className="grid gap-3">
+                {[
+                  {
+                    icon: <Search />,
+                    label: "Supplier check",
+                    value: "Factory reality",
+                  },
+                  {
+                    icon: <FileText />,
+                    label: "Quote review",
+                    value: "Hidden-cost scan",
+                  },
+                  {
+                    icon: <Building2 />,
+                    label: "Local context",
+                    value: "Seoul-side clarity",
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center gap-3 rounded-[1.35rem] border border-white/14 bg-white/8 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-xl"
                   >
-                    Start a Sourcing Review
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                <Link href="/instant-quote">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="rounded-full h-14 px-8 text-lg font-semibold border-blue-300/60 text-blue-100 hover:bg-blue-500/15 hover:text-white hover:-translate-y-0.5 bg-blue-500/10 backdrop-blur-sm shadow-lg shadow-blue-500/10 transition-all duration-300"
-                  >
-                    Quote Now
-                  </Button>
-                </Link>
-              </motion.div>
-            </motion.div>
+                    <div className="asv-glass-icon asv-glass-icon-dark h-11 w-11 shrink-0 rounded-2xl">
+                      {React.cloneElement(
+                        item.icon as React.ReactElement<{ className?: string }>,
+                        { className: "h-5 w-5 stroke-[1.5]" },
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">
+                        {item.label}
+                      </p>
+                      <p className="text-xs text-blue-100/62">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.aside>
           </div>
         </div>
       </section>
 
       {/* TRUST STRIP */}
-      <section className="bg-[#0a1128] border-y border-white/10">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-px px-6 md:grid-cols-4">
+      <section className="border-y border-white/10 bg-[#0a1128]">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-3 px-6 py-4 sm:grid-cols-2 md:grid-cols-4">
           {[
             ["Seoul-based", "Local Korean supplier communication"],
             ["Buyer-side", "Independent advisory, not a trading desk"],
             ["Pre-PO", "Verification before commitment"],
             ["Cross-border", "Language, culture, and commercial alignment"],
           ].map(([label, desc]) => (
-            <div key={label} className="py-6 md:py-7">
+            <div
+              key={label}
+              className="asv-glass-panel asv-glass-panel-dark rounded-3xl px-4 py-5 md:px-5 md:py-6"
+            >
               <p className="text-lg font-semibold tracking-tight text-white md:text-xl">
                 {label}
               </p>
@@ -178,7 +266,10 @@ export default function Home() {
       </section>
 
       {/* 2. THE PROBLEM / WHY ASIVANTA */}
-      <section className="py-28 md:py-36 bg-[#f9fafb]" id="why-asivanta">
+      <section
+        className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbff_0%,#eef5ff_100%)] py-28 md:py-36"
+        id="why-asivanta"
+      >
         <div className="container mx-auto px-6">
           <motion.div
             initial="hidden"
@@ -255,9 +346,9 @@ export default function Home() {
                     },
                   },
                 }}
-                className="bg-white p-8 md:p-10 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 group"
+                className="asv-glass-panel rounded-[2rem] p-8 transition-all duration-300 hover:-translate-y-1 md:p-10 group"
               >
-                <div className="h-11 w-11 bg-[#EFF6FF] rounded-xl flex items-center justify-center mb-7">
+                <div className="asv-glass-icon mb-7 h-12 w-12 rounded-2xl text-[#3B82F6]">
                   {item.icon}
                 </div>
                 <h3 className="text-lg font-semibold text-[#0F172A] mb-3 tracking-tight">
@@ -274,7 +365,7 @@ export default function Home() {
 
       {/* 3. CAPABILITIES / SERVICES */}
       <section
-        className="py-24 bg-[#f8f9fa] border-y border-gray-100"
+        className="relative overflow-hidden border-y border-white/60 bg-[linear-gradient(180deg,#eef5ff_0%,#f7fbff_52%,#ffffff_100%)] py-24"
         id="services"
       >
         <div className="container mx-auto px-6">
@@ -350,12 +441,12 @@ export default function Home() {
                     transition: { delay: i * 0.1, duration: 0.5 },
                   },
                 }}
-                className="bg-white p-8 rounded-2xl border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300"
+                className="asv-glass-panel rounded-[2rem] p-8 transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="text-blue-600 mb-6">
+                <div className="asv-glass-icon mb-6 h-14 w-14 rounded-3xl text-blue-600">
                   {React.cloneElement(
                     service.icon as React.ReactElement<{ className?: string }>,
-                    { className: "h-8 w-8 stroke-[1.5]" },
+                    { className: "h-7 w-7 stroke-[1.5]" },
                   )}
                 </div>
                 <h3 className="text-xl font-medium text-gray-900 mb-3">
@@ -371,7 +462,7 @@ export default function Home() {
       </section>
 
       {/* 3B. ENGAGEMENT OPTIONS */}
-      <section className="bg-white py-24">
+      <section className="bg-[linear-gradient(180deg,#ffffff_0%,#f7fbff_100%)] py-24">
         <div className="container mx-auto px-6">
           <div className="mb-14 max-w-3xl">
             <div className="mb-4 flex items-center gap-3">
@@ -417,7 +508,7 @@ export default function Home() {
             ].map((option) => (
               <div
                 key={option.title}
-                className="rounded-2xl border border-gray-100 bg-[#f8f9fa] p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-100 hover:bg-white hover:shadow-xl hover:shadow-blue-900/5"
+                className="asv-glass-panel rounded-[2rem] p-7 transition-all duration-300 hover:-translate-y-1"
               >
                 <h3 className="mb-3 text-xl font-medium tracking-tight text-[#0F172A]">
                   {option.title}
@@ -443,7 +534,10 @@ export default function Home() {
       </section>
 
       {/* 4. HOW IT WORKS (Methodology) */}
-      <section className="py-24 bg-white" id="how-it-works">
+      <section
+        className="bg-[linear-gradient(180deg,#f7fbff_0%,#ffffff_100%)] py-24"
+        id="how-it-works"
+      >
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto text-center mb-20">
             <h2 className="text-3xl md:text-4xl font-light text-gray-900 mb-6 tracking-tight">
@@ -487,9 +581,9 @@ export default function Home() {
               ].map((phase, i) => (
                 <div
                   key={i}
-                  className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm text-center"
+                  className="asv-glass-panel rounded-[1.75rem] p-6 text-center"
                 >
-                  <div className="w-12 h-12 bg-[#0a1128] text-white rounded-full flex items-center justify-center text-sm font-semibold mx-auto mb-4 font-mono shadow-lg">
+                  <div className="asv-glass-icon mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0a1128]/90 text-sm font-semibold text-white shadow-lg font-mono">
                     {phase.step}
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -506,14 +600,15 @@ export default function Home() {
       </section>
 
       {/* 5. FACTORY READINESS HIGHLIGHT */}
-      <section className="py-24 bg-[#0a1128] text-white relative overflow-hidden">
+      <section className="relative overflow-hidden bg-[#0a1128] py-24 text-white">
         <div className="absolute inset-0 z-0">
           <img
             src={factoryAbstract}
             alt="Factory"
             className="w-full h-full object-cover opacity-20 mix-blend-overlay"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a1128] via-[#0a1128]/90 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a1128] via-[#0a1128]/86 to-transparent"></div>
+          <div className="asv-liquid-sheen absolute inset-0"></div>
         </div>
 
         <div className="container relative z-10 mx-auto px-6">
@@ -546,7 +641,7 @@ export default function Home() {
             <Link href="/contact">
               <Button
                 size="lg"
-                className="rounded-full bg-blue-600 text-white hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-600/20 h-12 px-8 transition-all duration-300"
+                className="h-12 rounded-full border border-white/25 bg-blue-500/70 px-8 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_16px_44px_rgba(37,99,235,0.28)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500"
               >
                 Request Verification Support
               </Button>
@@ -556,7 +651,10 @@ export default function Home() {
       </section>
 
       {/* 6. INDUSTRIES SERVED */}
-      <section className="py-24 bg-white" id="industries">
+      <section
+        className="bg-[linear-gradient(180deg,#ffffff_0%,#f7fbff_100%)] py-24"
+        id="industries"
+      >
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-light text-gray-900 mb-4 tracking-tight">
@@ -572,35 +670,34 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             {[
               {
-                icon: (
-                  <Cpu className="mb-4 h-8 w-8 text-blue-600 stroke-[1.5]" />
-                ),
+                icon: <Cpu />,
                 name: "Electronics & Semiconductors",
               },
               {
-                icon: (
-                  <Building2 className="mb-4 h-8 w-8 text-blue-600 stroke-[1.5]" />
-                ),
+                icon: <Building2 />,
                 name: "Industrial Components",
               },
               {
-                icon: (
-                  <PackageSearch className="mb-4 h-8 w-8 text-blue-600 stroke-[1.5]" />
-                ),
+                icon: <PackageSearch />,
                 name: "Consumer Products",
               },
               {
-                icon: (
-                  <Zap className="mb-4 h-8 w-8 text-blue-600 stroke-[1.5]" />
-                ),
+                icon: <Zap />,
                 name: "OEM/ODM Projects",
               },
             ].map((ind, i) => (
               <div
                 key={i}
-                className="bg-gray-50 border border-gray-100 rounded-2xl p-8 text-center hover:bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                className="asv-glass-panel rounded-[2rem] p-8 text-center transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="flex justify-center">{ind.icon}</div>
+                <div className="mb-5 flex justify-center">
+                  <div className="asv-glass-icon h-14 w-14 rounded-3xl text-blue-600">
+                    {React.cloneElement(
+                      ind.icon as React.ReactElement<{ className?: string }>,
+                      { className: "h-7 w-7 stroke-[1.5]" },
+                    )}
+                  </div>
+                </div>
                 <h3 className="font-medium text-gray-900">{ind.name}</h3>
               </div>
             ))}
@@ -609,9 +706,9 @@ export default function Home() {
       </section>
 
       {/* 7. CLIENT PORTAL TEASER */}
-      <section className="py-24 bg-[#f8f9fa] border-t border-gray-200 overflow-hidden relative">
+      <section className="relative overflow-hidden border-t border-white/70 bg-[linear-gradient(180deg,#f7fbff_0%,#eef5ff_100%)] py-24">
         {/* Decorative background element */}
-        <div className="absolute right-0 top-0 w-1/3 h-full bg-gradient-to-l from-blue-50 to-transparent z-0"></div>
+        <div className="asv-liquid-sheen absolute inset-0 z-0"></div>
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -657,14 +754,14 @@ export default function Home() {
 
             {/* Abstract UI Mockup */}
             <div className="relative">
-              <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden aspect-[4/3] flex flex-col transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
-                <div className="h-12 border-b border-gray-100 bg-gray-50/50 flex items-center px-4 gap-2">
+              <div className="asv-glass-panel flex aspect-[4/3] transform flex-col overflow-hidden rounded-[2rem] transition-transform duration-500 hover:rotate-0 lg:rotate-2">
+                <div className="flex h-12 items-center gap-2 border-b border-white/50 bg-white/35 px-4 backdrop-blur-xl">
                   <div className="flex gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-gray-300"></div>
                     <div className="w-3 h-3 rounded-full bg-gray-300"></div>
                     <div className="w-3 h-3 rounded-full bg-gray-300"></div>
                   </div>
-                  <div className="ml-4 h-6 w-48 bg-white rounded-md border border-gray-200"></div>
+                  <div className="ml-4 h-6 w-48 rounded-full border border-white/50 bg-white/50"></div>
                 </div>
                 <div className="p-6 flex-1 flex flex-col gap-4">
                   <div className="flex justify-between items-end mb-4">
@@ -675,24 +772,24 @@ export default function Home() {
                     <div className="h-8 w-24 bg-blue-600/20 rounded"></div>
                   </div>
                   <div className="flex gap-4">
-                    <div className="flex-1 h-24 bg-gray-50 rounded-xl border border-gray-100 p-4">
+                    <div className="asv-glass-panel h-24 flex-1 rounded-2xl p-4">
                       <div className="h-3 w-16 bg-gray-200 rounded mb-3"></div>
                       <div className="h-6 w-24 bg-blue-100 rounded"></div>
                     </div>
-                    <div className="flex-1 h-24 bg-gray-50 rounded-xl border border-gray-100 p-4">
+                    <div className="asv-glass-panel h-24 flex-1 rounded-2xl p-4">
                       <div className="h-3 w-16 bg-gray-200 rounded mb-3"></div>
                       <div className="h-6 w-24 bg-gray-200 rounded"></div>
                     </div>
                   </div>
-                  <div className="flex-1 bg-gray-50 rounded-xl border border-gray-100 mt-2 p-4">
+                  <div className="asv-glass-panel mt-2 flex-1 rounded-2xl p-4">
                     <div className="h-4 w-full bg-gray-200 rounded mb-3"></div>
                     <div className="h-4 w-3/4 bg-gray-200 rounded mb-3"></div>
                     <div className="h-4 w-5/6 bg-gray-200 rounded"></div>
                   </div>
                 </div>
 
-                <div className="absolute inset-0 bg-white/10 flex items-center justify-center">
-                  <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-lg border border-gray-200 font-semibold text-gray-800 flex items-center gap-2">
+                <div className="absolute inset-0 flex items-center justify-center bg-white/10">
+                  <div className="asv-glass-panel flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-gray-800">
                     <Lock className="h-4 w-4" /> ASIVANTA Portal
                   </div>
                 </div>
@@ -711,7 +808,8 @@ export default function Home() {
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="absolute inset-0 bg-[#0a1128]/80 backdrop-blur-sm z-10"></div>
+        <div className="absolute inset-0 bg-[#0a1128]/76 backdrop-blur-sm z-10"></div>
+        <div className="asv-liquid-sheen absolute inset-0 z-10"></div>
 
         <div className="container relative z-20 mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-5xl font-light text-white mb-8 tracking-tight max-w-3xl mx-auto">
@@ -723,7 +821,7 @@ export default function Home() {
           <Link href="/about">
             <Button
               variant="outline"
-              className="rounded-full border-blue-400/50 text-blue-100 hover:bg-blue-400/20 hover:text-white h-12 px-8"
+              className="h-12 rounded-full border-white/30 bg-white/8 px-8 text-blue-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl hover:bg-white/14 hover:text-white"
             >
               Learn About Our Firm
             </Button>
@@ -732,7 +830,7 @@ export default function Home() {
       </section>
 
       {/* 9. INSIGHTS & RESOURCES */}
-      <section className="py-24 bg-white">
+      <section className="bg-[linear-gradient(180deg,#ffffff_0%,#f7fbff_100%)] py-24">
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-end mb-12">
             <div>
@@ -770,7 +868,7 @@ export default function Home() {
               },
             ].map((insight, i) => (
               <Link key={i} href="/insights" className="group cursor-pointer">
-                <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6 h-full flex flex-col hover:border-blue-200 hover:bg-blue-50/30 transition-colors">
+                <div className="asv-glass-panel flex h-full flex-col rounded-[2rem] p-6 transition-all duration-300 hover:-translate-y-1">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xs font-semibold tracking-wider uppercase text-blue-600">
                       {insight.type}
@@ -795,7 +893,8 @@ export default function Home() {
       </section>
 
       {/* 10. FINAL CTA */}
-      <section className="py-24 bg-[#0a1128] text-center border-t border-blue-900/30">
+      <section className="relative overflow-hidden border-t border-blue-900/30 bg-[#0a1128] py-24 text-center">
+        <div className="asv-liquid-sheen absolute inset-0"></div>
         <div className="container mx-auto px-6">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-light text-white mb-6">
@@ -810,7 +909,7 @@ export default function Home() {
               <Link href="/contact">
                 <Button
                   size="lg"
-                  className="rounded-full bg-white text-[#0a1128] hover:bg-gray-100 hover:-translate-y-0.5 hover:shadow-xl h-14 px-10 text-base font-medium shadow-lg w-full sm:w-auto transition-all duration-300"
+                  className="asv-glass-button h-14 w-full rounded-full px-10 text-base font-medium text-[#0a1128] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white sm:w-auto"
                 >
                   Get in Touch
                 </Button>
@@ -819,7 +918,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="rounded-full border-blue-300/60 bg-blue-500/10 text-blue-100 hover:text-white hover:bg-blue-500/20 hover:-translate-y-0.5 h-14 px-8 w-full sm:w-auto text-lg font-semibold shadow-lg shadow-blue-500/10 transition-all duration-300"
+                  className="h-14 w-full rounded-full border-white/30 bg-white/8 px-8 text-lg font-semibold text-blue-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_16px_44px_rgba(37,99,235,0.12)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-500/20 hover:text-white sm:w-auto"
                 >
                   Quote Now
                 </Button>
