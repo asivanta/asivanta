@@ -126,10 +126,10 @@ export default function SiteChatAssistant() {
   return (
     <>
       {open && (
-        <section className="fixed bottom-24 right-4 z-[9999] flex h-[min(620px,calc(100vh-120px))] w-[calc(100vw-2rem)] max-w-[390px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl md:right-6">
-          <div className="flex items-center justify-between bg-[#0a1128] px-4 py-4 text-white">
+        <section className="asv-glass-panel fixed bottom-24 right-4 z-[9999] flex h-[min(620px,calc(100vh-120px))] w-[calc(100vw-2rem)] max-w-[390px] flex-col overflow-hidden rounded-[2rem] shadow-2xl md:right-6">
+          <div className="flex items-center justify-between bg-[#0a1128]/82 px-4 py-4 text-white backdrop-blur-2xl">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-500">
+              <div className="asv-glass-icon asv-glass-icon-dark flex h-9 w-9 items-center justify-center rounded-full">
                 <Bot className="h-5 w-5" />
               </div>
               <div>
@@ -147,7 +147,7 @@ export default function SiteChatAssistant() {
             </button>
           </div>
 
-          <div className="flex-1 space-y-4 overflow-y-auto bg-[#f6f8fb] px-4 py-4">
+          <div className="flex-1 space-y-4 overflow-y-auto bg-white/35 px-4 py-4 backdrop-blur-xl">
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -157,7 +157,7 @@ export default function SiteChatAssistant() {
                   className={`max-w-[86%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                     message.role === "user"
                       ? "bg-blue-600 text-white"
-                      : "border border-gray-100 bg-white text-gray-700 shadow-sm"
+                      : "asv-glass-panel border-white/60 bg-white/46 text-gray-700 shadow-sm"
                   }`}
                 >
                   <p className="whitespace-pre-line">{message.text}</p>
@@ -180,7 +180,7 @@ export default function SiteChatAssistant() {
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="inline-flex items-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-3 text-sm text-gray-500 shadow-sm">
+                <div className="asv-glass-panel inline-flex items-center gap-2 rounded-2xl px-4 py-3 text-sm text-gray-500 shadow-sm">
                   <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
                   Checking ASIVANTA guidance...
                 </div>
@@ -190,7 +190,7 @@ export default function SiteChatAssistant() {
 
           <form
             onSubmit={sendMessage}
-            className="border-t border-gray-100 bg-white p-3"
+            className="border-t border-white/50 bg-white/60 p-3 backdrop-blur-xl"
           >
             <div className="flex items-end gap-2">
               <textarea
@@ -223,7 +223,7 @@ export default function SiteChatAssistant() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="fixed bottom-6 right-4 z-[9999] inline-flex h-12 items-center gap-2 rounded-full bg-blue-600 px-4 pr-5 text-sm font-semibold text-white shadow-[0_8px_28px_rgba(37,99,235,0.35)] transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-[0_12px_36px_rgba(37,99,235,0.45)] md:right-6"
+        className="fixed bottom-6 right-4 z-[9999] inline-flex h-12 items-center gap-2 rounded-full border border-white/35 bg-blue-600/82 px-4 pr-5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_14px_42px_rgba(37,99,235,0.42)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-[0_18px_50px_rgba(37,99,235,0.48)] md:right-6"
         aria-label="Open ASIVANTA assistant"
       >
         <MessageCircle className="h-5 w-5" />
