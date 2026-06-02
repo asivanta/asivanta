@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bot,
   ExternalLink,
@@ -64,6 +64,8 @@ export default function SiteChatAssistant() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesScrollRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
@@ -77,6 +79,24 @@ export default function SiteChatAssistant() {
     () => `${window.location.pathname}${window.location.search}`,
     [],
   );
+
+  useEffect(() => {
+    if (!open) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({
+        block: "end",
+        behavior: "smooth",
+      });
+
+      if (messagesScrollRef.current) {
+        messagesScrollRef.current.scrollTop =
+          messagesScrollRef.current.scrollHeight;
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [open, messages.length, loading]);
 
   const sendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -147,7 +167,10 @@ export default function SiteChatAssistant() {
             </button>
           </div>
 
-          <div className="flex-1 space-y-4 overflow-y-auto bg-white/35 px-4 py-4 backdrop-blur-xl">
+          <div
+            ref={messagesScrollRef}
+            className="flex-1 space-y-4 overflow-y-auto scroll-smooth bg-white/35 px-4 py-4 backdrop-blur-xl"
+          >
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -186,6 +209,7 @@ export default function SiteChatAssistant() {
                 </div>
               </div>
             )}
+            <div ref={messagesEndRef} aria-hidden="true" />
           </div>
 
           <form
