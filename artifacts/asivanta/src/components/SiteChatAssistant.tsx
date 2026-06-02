@@ -126,7 +126,7 @@ export default function SiteChatAssistant() {
   return (
     <>
       {open && (
-        <section className="asv-glass-panel fixed bottom-24 right-4 z-[2147483647] flex h-[min(620px,calc(100vh-120px))] w-[calc(100vw-2rem)] max-w-[390px] flex-col overflow-hidden rounded-[2rem] shadow-2xl md:right-6">
+        <section className="asv-glass-panel !fixed bottom-24 right-4 z-[2147483647] flex h-[min(620px,calc(100vh-120px))] w-[calc(100vw-2rem)] max-w-[390px] flex-col overflow-hidden rounded-[2rem] shadow-2xl md:right-6">
           <div className="flex items-center justify-between bg-[#0a1128]/82 px-4 py-4 text-white backdrop-blur-2xl">
             <div className="flex items-center gap-3">
               <div className="asv-glass-icon asv-glass-icon-dark flex h-9 w-9 items-center justify-center rounded-full">
