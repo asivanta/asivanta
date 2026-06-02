@@ -7,6 +7,7 @@ import {
   Search,
   Building2,
   FileText,
+  FileCheck2,
   Globe2,
   Briefcase,
   Factory,
@@ -19,6 +20,8 @@ import {
   Users,
   ChevronRight,
   PlayCircle,
+  ClipboardCheck,
+  MessagesSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
@@ -262,6 +265,117 @@ export default function Home() {
               </p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* TRUST ASSURANCE */}
+      <section
+        className="relative overflow-hidden bg-[#0a1128] py-24 text-white"
+        id="trust-assurance-preview"
+      >
+        <div className="asv-liquid-sheen absolute inset-0 opacity-70"></div>
+        <div className="absolute inset-x-0 top-0 h-px bg-white/10"></div>
+        <div className="container relative z-10 mx-auto px-6">
+          <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={staggerContainer}
+              className="max-w-2xl"
+            >
+              <motion.div variants={fadeIn} className="mb-5 flex items-center gap-3">
+                <div className="h-px w-8 bg-blue-400"></div>
+                <span className="text-xs font-semibold uppercase tracking-widest text-blue-300">
+                  Trust assurance
+                </span>
+              </motion.div>
+              <motion.h2
+                variants={fadeIn}
+                className="text-3xl font-light tracking-tight text-white md:text-5xl"
+              >
+                Secure Sourcing,{" "}
+                <span className="font-medium text-blue-300">
+                  Built on Trust
+                </span>
+              </motion.h2>
+              <motion.p
+                variants={fadeIn}
+                className="mt-6 max-w-xl text-base font-light leading-relaxed text-blue-100/72 md:text-lg"
+              >
+                Asivanta helps buyers reduce sourcing risk by checking supplier
+                credibility, document reliability, communication quality, and
+                basic security awareness before business moves forward.
+              </motion.p>
+              <motion.div variants={fadeIn} className="mt-9">
+                <Link href="/trust-assurance">
+                  <Button className="asv-glass-button h-12 rounded-full px-7 text-[#0a1128] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white">
+                    Learn More
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={staggerContainer}
+              className="grid gap-4 sm:grid-cols-2"
+            >
+              {[
+                {
+                  icon: <ShieldCheck />,
+                  title: "Supplier Credibility Check",
+                },
+                {
+                  icon: <FileCheck2 />,
+                  title: "Document & Certificate Review",
+                },
+                {
+                  icon: <MessagesSquare />,
+                  title: "Safer Communication Process",
+                },
+                {
+                  icon: <ClipboardCheck />,
+                  title: "Risk-Aware Sourcing Support",
+                },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  variants={{
+                    hidden: { opacity: 0, y: 18 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: {
+                        delay: i * 0.08,
+                        duration: 0.46,
+                        ease: [0.22, 1, 0.36, 1] as [
+                          number,
+                          number,
+                          number,
+                          number,
+                        ],
+                      },
+                    },
+                  }}
+                  className="asv-glass-panel asv-glass-panel-dark rounded-[2rem] p-6 transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="asv-glass-icon asv-glass-icon-dark mb-6 h-12 w-12 rounded-2xl text-blue-100">
+                    {React.cloneElement(
+                      item.icon as React.ReactElement<{ className?: string }>,
+                      { className: "h-6 w-6 stroke-[1.5]" },
+                    )}
+                  </div>
+                  <h3 className="max-w-[13rem] text-lg font-semibold tracking-tight text-white">
+                    {item.title}
+                  </h3>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
         </div>
       </section>
 

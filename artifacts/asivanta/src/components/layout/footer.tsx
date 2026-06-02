@@ -105,6 +105,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/trust-assurance"
+                  className="hover:text-white transition-colors"
+                >
+                  Trust Assurance
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/contact"
                   className="hover:text-white transition-colors"
                 >
