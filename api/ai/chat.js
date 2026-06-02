@@ -3,7 +3,11 @@ import path from "path";
 
 const MAX_MESSAGE_LENGTH = 700;
 const MAX_HISTORY_ITEMS = 6;
-const BRIDGE_TIMEOUT_MS = 15000;
+const BRIDGE_TIMEOUT_MS = 30000;
+
+export const config = {
+  maxDuration: 60,
+};
 
 const siteLinks = {
   home: { label: "Home", href: "/" },
@@ -13,6 +17,7 @@ const siteLinks = {
   contact: { label: "Sourcing Review", href: "/contact" },
   quote: { label: "Quote Now", href: "/instant-quote" },
   insights: { label: "Insights", href: "/insights" },
+  trust: { label: "Trust Assurance", href: "/trust-assurance" },
   about: { label: "About ASIVANTA", href: "/about" },
   portal: { label: "Client Portal", href: "/portal" },
   login: { label: "Portal Login", href: "/login" },
@@ -26,6 +31,7 @@ const siteMap = [
   "Contact /contact: sourcing review intake for advisory help.",
   "Quote Now /instant-quote: guided Sunny-style component builder, BOM/RFQ/spec upload, or manual part list for quote review.",
   "Insights /insights: articles on Korean supplier verification, commercial terms, and risk reduction.",
+  "Trust Assurance /trust-assurance: supplier credibility, document review, communication safety, business information awareness, and practical risk reduction.",
   "About /about: ASIVANTA background, buyer-side model, Seoul presence, no hidden supplier commissions.",
   "Portal /portal and /login: client sourcing dashboard and access.",
   "Privacy /privacy and Terms /terms: legal pages.",
@@ -119,7 +125,15 @@ function keywordFallback(message, pathName = "") {
     };
   }
 
-  if (/insight|article|learn|guide|risk|korea/.test(text)) {
+  if (/trust|security|safe|safety|document|certificate|risk|assurance/.test(text)) {
+    return {
+      answer:
+        "ASIVANTA's trust assurance approach helps buyers review supplier credibility, document consistency, communication quality, and business information handling before moving forward. It reduces practical sourcing risk, but does not promise zero risk.",
+      links: [siteLinks.trust, siteLinks.contact],
+    };
+  }
+
+  if (/insight|article|learn|guide|korea/.test(text)) {
     return {
       answer:
         "The Insights page has practical articles on Korean supplier verification, commercial terms, and sourcing risk reduction.",
@@ -132,13 +146,6 @@ function keywordFallback(message, pathName = "") {
       "I can help you find the right ASIVANTA path for Korea sourcing, supplier verification, quote comparison, factory readiness, or client portal access. For an RFQ, use Quote Now; for advisory help, start a sourcing review.",
     links: [siteLinks.quote, siteLinks.contact, siteLinks.services],
   };
-}
-
-function isGuideOnlyIntent(message, pathName = "") {
-  const text = `${message} ${pathName}`.toLowerCase();
-  return /quote|rfq|bom|price|pricing|part|spec|upload|drawing|sourcing review|supplier|verification|factory|service|capabilit|portal|login|about|contact|insight|article/.test(
-    text,
-  );
 }
 
 function buildBridgeGuide({ pagePath, pageTitle, history }) {
@@ -237,14 +244,6 @@ export default async function handler(req, res) {
   }
 
   const fallback = keywordFallback(message, pagePath);
-  if (isGuideOnlyIntent(message, pagePath)) {
-    return res.status(200).json({
-      answer: fallback.answer,
-      links: linksForAnswer(fallback.answer, fallback.links),
-      fallback: false,
-      source: "guide",
-    });
-  }
 
   const bridgeAnswer = await callBridge({
     message,
