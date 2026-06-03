@@ -328,22 +328,31 @@ export default function Home() {
                 {
                   icon: <ShieldCheck />,
                   title: "Supplier Credibility Check",
+                  href: "/trust-assurance#supplier-credibility",
                 },
                 {
                   icon: <FileCheck2 />,
                   title: "Document & Certificate Review",
+                  href: "/trust-assurance#document-review",
                 },
                 {
                   icon: <MessagesSquare />,
                   title: "Safer Communication Process",
+                  href: "/trust-assurance#communication-safety",
                 },
                 {
                   icon: <ClipboardCheck />,
                   title: "Risk-Aware Sourcing Support",
+                  href: "/trust-assurance#practical-risk-reduction",
                 },
               ].map((item, i) => (
-                <motion.div
+                <Link
                   key={item.title}
+                  href={item.href}
+                  className="group block"
+                  aria-label={`Learn about ${item.title}`}
+                >
+                  <motion.div
                   variants={{
                     hidden: { opacity: 0, y: 18 },
                     visible: {
@@ -361,8 +370,8 @@ export default function Home() {
                       },
                     },
                   }}
-                  className="asv-glass-panel asv-glass-panel-dark rounded-[2rem] p-6 transition-all duration-300 hover:-translate-y-1"
-                >
+                    className="asv-glass-panel asv-glass-panel-dark rounded-[2rem] p-6 transition-all duration-300 hover:-translate-y-1 group-hover:border-white/30"
+                  >
                   <div className="asv-glass-icon asv-glass-icon-dark mb-6 h-12 w-12 rounded-2xl text-blue-100">
                     {React.cloneElement(
                       item.icon as React.ReactElement<{ className?: string }>,
@@ -372,7 +381,8 @@ export default function Home() {
                   <h3 className="max-w-[13rem] text-lg font-semibold tracking-tight text-white">
                     {item.title}
                   </h3>
-                </motion.div>
+                  </motion.div>
+                </Link>
               ))}
             </motion.div>
           </div>
