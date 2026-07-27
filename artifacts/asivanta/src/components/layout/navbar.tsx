@@ -74,6 +74,12 @@ export function Navbar() {
               Industries
             </a>
             <Link
+              href="/report"
+              className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
+            >
+              The Report
+            </Link>
+            <Link
               href="/insights"
               className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
             >
@@ -136,6 +142,13 @@ export function Navbar() {
               >
                 Industries <ArrowRight className="h-4 w-4 text-gray-400" />
               </a>
+              <Link
+                href="/report"
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-gray-900 py-2 border-b border-gray-100 flex justify-between items-center"
+              >
+                The Report <ArrowRight className="h-4 w-4 text-gray-400" />
+              </Link>
               <Link
                 href="/insights"
                 onClick={() => setMobileMenuOpen(false)}
