@@ -89,6 +89,14 @@ export function Footer() {
             <ul className="flex flex-col gap-4 text-sm text-gray-400">
               <li>
                 <Link
+                  href="/report"
+                  className="hover:text-white transition-colors"
+                >
+                  Shortlist Report
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/insights"
                   className="hover:text-white transition-colors"
                 >
