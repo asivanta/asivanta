@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
+import { routeChat } from "./router.js";
 
 const MAX_MESSAGE_LENGTH = 700;
 const MAX_HISTORY_ITEMS = 6;
-const BRIDGE_TIMEOUT_MS = 30000;
 
 export const config = {
   maxDuration: 60,
@@ -125,7 +125,9 @@ function keywordFallback(message, pathName = "") {
     };
   }
 
-  if (/trust|security|safe|safety|document|certificate|risk|assurance/.test(text)) {
+  if (
+    /trust|security|safe|safety|document|certificate|risk|assurance/.test(text)
+  ) {
     return {
       answer:
         "ASIVANTA's trust assurance approach helps buyers review supplier credibility, document consistency, communication quality, and business information handling before moving forward. It reduces practical sourcing risk, but does not promise zero risk.",
@@ -148,8 +150,10 @@ function keywordFallback(message, pathName = "") {
   };
 }
 
-function buildBridgeGuide({ pagePath, pageTitle, history }) {
-  return `Current page: ${pagePath || "/"}
+function buildSystemGuide({ pagePath, pageTitle, history }) {
+  return `${readPersonality()}
+
+Current page: ${pagePath || "/"}
 Page title: ${pageTitle || "ASIVANTA"}
 
 Site map:
@@ -165,45 +169,6 @@ ${history
   .join("\n")}
 
 Return only the answer text. Keep it concise and include the best path as plain text if useful.`;
-}
-
-async function callBridge(payload) {
-  const bridgeUrl =
-    process.env.AI_BRIDGE_URL ||
-    process.env.OPENCLAW_URL ||
-    "http://127.0.0.1:8787/chat";
-  const token =
-    process.env.AI_BRIDGE_TOKEN || process.env.OPENCLAW_API_KEY || "";
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), BRIDGE_TIMEOUT_MS);
-  try {
-    const response = await fetch(bridgeUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal,
-    });
-
-    if (!response.ok) return null;
-    const data = await response.json().catch(() => null);
-    const answer =
-      data?.answer ||
-      data?.response ||
-      data?.message ||
-      data?.content ||
-      data?.choices?.[0]?.message?.content ||
-      data?.choices?.[0]?.text ||
-      "";
-    return sanitize(answer);
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timeout);
-  }
 }
 
 function linksForAnswer(answer, fallbackLinks) {
@@ -245,23 +210,21 @@ export default async function handler(req, res) {
 
   const fallback = keywordFallback(message, pagePath);
 
-  const bridgeAnswer = await callBridge({
+  const routed = await routeChat({
     message,
-    systemGuide: buildBridgeGuide({ pagePath, pageTitle, history }),
-    pagePath,
+    system: buildSystemGuide({ pagePath, pageTitle, history }),
     history: history.slice(-MAX_HISTORY_ITEMS),
   });
 
-  const safeAnswer =
-    bridgeAnswer && !isPupCareLeak(bridgeAnswer)
-      ? bridgeAnswer
-      : fallback.answer;
+  const usable = Boolean(routed.text) && !isPupCareLeak(routed.text);
+  const safeAnswer = usable ? routed.text : fallback.answer;
 
   return res.status(200).json({
     answer: safeAnswer,
     links: linksForAnswer(safeAnswer, fallback.links),
-    fallback: !bridgeAnswer || isPupCareLeak(bridgeAnswer),
-    source:
-      bridgeAnswer && !isPupCareLeak(bridgeAnswer) ? "bridge" : "fallback",
+    fallback: !usable,
+    source: usable ? routed.provider : "fallback",
+    model: usable ? routed.model : null,
+    intent: routed.intent,
   });
 }
