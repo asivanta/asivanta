@@ -15,6 +15,7 @@ import Admin from "@/pages/admin";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import TrustAssurance from "@/pages/trust-assurance";
+import Report from "@/pages/report";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,8 @@ function Router() {
       <Route path="/instant-quote" component={InstantQuote} />
       <Route path="/about" component={About} />
       <Route path="/trust-assurance" component={TrustAssurance} />
+      <Route path="/report" component={Report} />
+      <Route path="/shortlist-report" component={Report} />
       <Route path="/admin" component={Admin} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
