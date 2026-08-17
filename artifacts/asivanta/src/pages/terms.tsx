@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -113,6 +114,11 @@ const sections = [
 ];
 
 export default function Terms() {
+  useSeo(
+    "Terms of Service | Asivanta",
+    "The terms that govern your use of the Asivanta website and our Korea sourcing, supplier verification and RFQ comparison services.",
+  );
+
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
       <Navbar />

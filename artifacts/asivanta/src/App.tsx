@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import SiteChatAssistant from "@/components/SiteChatAssistant";
 import NotFound from "@/pages/not-found";
-import Home from "@/pages/home";
+import Home from "@/pages/home-apple";
 import Contact from "@/pages/contact";
 import InstantQuote from "@/pages/instant-quote";
 import Portal from "@/pages/portal";

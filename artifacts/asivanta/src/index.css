@@ -324,3 +324,43 @@ html {
     );
   opacity: 0.75;
 }
+
+/* Apple-inspired homepage: scoped so existing project pages stay unchanged. */
+.asv-apple-home {
+  --asv-apple-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+    "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.015em;
+}
+
+.asv-apple-home .asv-apple-press {
+  transition-property: transform, background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: var(--asv-apple-ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.asv-apple-home .asv-apple-press:active {
+  transform: scale(0.97);
+}
+
+.asv-apple-home :where(a, button):focus-visible {
+  outline: 3px solid #2997ff;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .asv-apple-home *,
+  .asv-apple-home *::before,
+  .asv-apple-home *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

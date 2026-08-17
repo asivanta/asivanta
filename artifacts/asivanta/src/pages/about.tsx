@@ -4,6 +4,7 @@ import { ArrowLeft, MapPin, Globe, Shield, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -39,6 +40,11 @@ const values = [
 ];
 
 export default function About() {
+  useSeo(
+    "About Asivanta | Seoul-Based Korea Sourcing Advisory",
+    "Who we are and how we work: a Seoul-based sourcing team that runs due diligence before introductions, with aligned incentives and full transparency for overseas buyers.",
+  );
+
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
       <Navbar />

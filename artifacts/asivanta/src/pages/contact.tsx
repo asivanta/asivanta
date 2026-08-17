@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -66,6 +67,11 @@ const inputErrorClass = "border-red-300";
 const inputNormalClass = "border-gray-200";
 
 export default function Contact() {
+  useSeo(
+    "Contact Asivanta | Talk to a Korea Sourcing Specialist",
+    "Tell us what you need to source in Korea and we will come back with verified supplier options, indicative pricing and a realistic lead time. English-language support.",
+  );
+
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");

@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -212,6 +213,11 @@ const referenceLinks = [
 ];
 
 export default function TrustAssurance() {
+  useSeo(
+    "Trust & Assurance | How Asivanta Verifies Korean Suppliers",
+    "How supplier verification actually works at Asivanta: is the company real, capable and acting consistently. Site checks, document review and ongoing monitoring explained.",
+  );
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-white text-gray-900 font-sans selection:bg-blue-100 selection:text-blue-900">
       <Navbar />

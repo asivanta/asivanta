@@ -1,21 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ArrowRight } from "lucide-react";
 import logoImage from "../../assets/logo-nav.png";
+import { useNavigationBackgroundTone } from "./use-navigation-background-tone";
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const headerRef = useRef<HTMLElement>(null);
+  const isLightBackground = useNavigationBackgroundTone(headerRef);
+  const navigationShadow = {
+    filter: isLightBackground
+      ? "drop-shadow(0 1px 2px rgba(0, 45, 110, 1)) drop-shadow(0 0 8px rgba(0, 113, 227, 0.95))"
+      : "drop-shadow(0 1px 2px rgba(0, 0, 0, 1)) drop-shadow(0 0 5px rgba(0, 0, 0, 0.65))",
+  };
+  const logoTreatment = {
+    filter: isLightBackground
+      ? "drop-shadow(0 1px 2px rgba(0, 45, 110, 1)) drop-shadow(0 0 8px rgba(0, 113, 227, 0.75))"
+      : "brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0, 0, 0, 1))",
+  };
 
   return (
     <>
@@ -30,26 +33,19 @@ export function Navbar() {
         }
       `}</style>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b ${
-          mobileMenuOpen
-            ? "bg-white/86 border-white/60 py-1 shadow-sm backdrop-blur-2xl"
-            : scrolled
-              ? "bg-[#0a1128]/58 backdrop-blur-2xl border-white/15 py-0.5 shadow-[0_18px_55px_rgba(0,0,0,0.18)]"
-              : "bg-transparent border-transparent py-1"
-        }`}
+        ref={headerRef}
+        className="fixed left-0 right-0 top-0 z-50 border-b border-transparent bg-transparent py-1"
+        data-background-tone={isLightBackground ? "light" : "dark"}
       >
         <div className="w-full px-6 md:px-10 lg:px-12 flex items-center">
           <Link href="/" className="flex items-center z-50 relative shrink-0">
             <img
               src={logoImage}
               alt="ASIVANTA"
-              className={`object-contain transition-all duration-300 ${
-                mobileMenuOpen
-                  ? "h-14 md:h-16 brightness-0"
-                  : scrolled
-                    ? "h-12 md:h-16 brightness-0 invert"
-                    : "h-16 md:h-24 brightness-0 invert"
+              className={`h-16 object-contain md:h-24 ${
+                mobileMenuOpen ? "brightness-0" : ""
               }`}
+              style={mobileMenuOpen ? undefined : logoTreatment}
             />
           </Link>
 
@@ -57,41 +53,42 @@ export function Navbar() {
           <nav className="hidden md:flex flex-1 items-center justify-end gap-8 lg:gap-12 xl:gap-16 ml-10 lg:ml-20">
             <a
               href="#services"
-              className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
+              className="text-sm font-medium text-white transition-opacity hover:opacity-75"
+              style={navigationShadow}
             >
               Services
             </a>
             <a
               href="#how-it-works"
-              className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
+              className="text-sm font-medium text-white transition-opacity hover:opacity-75"
+              style={navigationShadow}
             >
               How It Works
             </a>
             <a
               href="#industries"
-              className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
+              className="text-sm font-medium text-white transition-opacity hover:opacity-75"
+              style={navigationShadow}
             >
               Industries
             </a>
             <Link
               href="/report"
-              className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
+              className="text-sm font-medium text-white transition-opacity hover:opacity-75"
+              style={navigationShadow}
             >
               The Report
             </Link>
             <Link
               href="/insights"
-              className={`text-sm font-medium transition-colors ${scrolled ? "text-gray-300 hover:text-white" : "text-gray-300 hover:text-white"}`}
+              className="text-sm font-medium text-white transition-opacity hover:opacity-75"
+              style={navigationShadow}
             >
               Insights
             </Link>
             <Link
               href="/instant-quote"
-              className={`asivanta-quote-now-link flex items-center gap-1 rounded-full border px-4 py-2 text-base font-semibold transition-all duration-300 hover:-translate-y-0.5 ${
-                scrolled
-                  ? "border-white/25 bg-white/12 text-blue-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl hover:border-blue-200/70 hover:bg-white/18 hover:text-white"
-                  : "border-white/30 bg-white/12 text-blue-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_12px_34px_rgba(15,23,42,0.16)] backdrop-blur-xl hover:border-blue-100/80 hover:bg-white/18 hover:text-white"
-              }`}
+              className="asivanta-quote-now-link flex items-center gap-1 rounded-full border border-white/40 bg-black/20 px-4 py-2 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_12px_34px_rgba(15,23,42,0.16)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-100/80 hover:bg-black/30"
               style={{
                 animation: "asivantaQuoteNowPulse 6.5s ease-in-out infinite",
               }}
@@ -108,9 +105,7 @@ export function Navbar() {
             {mobileMenuOpen ? (
               <X className="h-6 w-6 text-gray-900" />
             ) : (
-              <Menu
-                className={`h-6 w-6 ${scrolled ? "text-white" : "text-white"}`}
-              />
+              <Menu className="h-6 w-6 text-white" style={navigationShadow} />
             )}
           </button>
 
