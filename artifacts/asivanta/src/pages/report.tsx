@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -177,6 +178,11 @@ const credibility = [
 ];
 
 export default function Report() {
+  useSeo(
+    "Korean Supplier Shortlist Report | Asivanta",
+    "Three to five Korean suppliers for one defined part or capability, screened by hand and scored on evidence, delivered as a written shortlist report.",
+  );
+
   return (
     <div className="min-h-screen overflow-x-hidden bg-white font-sans text-gray-900 selection:bg-blue-100 selection:text-blue-900">
       <Navbar />

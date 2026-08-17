@@ -146,7 +146,12 @@ export default function SiteChatAssistant() {
   return (
     <>
       {open && (
-        <section className="asv-glass-panel !fixed bottom-24 right-4 z-[2147483647] flex h-[min(620px,calc(100vh-120px))] w-[calc(100vw-2rem)] max-w-[390px] flex-col overflow-hidden rounded-[2rem] shadow-2xl md:right-6">
+        <section
+          id="asivanta-assistant-panel"
+          role="dialog"
+          aria-label="ASIVANTA sourcing assistant"
+          className="asv-glass-panel !fixed bottom-20 right-4 z-[2147483647] flex h-[min(620px,calc(100vh-104px))] w-[calc(100vw-2rem)] max-w-[390px] flex-col overflow-hidden rounded-[2rem] shadow-2xl md:bottom-24 md:right-6 md:h-[min(620px,calc(100vh-120px))]"
+        >
           <div className="flex items-center justify-between bg-[#0a1128]/82 px-4 py-4 text-white backdrop-blur-2xl">
             <div className="flex items-center gap-3">
               <div className="asv-glass-icon asv-glass-icon-dark flex h-9 w-9 items-center justify-center rounded-full">
@@ -160,7 +165,7 @@ export default function SiteChatAssistant() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
               aria-label="Close chat"
             >
               <X className="h-4 w-4" />
@@ -224,6 +229,7 @@ export default function SiteChatAssistant() {
                   if (e.key === "Enter" && !e.shiftKey) sendMessage(e);
                 }}
                 rows={2}
+                aria-label="Message for the ASIVANTA assistant"
                 className="max-h-24 min-h-[44px] flex-1 resize-none rounded-xl border border-gray-200 bg-[#f8fafc] px-3 py-2 text-sm outline-none transition-all focus:border-blue-400 focus:ring-2 focus:ring-blue-500/15"
                 placeholder="Ask about sourcing, quotes, verification..."
               />
@@ -247,11 +253,15 @@ export default function SiteChatAssistant() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="fixed bottom-6 right-4 z-[2147483647] inline-flex h-12 items-center gap-2 rounded-full border border-white/35 bg-blue-600/82 px-4 pr-5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_14px_42px_rgba(37,99,235,0.42)] backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-[0_18px_50px_rgba(37,99,235,0.48)] md:right-6"
-        aria-label="Open ASIVANTA assistant"
+        className="fixed bottom-4 right-4 z-[2147483647] inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-blue-600/90 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_10px_30px_rgba(37,99,235,0.38)] backdrop-blur-xl transition-[transform,background-color,box-shadow] duration-150 active:scale-[0.97] hover:bg-blue-600 sm:w-auto sm:gap-2 sm:px-4 sm:pr-5 md:bottom-6 md:right-6 md:h-12 md:hover:-translate-y-0.5 md:hover:shadow-[0_18px_50px_rgba(37,99,235,0.48)]"
+        aria-label={
+          open ? "Close ASIVANTA assistant" : "Open ASIVANTA assistant"
+        }
+        aria-expanded={open}
+        aria-controls="asivanta-assistant-panel"
       >
         <MessageCircle className="h-5 w-5" />
-        <span>Ask ASIVANTA</span>
+        <span className="hidden sm:inline">Ask ASIVANTA</span>
       </button>
     </>
   );

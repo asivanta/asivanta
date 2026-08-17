@@ -1,9 +1,9 @@
-﻿import { useState } from "react";
-import { Link } from "wouter";
+﻿import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Lock, ArrowRight } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo-new-transparent.png";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
@@ -16,12 +16,10 @@ const stagger = {
 };
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
+  useSeo(
+    "Client Portal | Asivanta",
+    "The Asivanta client portal is still in development. Until it launches, our team handles RFQs, supplier reports and order updates directly by email.",
+  );
 
   return (
     <div className="min-h-screen bg-[#0a1128] flex items-center justify-center px-4 py-12 relative overflow-hidden">
@@ -37,62 +35,40 @@ export default function Login() {
           <Link href="/">
             <img src={logo} alt="ASIVANTA" className="h-16 mx-auto mb-6 brightness-0 invert" />
           </Link>
-          <h1 className="text-2xl font-light text-white tracking-tight mb-2">Client Portal Login</h1>
-          <p className="text-gray-400 text-sm font-light">Access your sourcing dashboard and project documents.</p>
+          <h1 className="text-2xl font-light text-white tracking-tight mb-2">Client Portal</h1>
+          <p className="text-gray-400 text-sm font-light">Sign-in is not available yet.</p>
         </motion.div>
 
-        <motion.div variants={fadeIn} className="bg-white rounded-2xl shadow-2xl p-8 md:p-10">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-[#0F172A] mb-2">Email Address</label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-[#f9fafb] text-[#0F172A] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
-                placeholder="you@company.com"
-              />
-            </div>
+        <motion.div variants={fadeIn} className="bg-white rounded-2xl shadow-2xl p-8 md:p-10 text-center">
+          <div className="h-12 w-12 rounded-xl bg-[#EFF6FF] flex items-center justify-center mx-auto mb-5">
+            <Clock className="h-5 w-5 text-[#3B82F6] stroke-[1.5]" />
+          </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="block text-sm font-medium text-[#0F172A]">Password</label>
-                <button type="button" className="text-xs text-[#3B82F6] hover:text-blue-700 transition-colors">
-                  Forgot password?
-                </button>
-              </div>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-[#f9fafb] text-[#0F172A] text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
-                placeholder="Enter your password"
-              />
-            </div>
+          <h2 className="text-lg font-semibold text-[#0F172A] mb-3">Client portal is coming soon</h2>
+          <p className="text-sm text-gray-600 font-light leading-relaxed mb-7">
+            We are still building the online portal for sourcing dashboards and project documents.
+            Until it launches, our team handles RFQs, supplier reports and order updates directly by email.
+          </p>
 
-            <Button type="submit" size="lg" className="w-full rounded-xl h-12 text-sm font-medium group">
-              Sign In
+          <Link href="/contact">
+            <Button size="lg" className="w-full rounded-xl h-12 text-sm font-medium group">
+              Contact our team
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
             </Button>
-          </form>
+          </Link>
 
-          <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-            <div className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
-              <Lock className="h-3 w-3" />
-              Secured with end-to-end encryption
-            </div>
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <p className="text-xs text-gray-400 font-light">
+              Existing client? Reach your usual contact at ASIVANTA and we will send your latest status update.
+            </p>
           </div>
         </motion.div>
 
         <motion.div variants={fadeIn} className="text-center mt-8">
           <p className="text-gray-500 text-sm font-light">
-            Need access?{" "}
-            <Link href="/contact" className="text-[#3B82F6] hover:text-blue-300 transition-colors font-medium">
-              Contact our team
+            Want a preview?{" "}
+            <Link href="/portal" className="text-[#3B82F6] hover:text-blue-300 transition-colors font-medium">
+              See the portal preview
             </Link>
           </p>
         </motion.div>

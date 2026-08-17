@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, X, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -70,6 +71,11 @@ const articles = [
 ];
 
 export default function Insights() {
+  useSeo(
+    "Insights | Korea Sourcing and Supplier Verification Guides",
+    "Practical guides for buyers sourcing from Korea: how to verify a supplier before commitment, what MOQ, lead time and payment terms really mean, and where sourcing goes wrong.",
+  );
+
   const [activeArticle, setActiveArticle] = useState<number | null>(null);
   const selected = articles.find((a) => a.id === activeArticle);
 

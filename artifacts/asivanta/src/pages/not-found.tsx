@@ -1,7 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
+import { useSeo } from "@/hooks/use-seo";
 
 export default function NotFound() {
+  useSeo(
+    "Page Not Found | Asivanta",
+    "This page does not exist on asivanta.com. Explore our Korea supplier sourcing and verification services, or contact the team directly.",
+  );
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md mx-4">

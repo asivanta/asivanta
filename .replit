@@ -30,8 +30,5 @@ channel = "stable-25_05"
 
 [userenv]
 
-[userenv.shared]
-CONTACT_TO_EMAIL = "contact@asivanta.com"
-CONTACT_FROM_EMAIL = "onboarding@resend.dev"
-ADMIN_PASSWORD = "ASIVANTA2026!"
-RESEND_API_KEY = "re_HipeFvhJ_DsSeT1UedGcaXzaXbfBuPJ9g"
+# [userenv.shared] removed 2026-08-04 — secrets must live in Vercel/Replit env vars, never in a tracked file.
+# Required env vars: CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL, ADMIN_PASSWORD, RESEND_API_KEY

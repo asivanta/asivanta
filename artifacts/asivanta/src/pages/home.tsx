@@ -31,6 +31,7 @@ import { Footer } from "@/components/layout/footer";
 import heroBg from "../assets/hero-bg.png";
 import factoryAbstract from "../assets/factory-abstract.png";
 import logisticsAbstract from "../assets/logistics-abstract.png";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -55,6 +56,11 @@ const staggerContainer = {
 };
 
 export default function Home() {
+  useSeo(
+    "Asivanta | Korea Supplier Sourcing, Verification & RFQ Comparison",
+    "Asivanta helps overseas buyers source and verify Korean suppliers. Factory verification, side-by-side RFQ comparison and order oversight, run by a Korea-based advisory team.",
+  );
+
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,

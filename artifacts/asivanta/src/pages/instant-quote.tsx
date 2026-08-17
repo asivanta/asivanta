@@ -32,6 +32,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { useSeo } from "@/hooks/use-seo";
 
 type Mode = "guided" | "upload" | "build";
 type ProductFamily =
@@ -464,6 +465,11 @@ const inputClass =
   "h-11 w-full rounded-lg border border-gray-200 bg-white px-3 text-sm text-[#0F172A] outline-none transition-all focus:border-blue-400 focus:ring-2 focus:ring-blue-500/15";
 
 export default function InstantQuote() {
+  useSeo(
+    "Instant Quote | Compare Korean Supplier RFQs | Asivanta",
+    "Describe your part or project and get a structured RFQ sent to verified Korean suppliers, then compare the responses side by side on price, MOQ and lead time.",
+  );
+
   const [quoteId, setQuoteId] = useState(() => generateQuoteId());
   const [mode, setMode] = useState<Mode>("guided");
   const [files, setFiles] = useState<File[]>([]);

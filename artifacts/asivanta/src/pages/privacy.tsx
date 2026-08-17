@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -104,6 +105,11 @@ const sections = [
 ];
 
 export default function Privacy() {
+  useSeo(
+    "Privacy Policy | Asivanta",
+    "How Asivanta collects, uses, stores and protects the personal and business information you share with us through this website and our sourcing services.",
+  );
+
   return (
     <div className="min-h-screen bg-white text-gray-900 font-sans">
       <Navbar />

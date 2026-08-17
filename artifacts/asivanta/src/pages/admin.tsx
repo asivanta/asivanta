@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import logoImage from "../assets/logo-new-transparent.png";
+import { useSeo } from "@/hooks/use-seo";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -1130,6 +1131,11 @@ function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 export default function Admin() {
+  useSeo(
+    "Admin Console | Asivanta",
+    "Internal Asivanta administration console. This page is not part of the public asivanta.com website.",
+  );
+
   const [authenticated, setAuthenticated] = useState(() => !!getToken());
   const resetToken = getResetToken();
 

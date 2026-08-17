@@ -1,7 +1,8 @@
 ﻿import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { LogOut, FileText, Package, Truck, Warehouse, ArrowLeft } from "lucide-react";
+import { LogOut, FileText, Package, Truck, Warehouse, ArrowLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 16 },
@@ -31,33 +32,33 @@ function StatusBadge({ label, variant }: { label: string; variant: BadgeVariant 
 }
 
 const rfqData = [
-  { id: "RFQ-2026-0041", supplier: "Daesung Industrial", status: "Quoted", updated: "Apr 04, 2026", variant: "green" as BadgeVariant },
-  { id: "RFQ-2026-0039", supplier: "Jabil Inc.", status: "Negotiation", updated: "Apr 03, 2026", variant: "yellow" as BadgeVariant },
-  { id: "RFQ-2026-0037", supplier: "K-Tech Components", status: "Reviewing", updated: "Apr 01, 2026", variant: "blue" as BadgeVariant },
-  { id: "RFQ-2026-0035", supplier: "Arrow Electronics", status: "Quoted", updated: "Mar 29, 2026", variant: "green" as BadgeVariant },
-  { id: "RFQ-2026-0032", supplier: "Hanmi Electronics", status: "Reviewing", updated: "Mar 27, 2026", variant: "blue" as BadgeVariant },
+  { id: "RFQ-2026-0041", supplier: "Supplier A", status: "Quoted", updated: "Apr 04, 2026", variant: "green" as BadgeVariant },
+  { id: "RFQ-2026-0039", supplier: "Contract Manufacturer B", status: "Negotiation", updated: "Apr 03, 2026", variant: "yellow" as BadgeVariant },
+  { id: "RFQ-2026-0037", supplier: "Supplier C", status: "Reviewing", updated: "Apr 01, 2026", variant: "blue" as BadgeVariant },
+  { id: "RFQ-2026-0035", supplier: "Distributor D", status: "Quoted", updated: "Mar 29, 2026", variant: "green" as BadgeVariant },
+  { id: "RFQ-2026-0032", supplier: "Supplier E", status: "Reviewing", updated: "Mar 27, 2026", variant: "blue" as BadgeVariant },
 ];
 
 const orderData = [
-  { id: "ORD-8821", supplier: "Sanmina Corp.", qty: "12,000 units", status: "In Production", variant: "blue" as BadgeVariant },
-  { id: "ORD-8819", supplier: "Celestica Inc.", qty: "5,400 units", status: "Pending", variant: "gray" as BadgeVariant },
-  { id: "ORD-8815", supplier: "Jabil Inc.", qty: "28,000 kg", status: "In Production", variant: "blue" as BadgeVariant },
-  { id: "ORD-8812", supplier: "Sanmina Corp.", qty: "3,200 units", status: "Delayed", variant: "red" as BadgeVariant },
+  { id: "ORD-8821", supplier: "Contract Manufacturer A", qty: "12,000 units", status: "In Production", variant: "blue" as BadgeVariant },
+  { id: "ORD-8819", supplier: "Contract Manufacturer C", qty: "5,400 units", status: "Pending", variant: "gray" as BadgeVariant },
+  { id: "ORD-8815", supplier: "Contract Manufacturer B", qty: "28,000 kg", status: "In Production", variant: "blue" as BadgeVariant },
+  { id: "ORD-8812", supplier: "Contract Manufacturer A", qty: "3,200 units", status: "Delayed", variant: "red" as BadgeVariant },
 ];
 
 const deliveryData = [
-  { id: "SHP-44201", eta: "Apr 12, 2026", carrier: "Maersk Line", status: "In Transit", variant: "blue" as BadgeVariant },
-  { id: "SHP-44198", eta: "Apr 08, 2026", carrier: "CMA CGM", status: "Customs", variant: "yellow" as BadgeVariant },
-  { id: "SHP-44192", eta: "Mar 30, 2026", carrier: "HMM Co.", status: "Delivered", variant: "green" as BadgeVariant },
-  { id: "SHP-44187", eta: "Apr 18, 2026", carrier: "Evergreen Marine", status: "In Transit", variant: "blue" as BadgeVariant },
+  { id: "SHP-44201", eta: "Apr 12, 2026", carrier: "Carrier 1", status: "In Transit", variant: "blue" as BadgeVariant },
+  { id: "SHP-44198", eta: "Apr 08, 2026", carrier: "Carrier 2", status: "Customs", variant: "yellow" as BadgeVariant },
+  { id: "SHP-44192", eta: "Mar 30, 2026", carrier: "Carrier 3", status: "Delivered", variant: "green" as BadgeVariant },
+  { id: "SHP-44187", eta: "Apr 18, 2026", carrier: "Carrier 4", status: "In Transit", variant: "blue" as BadgeVariant },
 ];
 
 const inventoryData = [
-  { part: "STL-CR-440", qty: "14,200", location: "Busan Warehouse", status: "In Stock", variant: "green" as BadgeVariant },
-  { part: "ELC-HM-220", qty: "3,800", location: "Incheon FTZ", status: "In Stock", variant: "green" as BadgeVariant },
-  { part: "PRC-KP-115", qty: "960", location: "Ulsan Plant", status: "Low Stock", variant: "yellow" as BadgeVariant },
-  { part: "CMP-KT-300", qty: "7,500", location: "Gyeonggi Hub", status: "In Stock", variant: "green" as BadgeVariant },
-  { part: "DST-AV-650", qty: "0", location: "Busan Warehouse", status: "Out of Stock", variant: "red" as BadgeVariant },
+  { part: "STL-CR-440", qty: "14,200", location: "Warehouse 1", status: "In Stock", variant: "green" as BadgeVariant },
+  { part: "ELC-HM-220", qty: "3,800", location: "Free Trade Zone 1", status: "In Stock", variant: "green" as BadgeVariant },
+  { part: "PRC-KP-115", qty: "960", location: "Plant 1", status: "Low Stock", variant: "yellow" as BadgeVariant },
+  { part: "CMP-KT-300", qty: "7,500", location: "Distribution Hub 1", status: "In Stock", variant: "green" as BadgeVariant },
+  { part: "DST-AV-650", qty: "0", location: "Warehouse 1", status: "Out of Stock", variant: "red" as BadgeVariant },
 ];
 
 function DashboardCard({ title, icon: Icon, children }: { title: string; icon: React.ElementType; children: React.ReactNode }) {
@@ -91,8 +92,25 @@ function TableCell({ children, mono }: { children: React.ReactNode; mono?: boole
 }
 
 export default function Portal() {
+  useSeo(
+    "Client Portal Preview (Sample Data) | Asivanta",
+    "A design preview of the Asivanta client portal. All RFQ, order, shipment and inventory rows shown are generic sample data, not live client information.",
+  );
+
   return (
     <div className="min-h-screen bg-[#f4f5f7] font-sans">
+      <div className="bg-[#0a1128] text-white">
+        <div className="container mx-auto px-6 py-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+          <span className="inline-flex items-center gap-1.5 font-medium">
+            <Info className="h-4 w-4 stroke-[1.5]" />
+            Preview
+          </span>
+          <span className="font-light text-gray-300">
+            Sample data shown for demonstration only. Your live portal is provisioned after onboarding.
+          </span>
+        </div>
+      </div>
+
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
@@ -117,7 +135,7 @@ export default function Portal() {
         <motion.div initial="hidden" animate="visible" variants={stagger}>
           <motion.div variants={fadeIn} className="mb-10">
             <h1 className="text-3xl md:text-4xl font-light text-[#0F172A] tracking-tight mb-2">Client Portal</h1>
-            <p className="text-gray-500 font-light">Access your sourcing activity, RFQs, and order status.</p>
+            <p className="text-gray-500 font-light">A product preview of how your sourcing activity, RFQs, and order status will appear. All rows below are sample data.</p>
           </motion.div>
 
           <div className="grid gap-8">

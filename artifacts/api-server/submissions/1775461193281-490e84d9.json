@@ -1,11 +1,1 @@
-{
-  "fullName": "Test User",
-  "company": "Acme Corp",
-  "email": "test@acme.com",
-  "phone": "+1 555-0100",
-  "projectType": "Sourcing",
-  "message": "This is a test submission to verify the contact form stores data correctly in the database. Checking full pipeline.",
-  "files": [],
-  "submittedAt": "2026-04-06T07:39:53.280Z",
-  "ip": "::1"
-}
+{"removed":"2026-08-04","reason":"Customer PII must not be tracked in a public repo. Purge from git history."}

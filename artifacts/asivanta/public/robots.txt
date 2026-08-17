@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Internal / non-indexable routes
+Disallow: /admin
+Disallow: /login
+Disallow: /portal
+Disallow: /shortlist-report
+Disallow: /api/
+
+Sitemap: https://asivanta.com/sitemap.xml

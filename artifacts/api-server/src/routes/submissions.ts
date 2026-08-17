@@ -16,7 +16,6 @@ const resetTokens = new Map<string, number>(); // token → expiresAt
 const RESET_TOKEN_TTL = 60 * 60 * 1000; // 1 hour
 
 const ADMIN_USERNAME = "asivanta";
-const DEFAULT_PASSWORD = "asivanta2026!";
 
 function cleanExpiredSessions() {
   const now = Date.now();
@@ -62,8 +61,13 @@ async function getAdminPasswordHash(): Promise<string> {
     if (row) return row.value;
   } catch { /* db not ready */ }
 
-  // Fall back to env var or default
-  return process.env.ADMIN_PASSWORD || DEFAULT_PASSWORD;
+  // Fall back to the env var only — there is deliberately no compiled-in default.
+  const envPassword = process.env.ADMIN_PASSWORD;
+  if (envPassword) return envPassword;
+
+  throw new Error(
+    "No admin password configured: set the ADMIN_PASSWORD environment variable or store a password_hash in admin settings.",
+  );
 }
 
 async function setAdminPasswordHash(hash: string): Promise<void> {
@@ -134,7 +138,7 @@ router.post("/admin/login", async (req: Request, res: Response) => {
       return res.status(403).json({ error: "Invalid credentials." });
     }
 
-    // If password was stored as plain text (env var / default), migrate to hash
+    // If password was stored as plain text (env var), migrate to hash
     if (!storedHash.startsWith("scrypt:")) {
       const newHash = await hashPassword(password);
       await setAdminPasswordHash(newHash).catch(() => { /* non-fatal */ });
