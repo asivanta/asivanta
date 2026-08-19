@@ -17,6 +17,7 @@ import Terms from "@/pages/terms";
 import TrustAssurance from "@/pages/trust-assurance";
 import Report from "@/pages/report";
 import Kes2026BuyerGuide from "@/pages/kes-2026-buyer-guide";
+import KoreanManufacturerVsTradingCompany from "@/pages/korean-manufacturer-vs-trading-company";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,10 @@ function Router() {
       <Route
         path="/insights/kes-2026-overseas-buyer-checklist"
         component={Kes2026BuyerGuide}
+      />
+      <Route
+        path="/insights/korean-manufacturer-vs-trading-company"
+        component={KoreanManufacturerVsTradingCompany}
       />
       <Route path="/contact" component={Contact} />
       <Route path="/quote-now" component={InstantQuote} />
