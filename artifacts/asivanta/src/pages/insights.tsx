@@ -78,6 +78,16 @@ const articles = [
 ];
 
 const featuredArticle = {
+  title: "Korean Manufacturer or Trading Company? What Each Document Proves",
+  preview:
+    "How to check the legal entity, factory record, manufacturing role, and certificate scope before a sample, tooling payment, or purchase order.",
+  readTime: "9 min read",
+  date: "August 2026",
+  category: "Supplier Verification",
+  href: "/insights/korean-manufacturer-vs-trading-company",
+};
+
+const relatedGuide = {
   title: "How Overseas Buyers Should Prepare for Korea Electronics Show 2026",
   preview:
     "A buyer-side checklist for supplier shortlisting, comparable RFQs, meeting evidence, and safer post-show decisions.",
@@ -164,6 +174,39 @@ export default function Insights() {
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
+            </Link>
+          </motion.article>
+
+          <motion.article
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            className="mb-8 overflow-hidden rounded-3xl border border-black/10 bg-white"
+          >
+            <Link
+              href={relatedGuide.href}
+              className="group flex flex-col justify-between gap-6 p-7 sm:flex-row sm:items-center md:p-8"
+            >
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-[#0071e3]">
+                    {relatedGuide.category}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {relatedGuide.date}
+                  </span>
+                </div>
+                <h2 className="mt-4 text-xl font-semibold leading-tight tracking-tight text-[#0F172A] md:text-2xl">
+                  {relatedGuide.title}
+                </h2>
+                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
+                  {relatedGuide.preview}
+                </p>
+              </div>
+              <span className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-[#0071e3] transition-transform group-hover:translate-x-1">
+                {relatedGuide.readTime}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </span>
             </Link>
           </motion.article>
 
