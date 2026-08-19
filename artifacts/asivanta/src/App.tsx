@@ -16,6 +16,7 @@ import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import TrustAssurance from "@/pages/trust-assurance";
 import Report from "@/pages/report";
+import Kes2026BuyerGuide from "@/pages/kes-2026-buyer-guide";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,10 @@ function Router() {
       <Route path="/portal" component={Portal} />
       <Route path="/login" component={Login} />
       <Route path="/insights" component={Insights} />
+      <Route
+        path="/insights/kes-2026-overseas-buyer-checklist"
+        component={Kes2026BuyerGuide}
+      />
       <Route path="/contact" component={Contact} />
       <Route path="/quote-now" component={InstantQuote} />
       <Route path="/instant-quote" component={InstantQuote} />
