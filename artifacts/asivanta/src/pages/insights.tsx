@@ -78,24 +78,35 @@ const articles = [
 ];
 
 const featuredArticle = {
-  title: "Korean Manufacturer or Trading Company? What Each Document Proves",
+  title: "Korea Physical AI R&D Partner Checklist",
   preview:
-    "How to check the legal entity, factory record, manufacturing role, and certificate scope before a sample, tooling payment, or purchase order.",
-  readTime: "9 min read",
+    "Define the Korean partner role, evidence, IP and data questions, pilot result, and next commercial decision before a co-development commitment.",
+  readTime: "10 min read",
   date: "August 2026",
-  category: "Supplier Verification",
-  href: "/insights/korean-manufacturer-vs-trading-company",
+  category: "Physical AI & Joint R&D",
+  href: "/insights/korea-physical-ai-rd-partner-checklist",
 };
 
-const relatedGuide = {
-  title: "How Overseas Buyers Should Prepare for Korea Electronics Show 2026",
-  preview:
-    "A buyer-side checklist for supplier shortlisting, comparable RFQs, meeting evidence, and safer post-show decisions.",
-  readTime: "8 min read",
-  date: "August 2026",
-  category: "Trade Show Preparation",
-  href: "/insights/kes-2026-overseas-buyer-checklist",
-};
+const relatedGuides = [
+  {
+    title: "Korean Manufacturer or Trading Company? What Each Document Proves",
+    preview:
+      "How to check the legal entity, factory record, manufacturing role, and certificate scope before a sample, tooling payment, or purchase order.",
+    readTime: "9 min read",
+    date: "August 2026",
+    category: "Supplier Verification",
+    href: "/insights/korean-manufacturer-vs-trading-company",
+  },
+  {
+    title: "How Overseas Buyers Should Prepare for Korea Electronics Show 2026",
+    preview:
+      "A buyer-side checklist for supplier shortlisting, comparable RFQs, meeting evidence, and safer post-show decisions.",
+    readTime: "8 min read",
+    date: "August 2026",
+    category: "Trade Show Preparation",
+    href: "/insights/kes-2026-overseas-buyer-checklist",
+  },
+];
 
 export default function Insights() {
   useSeo(
@@ -177,38 +188,43 @@ export default function Insights() {
             </Link>
           </motion.article>
 
-          <motion.article
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            className="mb-8 overflow-hidden rounded-3xl border border-black/10 bg-white"
-          >
-            <Link
-              href={relatedGuide.href}
-              className="group flex flex-col justify-between gap-6 p-7 sm:flex-row sm:items-center md:p-8"
-            >
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-[#0071e3]">
-                    {relatedGuide.category}
+          <div className="mb-8 grid gap-4 lg:grid-cols-2">
+            {relatedGuides.map((guide) => (
+              <motion.article
+                key={guide.href}
+                initial="hidden"
+                animate="visible"
+                variants={fadeIn}
+                className="overflow-hidden rounded-3xl border border-black/10 bg-white"
+              >
+                <Link
+                  href={guide.href}
+                  className="group flex h-full flex-col justify-between gap-6 p-7 md:p-8"
+                >
+                  <div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-[#0071e3]">
+                        {guide.category}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        {guide.date}
+                      </span>
+                    </div>
+                    <h2 className="mt-4 text-xl font-semibold leading-tight tracking-tight text-[#0F172A] md:text-2xl">
+                      {guide.title}
+                    </h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
+                      {guide.preview}
+                    </p>
+                  </div>
+                  <span className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-[#0071e3] transition-transform group-hover:translate-x-1">
+                    {guide.readTime}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </span>
-                  <span className="text-xs text-slate-400">
-                    {relatedGuide.date}
-                  </span>
-                </div>
-                <h2 className="mt-4 text-xl font-semibold leading-tight tracking-tight text-[#0F172A] md:text-2xl">
-                  {relatedGuide.title}
-                </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-                  {relatedGuide.preview}
-                </p>
-              </div>
-              <span className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-[#0071e3] transition-transform group-hover:translate-x-1">
-                {relatedGuide.readTime}
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </span>
-            </Link>
-          </motion.article>
+                </Link>
+              </motion.article>
+            ))}
+          </div>
 
           <motion.div
             initial="hidden"
