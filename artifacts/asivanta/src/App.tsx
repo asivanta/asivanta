@@ -19,6 +19,7 @@ import Report from "@/pages/report";
 import Kes2026BuyerGuide from "@/pages/kes-2026-buyer-guide";
 import KoreanManufacturerVsTradingCompany from "@/pages/korean-manufacturer-vs-trading-company";
 import KoreaPhysicalAiRdPartnerChecklist from "@/pages/korea-physical-ai-rd-partner-checklist";
+import KoreanAutomotiveSupplierReviewChecklist from "@/pages/korean-automotive-supplier-review-checklist";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,10 @@ function Router() {
       <Route
         path="/insights/korea-physical-ai-rd-partner-checklist"
         component={KoreaPhysicalAiRdPartnerChecklist}
+      />
+      <Route
+        path="/insights/korean-automotive-supplier-review-checklist"
+        component={KoreanAutomotiveSupplierReviewChecklist}
       />
       <Route path="/contact" component={Contact} />
       <Route path="/quote-now" component={InstantQuote} />
