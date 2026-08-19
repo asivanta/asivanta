@@ -78,16 +78,25 @@ const articles = [
 ];
 
 const featuredArticle = {
-  title: "Korea Physical AI R&D Partner Checklist",
+  title: "Korean Automotive Supplier Review Checklist",
   preview:
-    "Define the Korean partner role, evidence, IP and data questions, pilot result, and next commercial decision before a co-development commitment.",
-  readTime: "10 min read",
+    "Review the exact site, IATF scope, core-tool readiness, capacity, sub-tier controls, material reporting, and launch evidence before nomination or tooling commitment.",
+  readTime: "11 min read",
   date: "August 2026",
-  category: "Physical AI & Joint R&D",
-  href: "/insights/korea-physical-ai-rd-partner-checklist",
+  category: "Automotive Supplier Quality",
+  href: "/insights/korean-automotive-supplier-review-checklist",
 };
 
 const relatedGuides = [
+  {
+    title: "Korea Physical AI R&D Partner Checklist",
+    preview:
+      "Define the Korean partner role, evidence, IP and data questions, pilot result, and next commercial decision before a co-development commitment.",
+    readTime: "10 min read",
+    date: "August 2026",
+    category: "Physical AI & Joint R&D",
+    href: "/insights/korea-physical-ai-rd-partner-checklist",
+  },
   {
     title: "Korean Manufacturer or Trading Company? What Each Document Proves",
     preview:
@@ -188,7 +197,7 @@ export default function Insights() {
             </Link>
           </motion.article>
 
-          <div className="mb-8 grid gap-4 lg:grid-cols-2">
+          <div className="mb-8 grid gap-4 lg:grid-cols-3">
             {relatedGuides.map((guide) => (
               <motion.article
                 key={guide.href}
