@@ -9,12 +9,19 @@ import { useSeo } from "@/hooks/use-seo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } }
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
+  },
 };
 
 const stagger = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const articles = [
@@ -32,8 +39,8 @@ const articles = [
       "Next, request audited financial statements for the most recent two fiscal years. Korean accounting standards (K-IFRS) are aligned with international norms, making it straightforward to assess solvency, debt ratios, and revenue consistency. A supplier that resists sharing financials is a supplier with something to hide.",
       "Conduct a physical factory visit — or engage a local advisory firm to do so on your behalf. During the visit, verify production capacity against the supplier's claims. Check equipment age, workforce size, quality management certifications (ISO 9001, IATF 16949 for automotive), and environmental compliance.",
       "Finally, request customer references from at least two existing export clients. Contact them directly and ask about on-time delivery rates, defect ratios, and responsiveness to quality claims. A supplier with strong references will be happy to share them.",
-      "Verification is not a sign of distrust — it is a standard business practice that reputable Korean manufacturers expect and respect from serious international buyers."
-    ]
+      "Verification is not a sign of distrust — it is a standard business practice that reputable Korean manufacturers expect and respect from serious international buyers.",
+    ],
   },
   {
     id: 2,
@@ -48,8 +55,8 @@ const articles = [
       "A more effective approach: negotiate a trial order at a modestly higher unit price, with a written agreement that pricing will step down once volumes reach the supplier's standard MOQ threshold. This gives both parties a low-risk entry point.",
       "Lead times in Korea are generally reliable by global standards, but they are not infinitely flexible. Most manufacturers plan production 4-8 weeks out. Requesting rush orders repeatedly marks you as a difficult client. Instead, build a rolling forecast relationship: share your projected demand quarterly, and the supplier can pre-position raw materials accordingly.",
       "Payment terms are where cultural misunderstandings cause the most friction. Korean suppliers strongly prefer T/T (telegraphic transfer) with a deposit structure — typically 30% upfront, 70% before shipment. Letters of Credit (L/C) are accepted but considered slow and bureaucratic. Net-30 or Net-60 terms are rarely offered to new foreign clients.",
-      "The key insight: all three variables are interconnected. A buyer who commits to higher volumes can negotiate better payment terms. A buyer who provides reliable forecasts earns shorter lead times. Approach these as a package, not as isolated line items."
-    ]
+      "The key insight: all three variables are interconnected. A buyer who commits to higher volumes can negotiate better payment terms. A buyer who provides reliable forecasts earns shorter lead times. Approach these as a package, not as isolated line items.",
+    ],
   },
   {
     id: 3,
@@ -63,12 +70,22 @@ const articles = [
       "The first category of risk is financial. Korean manufacturers, particularly mid-sized firms, often carry higher leverage ratios than their Western counterparts. This is partly structural — Korean banks have historically extended generous credit lines to manufacturing firms — but it means that a supplier's apparent stability can mask underlying financial stress. Annual financial reviews should be non-negotiable.",
       "The second category is operational. Korea's manufacturing sector is highly concentrated geographically. A single natural disaster, labor action, or infrastructure disruption in the Gyeongsang or Chungcheong provinces could affect dozens of suppliers simultaneously. Diversifying across regions — or at minimum, maintaining a qualified backup supplier — is essential.",
       "The third category is relational. In Korean business culture, relationships carry contractual weight. A supplier who feels disrespected or undervalued may deprioritize your orders in favor of domestic clients or longer-standing partners. This is not malice — it is the natural consequence of a relationship-driven business environment.",
-      "Practical mitigation starts with structured communication. Establish a regular cadence of calls or visits — quarterly at minimum. Assign a dedicated point of contact rather than rotating through procurement staff. Learn the basics of Korean business etiquette: exchanging business cards with both hands, addressing counterparts by title, and understanding that \"we will review\" often means \"no.\"",
+      'Practical mitigation starts with structured communication. Establish a regular cadence of calls or visits — quarterly at minimum. Assign a dedicated point of contact rather than rotating through procurement staff. Learn the basics of Korean business etiquette: exchanging business cards with both hands, addressing counterparts by title, and understanding that "we will review" often means "no."',
       "Invest in a local presence or partnership. Having a Korean-speaking representative who can visit factories, attend industry events, and maintain relationships between orders is the single most effective risk-reduction strategy available to foreign buyers.",
-      "Risk is never eliminated — it is managed. The buyers who succeed in Korea are those who treat supplier relationships as long-term investments, not transactional conveniences."
-    ]
-  }
+      "Risk is never eliminated — it is managed. The buyers who succeed in Korea are those who treat supplier relationships as long-term investments, not transactional conveniences.",
+    ],
+  },
 ];
+
+const featuredArticle = {
+  title: "How Overseas Buyers Should Prepare for Korea Electronics Show 2026",
+  preview:
+    "A buyer-side checklist for supplier shortlisting, comparable RFQs, meeting evidence, and safer post-show decisions.",
+  readTime: "8 min read",
+  date: "August 2026",
+  category: "Trade Show Preparation",
+  href: "/insights/kes-2026-overseas-buyer-checklist",
+};
 
 export default function Insights() {
   useSeo(
@@ -87,19 +104,68 @@ export default function Insights() {
         <div className="container mx-auto px-6">
           <motion.div initial="hidden" animate="visible" variants={stagger}>
             <motion.div variants={fadeIn} className="mb-4">
-              <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+              >
                 <ArrowLeft className="h-4 w-4" />
                 Back to Home
               </Link>
             </motion.div>
 
-            <motion.h1 variants={fadeIn} className="text-4xl md:text-5xl font-light text-[#0F172A] tracking-tight mb-4">
+            <motion.h1
+              variants={fadeIn}
+              className="text-4xl md:text-5xl font-light text-[#0F172A] tracking-tight mb-4"
+            >
               Insights
             </motion.h1>
-            <motion.p variants={fadeIn} className="text-lg text-gray-500 font-light max-w-xl mb-16">
-              Practical perspectives on sourcing, supplier risk, and Korea market execution.
+            <motion.p
+              variants={fadeIn}
+              className="text-lg text-gray-500 font-light max-w-xl mb-16"
+            >
+              Practical perspectives on sourcing, supplier risk, and Korea
+              market execution.
             </motion.p>
           </motion.div>
+
+          <motion.article
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            className="mb-8 overflow-hidden rounded-3xl bg-[#07172f] text-white shadow-[0_16px_50px_rgba(15,23,42,0.16)]"
+          >
+            <Link
+              href={featuredArticle.href}
+              className="group grid gap-8 p-8 md:grid-cols-[1.25fr_0.75fr] md:p-12"
+            >
+              <div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="rounded-full bg-blue-400/15 px-3 py-1 text-xs font-medium text-blue-200">
+                    {featuredArticle.category}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {featuredArticle.date}
+                  </span>
+                </div>
+                <h2 className="mt-6 max-w-3xl text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
+                  {featuredArticle.title}
+                </h2>
+                <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">
+                  {featuredArticle.preview}
+                </p>
+              </div>
+              <div className="flex items-end justify-between gap-6 md:flex-col md:items-end md:justify-between">
+                <span className="flex items-center gap-2 text-sm text-slate-400">
+                  <Clock className="h-4 w-4" aria-hidden="true" />
+                  {featuredArticle.readTime}
+                </span>
+                <span className="inline-flex items-center gap-2 text-sm font-medium text-blue-300 transition-transform group-hover:translate-x-1">
+                  Read the guide
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </span>
+              </div>
+            </Link>
+          </motion.article>
 
           <motion.div
             initial="hidden"
@@ -117,8 +183,12 @@ export default function Insights() {
                 <div className="h-1.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]" />
                 <div className="p-8 flex flex-col flex-1">
                   <div className="flex items-center gap-3 mb-5">
-                    <span className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-2.5 py-1 rounded-full">{article.category}</span>
-                    <span className="text-xs text-gray-400">{article.date}</span>
+                    <span className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-2.5 py-1 rounded-full">
+                      {article.category}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {article.date}
+                    </span>
                   </div>
                   <h2 className="text-xl font-semibold text-[#0F172A] leading-snug mb-3 group-hover:text-[#3B82F6] transition-colors">
                     {article.title}
@@ -156,7 +226,10 @@ export default function Insights() {
               initial={{ opacity: 0, y: 30, scale: 0.97 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.97 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+              transition={{
+                duration: 0.35,
+                ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+              }}
               className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full relative"
               onClick={(e) => e.stopPropagation()}
             >
@@ -170,7 +243,9 @@ export default function Insights() {
 
               <div className="p-8 md:p-12">
                 <div className="flex items-center gap-3 mb-5">
-                  <span className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-2.5 py-1 rounded-full">{selected.category}</span>
+                  <span className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-2.5 py-1 rounded-full">
+                    {selected.category}
+                  </span>
                   <span className="text-xs text-gray-400">{selected.date}</span>
                   <span className="flex items-center gap-1.5 text-xs text-gray-400">
                     <Clock className="h-3.5 w-3.5" />
@@ -184,7 +259,10 @@ export default function Insights() {
 
                 <div className="space-y-5">
                   {selected.body.map((paragraph, i) => (
-                    <p key={i} className="text-gray-600 font-light leading-relaxed text-[15px]">
+                    <p
+                      key={i}
+                      className="text-gray-600 font-light leading-relaxed text-[15px]"
+                    >
                       {paragraph}
                     </p>
                   ))}
