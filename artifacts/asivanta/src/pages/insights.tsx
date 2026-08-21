@@ -87,6 +87,16 @@ const featuredArticle = {
   href: "/insights/kes-2026-overseas-buyer-checklist",
 };
 
+const buyerReadinessArticle = {
+  title: "A Sourcing Lead Is Not Yet a Buyer",
+  preview:
+    "Seven checks before asking a Korean supplier to quote, sample, or begin a technical review.",
+  readTime: "6 min read",
+  date: "August 2026",
+  category: "Buyer Readiness",
+  href: "/insights/qualify-sourcing-lead-before-korean-supplier",
+};
+
 export default function Insights() {
   useSeo(
     "Insights | Korea Sourcing and Supplier Verification Guides",
@@ -171,8 +181,45 @@ export default function Insights() {
             initial="hidden"
             animate="visible"
             variants={stagger}
-            className="grid md:grid-cols-3 gap-8"
+            className="grid gap-8 md:grid-cols-2 xl:grid-cols-4"
           >
+            <motion.article
+              variants={fadeIn}
+              className="overflow-hidden rounded-2xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_4px_24px_rgba(0,0,0,0.08)]"
+            >
+              <Link
+                href={buyerReadinessArticle.href}
+                className="group flex h-full flex-col"
+              >
+                <div className="h-1.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]" />
+                <div className="flex flex-1 flex-col p-8">
+                  <div className="mb-5 flex items-center gap-3">
+                    <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-[#3B82F6]">
+                      {buyerReadinessArticle.category}
+                    </span>
+                    <span className="text-xs text-gray-400">
+                      {buyerReadinessArticle.date}
+                    </span>
+                  </div>
+                  <h2 className="mb-3 text-xl font-semibold leading-snug text-[#0F172A] transition-colors group-hover:text-[#3B82F6]">
+                    {buyerReadinessArticle.title}
+                  </h2>
+                  <p className="mb-6 flex-1 text-sm font-light leading-relaxed text-gray-500">
+                    {buyerReadinessArticle.preview}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-xs text-gray-400">
+                      <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                      {buyerReadinessArticle.readTime}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-sm font-medium text-[#3B82F6] transition-transform group-hover:translate-x-1">
+                      Read More
+                      <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            </motion.article>
             {articles.map((article) => (
               <motion.article
                 key={article.id}
