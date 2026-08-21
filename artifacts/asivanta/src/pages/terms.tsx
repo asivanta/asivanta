@@ -108,7 +108,7 @@ const sections = [
     title: "12. Contact",
     body: [
       "For questions regarding these Terms of Service, please contact us:",
-      "Email: contact@asivanta.com\nLocation: Seoul, South Korea",
+      "Email: hello@asivanta.com\nLocation: Seoul, South Korea",
     ],
   },
 ];
@@ -192,10 +192,10 @@ export default function Terms() {
             <p className="text-sm text-gray-400 font-light">
               Questions about these terms?{" "}
               <a
-                href="mailto:contact@asivanta.com"
+                href="mailto:hello@asivanta.com"
                 className="text-blue-600 hover:underline"
               >
-                contact@asivanta.com
+                hello@asivanta.com
               </a>
             </p>
           </motion.div>

@@ -47,10 +47,10 @@ export function AppleFooter() {
                 Start a Review
               </Link>
               <a
-                href="mailto:contact@asivanta.com"
+                href="mailto:hello@asivanta.com"
                 className="flex min-h-11 items-center hover:text-[#1d1d1f]"
               >
-                contact@asivanta.com
+                hello@asivanta.com
               </a>
             </div>
           </div>

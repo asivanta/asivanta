@@ -195,7 +195,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Email service not configured." });
   }
 
-  const toEmail = process.env.CONTACT_TO_EMAIL || "contact@asivanta.com";
+  const toEmail = process.env.CONTACT_TO_EMAIL || "hello@asivanta.com";
   const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
   const attachments =
     quoteLines.length > 0
@@ -264,7 +264,7 @@ Quote Mode: ${quoteMode || "Not provided"}
 We received your information and will review the submitted part details. If anything is unclear, we will contact you before preparing the quote response.
 
 ASIVANTA Advisory
-contact@asivanta.com`,
+hello@asivanta.com`,
     });
     if (ackError) {
       console.error("Customer acknowledgement could not be sent.");

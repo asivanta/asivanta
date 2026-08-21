@@ -493,10 +493,10 @@ export default function Contact() {
                         Email
                       </h3>
                       <a
-                        href="mailto:contact@asivanta.com"
+                        href="mailto:hello@asivanta.com"
                         className="text-sm text-gray-500 hover:text-[#3B82F6] transition-colors"
                       >
-                        contact@asivanta.com
+                        hello@asivanta.com
                       </a>
                     </div>
                   </div>

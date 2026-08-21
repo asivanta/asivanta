@@ -27,7 +27,7 @@ const sections = [
     title: "1. Who We Are",
     body: [
       'ASIVANTA Advisory is a procurement and sourcing advisory firm based in Seoul, South Korea. We provide services to companies seeking to source from Korean and Asian manufacturers. References to "ASIVANTA," "we," "us," or "our" in this policy refer to ASIVANTA Advisory.',
-      "Our contact email for privacy-related matters is: contact@asivanta.com",
+      "Our contact email for privacy-related matters is: hello@asivanta.com",
     ],
   },
   {
@@ -59,7 +59,7 @@ const sections = [
     title: "5. Data Retention",
     body: [
       "We retain contact form submissions for a period of 24 months from the date of submission. If an advisory engagement is initiated, we retain relevant correspondence and documentation for the duration of the engagement plus 36 months.",
-      "You may request deletion of your personal data at any time by contacting us at contact@asivanta.com. We will process deletion requests within 30 days, subject to any legal or contractual retention obligations.",
+      "You may request deletion of your personal data at any time by contacting us at hello@asivanta.com. We will process deletion requests within 30 days, subject to any legal or contractual retention obligations.",
     ],
   },
   {
@@ -80,7 +80,7 @@ const sections = [
     body: [
       "Depending on your location, you may have the following rights regarding your personal data:",
       "• Access: Request a copy of the personal information we hold about you\n• Correction: Request correction of inaccurate or incomplete data\n• Deletion: Request that we delete your personal data, subject to retention obligations\n• Objection: Object to our processing of your data in certain circumstances\n• Portability: Request a copy of your data in a structured, machine-readable format",
-      "To exercise any of these rights, please contact us at contact@asivanta.com. We will respond within 30 days. We may need to verify your identity before processing a request.",
+      "To exercise any of these rights, please contact us at hello@asivanta.com. We will respond within 30 days. We may need to verify your identity before processing a request.",
     ],
   },
   {
@@ -99,7 +99,7 @@ const sections = [
     title: "11. Contact Us",
     body: [
       "If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:",
-      "Email: contact@asivanta.com\nLocation: Seoul, South Korea",
+      "Email: hello@asivanta.com\nLocation: Seoul, South Korea",
     ],
   },
 ];
@@ -184,10 +184,10 @@ export default function Privacy() {
             <p className="text-sm text-gray-400 font-light">
               Questions about this policy?{" "}
               <a
-                href="mailto:contact@asivanta.com"
+                href="mailto:hello@asivanta.com"
                 className="text-blue-600 hover:underline"
               >
-                contact@asivanta.com
+                hello@asivanta.com
               </a>
             </p>
           </motion.div>

@@ -33,10 +33,10 @@ export function Footer() {
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-blue-400 shrink-0" />
                 <a
-                  href="mailto:contact@asivanta.com"
+                  href="mailto:hello@asivanta.com"
                   className="hover:text-white transition-colors"
                 >
-                  contact@asivanta.com
+                  hello@asivanta.com
                 </a>
               </div>
             </div>
@@ -138,7 +138,7 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-6">
             <a
-              href="mailto:contact@asivanta.com"
+              href="mailto:hello@asivanta.com"
               className="hover:text-white transition-colors flex items-center gap-2"
             >
               <Mail className="h-4 w-4" />
