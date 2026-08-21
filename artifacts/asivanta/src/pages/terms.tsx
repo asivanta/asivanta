@@ -35,14 +35,14 @@ const sections = [
     body: [
       "ASIVANTA Advisory provides procurement and sourcing advisory services, including supplier identification, factory verification, commercial negotiation support, and production oversight for companies sourcing from Korean and Asian manufacturers.",
       "This website is an informational platform and intake channel. It is not a marketplace, trading platform, or transactional service. ASIVANTA does not operate as a broker, trading company, or reseller. We represent the buyer's interests as an independent advisor.",
-      "Access to the Client Portal is provided to active clients only, under the terms of their engagement agreement. Portal access does not constitute a standalone service agreement.",
+      "Private project information is shared only through the communication method agreed with an active client. Access to project information does not constitute a standalone service agreement.",
     ],
   },
   {
     title: "3. Use of This Website",
     body: [
       "You may use this website for lawful purposes only. You agree not to:",
-      "• Submit false, misleading, or fraudulent information through any form on this site\n• Attempt to gain unauthorized access to any part of the site, including the admin or client portal\n• Use automated tools (scrapers, bots, crawlers) to extract content from this site without permission\n• Upload files containing malware, viruses, or malicious code\n• Interfere with or disrupt the operation of the site or its infrastructure\n• Violate any applicable law or regulation in connection with your use of this site",
+      "• Submit false, misleading, or fraudulent information through any form on this site\n• Attempt to gain unauthorized access to any private part of the site or service\n• Use automated tools (scrapers, bots, crawlers) to extract content from this site without permission\n• Send files containing malware, viruses, or malicious code\n• Interfere with or disrupt the operation of the site or its infrastructure\n• Violate any applicable law or regulation in connection with your use of this site",
       "We reserve the right to block access to users who violate these terms.",
     ],
   },

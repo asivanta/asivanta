@@ -52,12 +52,6 @@ export function AppleFooter() {
               >
                 contact@asivanta.com
               </a>
-              <Link
-                href="/portal"
-                className="flex min-h-11 items-center hover:text-[#1d1d1f]"
-              >
-                Client Portal
-              </Link>
             </div>
           </div>
         </div>

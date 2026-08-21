@@ -7,11 +7,8 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home-apple";
 import Contact from "@/pages/contact";
 import InstantQuote from "@/pages/instant-quote";
-import Portal from "@/pages/portal";
 import Insights from "@/pages/insights";
 import About from "@/pages/about";
-import Login from "@/pages/login";
-import Admin from "@/pages/admin";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
 import TrustAssurance from "@/pages/trust-assurance";
@@ -27,8 +24,6 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/portal" component={Portal} />
-      <Route path="/login" component={Login} />
       <Route path="/insights" component={Insights} />
       <Route
         path="/insights/kes-2026-overseas-buyer-checklist"
@@ -53,7 +48,6 @@ function Router() {
       <Route path="/trust-assurance" component={TrustAssurance} />
       <Route path="/report" component={Report} />
       <Route path="/shortlist-report" component={Report} />
-      <Route path="/admin" component={Admin} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/terms" component={Terms} />
       <Route component={NotFound} />

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
@@ -11,7 +11,6 @@ import {
   Cpu,
   Download,
   FileSpreadsheet,
-  FileText,
   Gauge,
   HelpCircle,
   Loader2,
@@ -25,9 +24,7 @@ import {
   Sparkles,
   Timer,
   Trash2,
-  Upload,
   Waves,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/layout/navbar";
@@ -90,7 +87,7 @@ const categories = [
 
 const quoteTypes = [
   "Guided component quote",
-  "Upload BOM / RFQ list",
+  "Paste BOM / RFQ list",
   "Build part list",
   "Supplier quote comparison",
   "Spec sheet review",
@@ -285,10 +282,6 @@ const crystalEsrBands = [
   { min: 44, max: 54, esr: "40 ohm max" },
 ];
 
-const ALLOWED_EXTENSIONS = [".pdf", ".xlsx", ".png", ".jpg", ".jpeg"];
-const MAX_FILE_SIZE = 8 * 1024 * 1024;
-const MAX_FILES = 2;
-const MAX_TOTAL_SIZE = 14 * 1024 * 1024;
 const MIN_MESSAGE = 30;
 const DRAFT_KEY = "asivanta_instant_quote_draft";
 
@@ -300,12 +293,6 @@ function generateQuoteId() {
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function formatFileSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function formatMHz(value: string, digits = 4) {
@@ -324,7 +311,7 @@ function formatKHz(value: string) {
 
 function modeLabel(mode: Mode) {
   if (mode === "guided") return "Quote Now Builder";
-  if (mode === "upload") return "Upload List";
+  if (mode === "upload") return "Paste List";
   return "Build List";
 }
 
@@ -472,8 +459,6 @@ export default function InstantQuote() {
 
   const [quoteId, setQuoteId] = useState(() => generateQuoteId());
   const [mode, setMode] = useState<Mode>("guided");
-  const [files, setFiles] = useState<File[]>([]);
-  const [fileError, setFileError] = useState("");
   const [bulkText, setBulkText] = useState("");
   const [bulkMessage, setBulkMessage] = useState("");
   const [guidedMessage, setGuidedMessage] = useState("");
@@ -501,8 +486,6 @@ export default function InstantQuote() {
   const [guidedPulling, setGuidedPulling] = useState("5");
   const [guidedReference, setGuidedReference] = useState("");
   const [guidedNote, setGuidedNote] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [form, setForm] = useState({
     fullName: "",
     company: "",
@@ -513,11 +496,6 @@ export default function InstantQuote() {
     timeline: "",
     message: "",
   });
-
-  const totalFileSize = useMemo(
-    () => files.reduce((sum, file) => sum + file.size, 0),
-    [files],
-  );
 
   const usableLines = useMemo(
     () => lines.filter((line) => quoteLineHasData(line)),
@@ -532,18 +510,13 @@ export default function InstantQuote() {
       form.destination,
       form.timeline,
     ].filter((value) => value.trim()).length;
-    const lineScore =
-      mode === "upload"
-        ? files.length > 0
-          ? 2
-          : 0
-        : Math.min(usableLines.length, 2);
+    const lineScore = Math.min(usableLines.length, 2);
     return Math.round(((baseFields + lineScore) / 7) * 100);
-  }, [files.length, form, mode, usableLines.length]);
+  }, [form, usableLines.length]);
 
   const previewLines = useMemo(
-    () => (mode === "upload" ? [] : usableLines),
-    [mode, usableLines],
+    () => usableLines,
+    [usableLines],
   );
 
   const structuredQuoteLines = useMemo(
@@ -571,36 +544,6 @@ export default function InstantQuote() {
         notes: line.notes,
       })),
     [usableLines],
-  );
-
-  const quoteRecord = useMemo(
-    () => ({
-      quoteId,
-      source: "Quote Now",
-      mode: modeLabel(mode),
-      quoteType: form.quoteType,
-      readiness: quoteCompleteness,
-      customer: {
-        fullName: form.fullName.trim(),
-        company: form.company.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-      },
-      logistics: {
-        destination: form.destination.trim(),
-        timeline: form.timeline.trim(),
-      },
-      message: form.message.trim(),
-      files: files.map((file) => ({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      })),
-      lines: structuredQuoteLines,
-      createdAt: new Date().toISOString(),
-      adminStatus: "new",
-    }),
-    [files, form, mode, quoteCompleteness, quoteId, structuredQuoteLines],
   );
 
   const selectedGuidedFamily = useMemo(
@@ -761,7 +704,7 @@ export default function InstantQuote() {
     const nextLine: QuoteLine = {
       ...emptyLine(Date.now()),
       category: "Electronics",
-      manufacturer: "ASIVANTA / Open market",
+      manufacturer: "Open market / Buyer specified",
       customerPart: guidedPartNumber,
       description: `${selectedGuidedFamily.name} ${selectedGuidedPackage.label} ${guidedFrequencyDisplay}`,
       quantity,
@@ -1005,7 +948,7 @@ export default function InstantQuote() {
               ].join("\n"),
             )
             .join("\n\n")
-        : "No built part lines. Uploaded files are the source list.";
+        : "No part lines added.";
 
     return `ASIVANTA QUOTE NOW PACKET
 Quote ID: ${quoteId}
@@ -1023,9 +966,6 @@ ${form.message || "Not provided"}
 
 ASV LINE DATA
 ${lineSummary}
-
-FILES
-${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.size)})`).join("\n") : "None attached in browser"}
 `;
   };
 
@@ -1089,60 +1029,10 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
       if (Array.isArray(draft.lines) && draft.lines.length > 0) {
         setLines(draft.lines.slice(0, 12));
       }
-      setDraftMessage(
-        "Draft restored. Attached files must be reselected for browser security.",
-      );
+      setDraftMessage("Draft restored.");
     } catch {
       setDraftMessage("Saved draft could not be restored.");
     }
-  };
-
-  const downloadQuoteRecord = () => {
-    downloadTextFile(
-      `${quoteId}-admin-record.json`,
-      JSON.stringify(quoteRecord, null, 2),
-      "application/json;charset=utf-8",
-    );
-  };
-
-  const selectFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFileError("");
-    const selected = Array.from(e.target.files || []);
-    if (selected.length + files.length > MAX_FILES) {
-      setFileError(`Maximum ${MAX_FILES} files allowed.`);
-      return;
-    }
-
-    const newTotal =
-      totalFileSize + selected.reduce((sum, file) => sum + file.size, 0);
-    if (newTotal > MAX_TOTAL_SIZE) {
-      setFileError(
-        `Total upload size must stay under ${formatFileSize(MAX_TOTAL_SIZE)}.`,
-      );
-      return;
-    }
-
-    for (const file of selected) {
-      const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
-      if (!ALLOWED_EXTENSIONS.includes(ext)) {
-        setFileError("Allowed files: PDF, XLSX, PNG, JPG.");
-        return;
-      }
-      if (file.size > MAX_FILE_SIZE) {
-        setFileError(
-          `${file.name} exceeds the ${formatFileSize(MAX_FILE_SIZE)} limit.`,
-        );
-        return;
-      }
-    }
-
-    setFiles((current) => [...current, ...selected]);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const removeFile = (index: number) => {
-    setFiles((current) => current.filter((_, i) => i !== index));
-    setFileError("");
   };
 
   const errorFor = (name: string) => {
@@ -1154,10 +1044,10 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
       if (!isValidEmail(form.email)) return "Enter a valid email.";
     }
     if (name === "quoteSource") {
-      if (mode === "upload" && files.length === 0)
-        return "Upload at least one file.";
-      if (mode !== "upload" && usableLines.length === 0)
-        return "Add at least one part line.";
+      if (usableLines.length === 0)
+        return mode === "upload"
+          ? "Paste and parse at least one part line."
+          : "Add at least one part line.";
     }
     if (name === "message" && form.message.trim().length < MIN_MESSAGE) {
       return `Add at least ${MIN_MESSAGE} characters.`;
@@ -1170,13 +1060,11 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
     form.company.trim() &&
     isValidEmail(form.email) &&
     form.message.trim().length >= MIN_MESSAGE &&
-    (mode === "upload" ? files.length > 0 : usableLines.length > 0);
+    usableLines.length > 0;
 
   const buildMessage = () => {
-    const quoteLines =
-      mode !== "upload"
-        ? usableLines
-            .map((line, index) => {
+    const quoteLines = usableLines
+      .map((line, index) => {
               return [
                 `${index + 1}. ${generatedAsivantaNumber(line, index)}`,
                 `Category: ${line.category}`,
@@ -1197,9 +1085,8 @@ ${files.length > 0 ? files.map((file) => `${file.name} (${formatFileSize(file.si
                 `Generated Spec: ${line.spec || "Not provided"}`,
                 `Notes: ${line.notes || "None"}`,
               ].join("\n");
-            })
-            .join("\n\n")
-        : "Quote list uploaded as attachment.";
+      })
+      .join("\n\n");
 
     return `QUOTE NOW REQUEST
 Quote ID: ${quoteId}
@@ -1215,8 +1102,8 @@ ${form.message.trim()}
 ASIVANTA GENERATED PART DATA:
 ${quoteLines}
 
-NEXT INTERNAL STEP:
-Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and reply to customer.`;
+NEXT REVIEW STEP:
+Confirm specifications, compare available supplier responses, and reply to the customer.`;
   };
 
   const submitQuote = async (e: React.FormEvent) => {
@@ -1235,27 +1122,21 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
 
     try {
       const nativeFormData = new FormData(e.currentTarget as HTMLFormElement);
-      const formData = new FormData();
-      formData.append(
-        "_hp_field",
-        String(nativeFormData.get("_hp_field") || ""),
-      );
-      formData.append("fullName", form.fullName.trim());
-      formData.append("company", form.company.trim());
-      formData.append("email", form.email.trim());
-      formData.append("phone", form.phone.trim());
-      formData.append("projectType", "Quote / RFQ Comparison");
-      formData.append("quoteId", quoteId);
-      formData.append("source", "Quote Now");
-      formData.append("quoteMode", modeLabel(mode));
-      formData.append("quoteLinesJson", JSON.stringify(structuredQuoteLines));
-      formData.append("quoteRecordJson", JSON.stringify(quoteRecord));
-      formData.append("message", buildMessage());
-      files.forEach((file) => formData.append("files", file));
-
       const res = await fetch("/api/contact", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          _hp_field: String(nativeFormData.get("_hp_field") || ""),
+          fullName: form.fullName.trim(),
+          company: form.company.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          projectType: "Quote / RFQ Comparison",
+          quoteId,
+          quoteMode: modeLabel(mode),
+          quoteLines: structuredQuoteLines,
+          message: buildMessage(),
+        }),
       });
       const data = await res.json();
 
@@ -1300,9 +1181,9 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   Build a quote-ready part request in minutes.
                 </h1>
                 <p className="mt-6 max-w-2xl text-base font-light leading-relaxed text-blue-100/75 md:text-lg">
-                  Start with one guided component path, upload a BOM, or build a
-                  list manually. ASIVANTA turns partial specs into cleaner RFQ
-                  data for faster pricing and supplier comparison.
+                  Start with one guided component path, paste a BOM or RFQ list,
+                  or build a list manually. ASIVANTA turns partial specs into
+                  cleaner RFQ data for faster pricing and supplier comparison.
                 </p>
               </div>
 
@@ -1323,7 +1204,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                 </div>
                 <div className="mt-5 grid grid-cols-3 gap-3 text-xs text-blue-100/70">
                   <span>Guided specs</span>
-                  <span>Upload guardrails</span>
+                  <span>Safer text intake</span>
                   <span>PDF-ready packet</span>
                 </div>
               </div>
@@ -1343,8 +1224,8 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-gray-500">
               The request was sent to ASIVANTA with the generated ASV part data.
-              Internal pricing can be matched to these numbers for the PDF quote
-              packet.
+              We will review the specifications and contact you if anything
+              needs clarification.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link href="/instant-quote">
@@ -1354,7 +1235,6 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   onClick={() => {
                     setSubmitted(false);
                     setQuoteId(generateQuoteId());
-                    setFiles([]);
                     setLines([emptyLine(1)]);
                     setBulkText("");
                     setBulkMessage("");
@@ -1422,7 +1302,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                     setMode("upload");
                     setForm((current) => ({
                       ...current,
-                      quoteType: "Upload BOM / RFQ list",
+                      quoteType: "Paste BOM / RFQ list",
                     }));
                   }}
                   className={`rounded-2xl border p-6 text-left transition-all ${
@@ -1432,14 +1312,14 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   }`}
                 >
                   <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50">
-                    <Upload className="h-5 w-5 text-blue-600" />
+                    <ClipboardList className="h-5 w-5 text-blue-600" />
                   </div>
                   <h2 className="text-xl font-medium tracking-tight">
-                    Upload List
+                    Paste List
                   </h2>
                   <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                    Send a prepared BOM, RFQ sheet, supplier quote, or spec
-                    packet.
+                    Paste rows from a BOM, RFQ sheet, supplier quote, or
+                    specification list.
                   </p>
                 </button>
 
@@ -1476,8 +1356,8 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   <div>
                     <p className="text-sm font-medium">Draft tools</p>
                     <p className="mt-1 text-xs text-gray-400">
-                      Save long RFQs locally before submitting. Files must be
-                      reselected after restore.
+                  Save long RFQs locally before submitting and restore them on
+                  this browser.
                     </p>
                     {draftMessage && (
                       <p className="mt-2 text-xs text-blue-700">
@@ -1635,7 +1515,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                           Start with one component family
                         </label>
                         <span className="text-xs text-gray-400">
-                          ASIVANTA catalog reference, ASIVANTA review
+                          ASIVANTA component reference
                         </span>
                       </div>
                       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -2150,70 +2030,12 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                       </div>
                     </div>
 
-                    <div className="rounded-2xl border border-dashed border-gray-200 bg-[#f8fafc] p-4">
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <p className="text-sm font-medium">
-                            Optional spec sheet or drawing
-                          </p>
-                          <p className="mt-1 text-xs text-gray-400">
-                            Upload only helpful support files. Limits protect
-                            the form from abuse.
-                          </p>
-                        </div>
-                        {files.length < MAX_FILES && (
-                          <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white px-4 text-sm font-medium transition-colors hover:border-blue-300 hover:text-blue-600">
-                            <Upload className="mr-2 h-4 w-4" />
-                            Add File
-                            <input
-                              ref={fileInputRef}
-                              type="file"
-                              className="hidden"
-                              accept=".pdf,.xlsx,.png,.jpg,.jpeg"
-                              multiple
-                              onChange={selectFiles}
-                            />
-                          </label>
-                        )}
-                      </div>
-                      {files.length > 0 && (
-                        <div className="mt-4 space-y-2">
-                          {files.map((file, index) => (
-                            <div
-                              key={`${file.name}-${index}`}
-                              className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3"
-                            >
-                              <FileText className="h-4 w-4 text-blue-600" />
-                              <span className="flex-1 truncate text-sm">
-                                {file.name}
-                              </span>
-                              <span className="text-xs text-gray-400">
-                                {formatFileSize(file.size)}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => removeFile(index)}
-                                className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
-                              >
-                                <X className="h-3.5 w-3.5 text-gray-500" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {(fileError || errorFor("quoteSource")) && (
-                        <p className="mt-2 flex items-center gap-1 text-xs text-red-500">
-                          <AlertCircle className="h-3 w-3" />
-                          {fileError || errorFor("quoteSource")}
-                        </p>
-                      )}
-                    </div>
                   </div>
                 ) : mode === "upload" ? (
                   <div className="mb-7">
                     <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <label className="block text-sm font-medium">
-                        Upload List
+                        Paste List
                       </label>
                       <Button
                         type="button"
@@ -2225,55 +2047,41 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                         RFQ Template
                       </Button>
                     </div>
-                    <label className="flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-[#f8fafc] p-8 text-center transition-all hover:border-blue-300 hover:bg-blue-50/40">
-                      <Upload className="mb-4 h-8 w-8 text-blue-500" />
-                      <span className="text-sm font-medium">
-                        Choose BOM, RFQ, quote, or spec file
-                      </span>
-                      <span className="mt-2 text-xs text-gray-400">
-                        PDF, XLSX, PNG, JPG - max 2 files, 8MB each
-                      </span>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        className="hidden"
-                        accept=".pdf,.xlsx,.png,.jpg,.jpeg"
-                        multiple
-                        onChange={selectFiles}
-                        onBlur={() =>
-                          setTouched((t) => ({ ...t, quoteSource: true }))
-                        }
-                      />
-                    </label>
-                    {files.length > 0 && (
-                      <div className="mt-4 space-y-2">
-                        {files.map((file, index) => (
-                          <div
-                            key={`${file.name}-${index}`}
-                            className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3"
-                          >
-                            <FileText className="h-4 w-4 text-blue-600" />
-                            <span className="flex-1 truncate text-sm">
-                              {file.name}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {formatFileSize(file.size)}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => removeFile(index)}
-                              className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
-                            >
-                              <X className="h-3.5 w-3.5 text-gray-500" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
+                    <textarea
+                      value={bulkText}
+                      onChange={(event) => setBulkText(event.target.value)}
+                      onBlur={() =>
+                        setTouched((current) => ({
+                          ...current,
+                          quoteSource: true,
+                        }))
+                      }
+                      rows={8}
+                      className="w-full resize-none rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/15"
+                      placeholder="Paste one part per line: part number, quantity, description, manufacturer, target price, lead time, packaging"
+                    />
+                    <div className="mt-3 flex flex-wrap items-center gap-3">
+                      <Button
+                        type="button"
+                        className="h-10 rounded-full px-5"
+                        onClick={parseBulkLines}
+                      >
+                        Parse Into List
+                      </Button>
+                      <p className="text-xs leading-relaxed text-gray-500">
+                        File uploads are paused while stronger document
+                        screening is added.
+                      </p>
+                    </div>
+                    {bulkMessage && (
+                      <p className="mt-3 text-xs text-blue-700">
+                        {bulkMessage}
+                      </p>
                     )}
-                    {(fileError || errorFor("quoteSource")) && (
+                    {errorFor("quoteSource") && (
                       <p className="mt-2 flex items-center gap-1 text-xs text-red-500">
                         <AlertCircle className="h-3 w-3" />
-                        {fileError || errorFor("quoteSource")}
+                        {errorFor("quoteSource")}
                       </p>
                     )}
                   </div>
@@ -2569,63 +2377,6 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                         </tbody>
                       </table>
                     </div>
-                    <div className="mt-4 rounded-2xl border border-dashed border-gray-200 bg-[#f8fafc] p-4">
-                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                          <p className="text-sm font-medium">
-                            Attach spec sheet or drawing
-                          </p>
-                          <p className="mt-1 text-xs text-gray-400">
-                            Optional PDF, XLSX, PNG, or JPG support files
-                          </p>
-                        </div>
-                        {files.length < MAX_FILES && (
-                          <label className="inline-flex h-10 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white px-4 text-sm font-medium transition-colors hover:border-blue-300 hover:text-blue-600">
-                            <Upload className="mr-2 h-4 w-4" />
-                            Add File
-                            <input
-                              ref={fileInputRef}
-                              type="file"
-                              className="hidden"
-                              accept=".pdf,.xlsx,.png,.jpg,.jpeg"
-                              multiple
-                              onChange={selectFiles}
-                            />
-                          </label>
-                        )}
-                      </div>
-                      {files.length > 0 && (
-                        <div className="mt-4 space-y-2">
-                          {files.map((file, index) => (
-                            <div
-                              key={`${file.name}-${index}`}
-                              className="flex items-center gap-3 rounded-xl border border-gray-100 bg-white px-4 py-3"
-                            >
-                              <FileText className="h-4 w-4 text-blue-600" />
-                              <span className="flex-1 truncate text-sm">
-                                {file.name}
-                              </span>
-                              <span className="text-xs text-gray-400">
-                                {formatFileSize(file.size)}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => removeFile(index)}
-                                className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 transition-colors hover:bg-gray-200"
-                              >
-                                <X className="h-3.5 w-3.5 text-gray-500" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {fileError && (
-                        <p className="mt-2 flex items-center gap-1 text-xs text-red-500">
-                          <AlertCircle className="h-3 w-3" />
-                          {fileError}
-                        </p>
-                      )}
-                    </div>
                     {errorFor("quoteSource") && (
                       <p className="mt-2 flex items-center gap-1 text-xs text-red-500">
                         <AlertCircle className="h-3 w-3" />
@@ -2655,7 +2406,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                       </p>
                     ) : (
                       <p className="text-xs text-gray-400">
-                        Internal pricing table can be matched after submission.
+                        ASIVANTA will review the specifications after submission.
                       </p>
                     )}
                     <span className="text-xs text-gray-400">
@@ -2697,15 +2448,6 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Download Packet
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-12 rounded-full px-7"
-                    onClick={downloadQuoteRecord}
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Admin JSON
                   </Button>
                   <Link href="/contact">
                     <Button
@@ -2766,15 +2508,15 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                   <div className="mb-4 flex items-center gap-3">
                     <ShieldCheck className="h-5 w-5 text-blue-600" />
                     <h3 className="font-medium tracking-tight">
-                      Upload Guardrails
+                      Safer Information Handling
                     </h3>
                   </div>
                   <ul className="space-y-3 text-sm text-gray-600">
                     {[
-                      "Only PDF, XLSX, PNG, JPG files accepted",
-                      "Maximum 2 files and 8MB per file",
-                      "Total upload size capped below server limit",
-                      "Server revalidates file count, size, and extension",
+                      "Structured text intake reduces unsafe attachments",
+                      "Only the details needed for the sourcing review",
+                      "Request size and frequency limits reduce abuse",
+                      "Secure document exchange can follow human review",
                     ].map((item) => (
                       <li key={item} className="flex gap-2">
                         <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" />
@@ -2792,8 +2534,8 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                     {[
                       "Customer list intake",
                       "ASV standard part number generation",
-                      "Internal price/spec matching",
-                      "PDF quote packet reply",
+                      "Specification and supplier review",
+                      "Buyer-ready quote response",
                     ].map((step, index) => (
                       <div key={step} className="flex items-center gap-3">
                         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs text-white">
@@ -2804,7 +2546,7 @@ Match ASV numbers to internal pricing/spec table, generate PDF quote packet, and
                     ))}
                   </div>
                   <div className="mt-6 flex items-center gap-2 text-xs font-medium text-blue-300">
-                    Ready for internal pricing data
+                    Ready for ASIVANTA review
                     <ArrowRight className="h-3.5 w-3.5" />
                   </div>
                 </div>

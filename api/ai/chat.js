@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { routeChat } from "./router.js";
+import { enforceRateLimit } from "../_rate-limit.js";
 
 const MAX_MESSAGE_LENGTH = 700;
 const MAX_HISTORY_ITEMS = 6;
@@ -19,8 +20,6 @@ const siteLinks = {
   insights: { label: "Insights", href: "/insights" },
   trust: { label: "Trust Assurance", href: "/trust-assurance" },
   about: { label: "About ASIVANTA", href: "/about" },
-  portal: { label: "Client Portal", href: "/portal" },
-  login: { label: "Portal Login", href: "/login" },
   privacy: { label: "Privacy", href: "/privacy" },
   terms: { label: "Terms", href: "/terms" },
 };
@@ -29,11 +28,10 @@ const siteMap = [
   "Home /: ASIVANTA overview, Seoul-based Korea sourcing, services, methodology, industries.",
   "Services /#services: supplier sourcing, verification, negotiation, factory readiness, quote comparison, market communication.",
   "Contact /contact: sourcing review intake for advisory help.",
-  "Quote Now /instant-quote: guided ASIVANTA-style component builder, BOM/RFQ/spec upload, or manual part list for quote review.",
+  "Quote Now /instant-quote: guided component builder, pasted BOM/RFQ details, or a manual part list for quote review.",
   "Insights /insights: articles on Korean supplier verification, commercial terms, and risk reduction.",
   "Trust Assurance /trust-assurance: supplier credibility, document review, communication safety, business information awareness, and practical risk reduction.",
   "About /about: ASIVANTA background, buyer-side model, Seoul presence, no hidden supplier commissions.",
-  "Portal /portal and /login: client sourcing dashboard and access.",
   "Privacy /privacy and Terms /terms: legal pages.",
 ];
 
@@ -66,8 +64,10 @@ function parseBody(req) {
   return {};
 }
 
-function isASIVANTALeak(text) {
-  return /\b(ASIVANTA|pet|dog|cat|veterinary|grooming|walking)\b/i.test(text);
+function isOutOfScopeLeak(text) {
+  return /\b(pet|dog|cat|veterinary|grooming|walking|language teaching|language lesson|tutoring)\b/i.test(
+    text,
+  );
 }
 
 function keywordFallback(message, pathName = "") {
@@ -76,7 +76,7 @@ function keywordFallback(message, pathName = "") {
   if (/quote|rfq|bom|price|pricing|part|spec|upload|drawing/.test(text)) {
     return {
       answer:
-        "For a quote or RFQ, use Quote Now. Start with the guided component builder, upload a BOM/RFQ/spec sheet, or build a part list directly on the page.",
+        "For a quote or RFQ, use Quote Now. Start with the guided component builder, paste BOM or RFQ details, or build a part list directly on the page.",
       links: [siteLinks.quote],
     };
   }
@@ -108,8 +108,8 @@ function keywordFallback(message, pathName = "") {
   if (/portal|login|dashboard|client|document|order|rfq status/.test(text)) {
     return {
       answer:
-        "For client project access, use the Client Portal or Portal Login. If you do not have access yet, contact ASIVANTA so the team can help.",
-      links: [siteLinks.portal, siteLinks.login, siteLinks.contact],
+        "For a private project update or document question, contact ASIVANTA through the sourcing review form or your established business contact.",
+      links: [siteLinks.contact],
     };
   }
 
@@ -145,7 +145,7 @@ function keywordFallback(message, pathName = "") {
 
   return {
     answer:
-      "I can help you find the right ASIVANTA path for Korea sourcing, supplier verification, quote comparison, factory readiness, or client portal access. For an RFQ, use Quote Now; for advisory help, start a sourcing review.",
+      "I can help you find the right ASIVANTA path for Korea sourcing, supplier verification, quote comparison, or factory readiness. For an RFQ, use Quote Now; for advisory help, start a sourcing review.",
     links: [siteLinks.quote, siteLinks.contact, siteLinks.services],
   };
 }
@@ -182,7 +182,7 @@ function linksForAnswer(answer, fallbackLinks) {
   if (/insight|article/.test(lower)) links.push(siteLinks.insights);
   if (/about|seoul|buyer-side|trading company/.test(lower))
     links.push(siteLinks.about);
-  if (/portal|login|dashboard/.test(lower)) links.push(siteLinks.login);
+  if (/portal|login|dashboard/.test(lower)) links.push(siteLinks.contact);
 
   const merged = [...links, ...(fallbackLinks || [])];
   return merged
@@ -196,6 +196,15 @@ function linksForAnswer(answer, fallbackLinks) {
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+  if (
+    !enforceRateLimit(req, res, {
+      name: "ai-chat",
+      limit: 30,
+      windowMs: 60_000,
+    })
+  ) {
+    return;
   }
 
   const body = parseBody(req);
@@ -216,15 +225,12 @@ export default async function handler(req, res) {
     history: history.slice(-MAX_HISTORY_ITEMS),
   });
 
-  const usable = Boolean(routed.text) && !isASIVANTALeak(routed.text);
+  const usable = Boolean(routed.text) && !isOutOfScopeLeak(routed.text);
   const safeAnswer = usable ? routed.text : fallback.answer;
 
   return res.status(200).json({
     answer: safeAnswer,
     links: linksForAnswer(safeAnswer, fallback.links),
     fallback: !usable,
-    source: usable ? routed.provider : "fallback",
-    model: usable ? routed.model : null,
-    intent: routed.intent,
   });
 }

@@ -1,4 +1,4 @@
-﻿import { useState, useRef } from "react";
+﻿import { useState } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
@@ -8,9 +8,6 @@ import {
   ArrowLeft,
   CheckCircle2,
   Send,
-  Upload,
-  X,
-  FileText,
   AlertCircle,
   Loader2,
 } from "lucide-react";
@@ -45,20 +42,11 @@ const projectTypes = [
   "Managed Sourcing",
   "Other",
 ];
-const ALLOWED_EXTENSIONS = [".pdf", ".xlsx", ".png", ".jpg", ".jpeg"];
-const MAX_FILE_SIZE = 8 * 1024 * 1024;
-const MAX_FILES = 2;
 const MIN_MESSAGE = 30;
 const MAX_MESSAGE = 2000;
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function formatFileSize(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 const inputClass =
@@ -75,10 +63,7 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
-  const [fileError, setFileError] = useState("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -126,35 +111,6 @@ export default function Contact() {
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFileError("");
-    const selected = Array.from(e.target.files || []);
-    if (selected.length + files.length > MAX_FILES) {
-      setFileError(`Maximum ${MAX_FILES} files allowed.`);
-      return;
-    }
-    for (const f of selected) {
-      const ext = "." + f.name.split(".").pop()?.toLowerCase();
-      if (!ALLOWED_EXTENSIONS.includes(ext)) {
-        setFileError(
-          `File type ${ext} is not supported. Allowed: PDF, XLSX, PNG, JPG.`,
-        );
-        return;
-      }
-      if (f.size > MAX_FILE_SIZE) {
-        setFileError(`${f.name} exceeds the 8MB size limit.`);
-        return;
-      }
-    }
-    setFiles([...files, ...selected]);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const removeFile = (index: number) => {
-    setFiles(files.filter((_, i) => i !== index));
-    setFileError("");
-  };
-
   const isFormValid =
     form.fullName.trim() &&
     form.company.trim() &&
@@ -178,20 +134,17 @@ export default function Contact() {
     setServerError("");
 
     try {
-      const formData = new FormData();
-      formData.append("fullName", form.fullName.trim());
-      formData.append("company", form.company.trim());
-      formData.append("email", form.email.trim());
-      formData.append("phone", form.phone.trim());
-      formData.append("projectType", form.projectType);
-      formData.append("message", form.message.trim());
-      for (const file of files) {
-        formData.append("files", file);
-      }
-
       const res = await fetch("/api/contact", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName.trim(),
+          company: form.company.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          projectType: form.projectType,
+          message: form.message.trim(),
+        }),
       });
 
       const data = await res.json();
@@ -469,70 +422,12 @@ export default function Contact() {
                     </div>
                   </div>
 
-                  <div className="mb-8">
-                    <label className="block text-sm font-medium text-[#0F172A] mb-2">
-                      Upload supporting file(s){" "}
-                      <span className="text-gray-400 font-normal">
-                        (optional)
-                      </span>
-                    </label>
-                    <p className="text-xs text-gray-400 mb-3">
-                      Quote, RFQ sheet, supplier profile, spec sheet, drawing,
-                      or related document
-                    </p>
-
-                    {files.length > 0 && (
-                      <div className="space-y-2 mb-3">
-                        {files.map((file, i) => (
-                          <div
-                            key={i}
-                            className="flex items-center gap-3 bg-[#f9fafb] border border-gray-200 rounded-xl px-4 py-3"
-                          >
-                            <FileText className="h-4 w-4 text-[#3B82F6] shrink-0" />
-                            <span className="text-sm text-[#0F172A] truncate flex-1">
-                              {file.name}
-                            </span>
-                            <span className="text-xs text-gray-400 shrink-0">
-                              {formatFileSize(file.size)}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => removeFile(i)}
-                              className="h-6 w-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors shrink-0"
-                            >
-                              <X className="h-3 w-3 text-gray-600" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {files.length < MAX_FILES && (
-                      <label className="flex items-center justify-center gap-2 border-2 border-dashed border-gray-200 rounded-xl py-4 cursor-pointer hover:border-blue-300 hover:bg-blue-50/30 transition-all">
-                        <Upload className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-500">
-                          Choose file
-                        </span>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.xlsx,.png,.jpg,.jpeg"
-                          onChange={handleFileSelect}
-                        />
-                      </label>
-                    )}
-
-                    <p className="text-[11px] text-gray-400 mt-2">
-                      Accepted: PDF, XLSX, PNG, JPG &middot; Max 2 files
-                      &middot; 8MB each &middot; Do not upload sensitive
-                      personal data
-                    </p>
-                    {fileError && (
-                      <p className="text-red-500 text-xs mt-1.5 flex items-center gap-1">
-                        <AlertCircle className="h-3 w-3" /> {fileError}
-                      </p>
-                    )}
+                  <div className="mb-8 rounded-xl border border-blue-100 bg-blue-50/60 p-4 text-sm leading-relaxed text-gray-600">
+                    File uploads are temporarily unavailable while ASIVANTA
+                    strengthens document screening. Paste the important RFQ,
+                    supplier, or specification details into the message field.
+                    We will arrange a secure document exchange after reviewing
+                    your request.
                   </div>
 
                   {serverError && (

@@ -58,7 +58,7 @@ const sections = [
   {
     title: "5. Data Retention",
     body: [
-      "We retain contact form submissions and associated files for a period of 24 months from the date of submission. If an advisory engagement is initiated, we retain relevant correspondence and documentation for the duration of the engagement plus 36 months.",
+      "We retain contact form submissions for a period of 24 months from the date of submission. If an advisory engagement is initiated, we retain relevant correspondence and documentation for the duration of the engagement plus 36 months.",
       "You may request deletion of your personal data at any time by contacting us at contact@asivanta.com. We will process deletion requests within 30 days, subject to any legal or contractual retention obligations.",
     ],
   },
@@ -72,7 +72,7 @@ const sections = [
   {
     title: "7. Cookies and Tracking",
     body: [
-      "This website does not use advertising cookies, third-party tracking scripts, or behavioral analytics tools. We may use basic session cookies necessary for the operation of secure areas of the site (such as the client portal). These cookies are not used to track you across other websites.",
+      "This website does not use advertising cookies, third-party tracking scripts, or behavioral analytics tools. We may use basic session cookies when they are necessary for site operation. These cookies are not used to track you across other websites.",
     ],
   },
   {

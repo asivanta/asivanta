@@ -1,22 +1,12 @@
 import { Resend } from "resend";
-import formidable from "formidable";
-import fs from "fs";
+import { enforceRateLimit } from "./_rate-limit.js";
 
 export const config = {
-  api: { bodyParser: false },
+  api: { bodyParser: { sizeLimit: "96kb" } },
+  maxDuration: 30,
 };
 
-const ALLOWED_EXTENSIONS = new Set([".pdf", ".xlsx", ".png", ".jpg", ".jpeg"]);
-const ALLOWED_MIME_TYPES = new Set([
-  "application/pdf",
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  "image/png",
-  "image/jpeg",
-]);
-const MAX_FILE_SIZE = 8 * 1024 * 1024;
-const MAX_FILES = 2;
-const MAX_TOTAL_FILE_SIZE = 14 * 1024 * 1024;
-const VALID_PROJECT_TYPES = [
+const VALID_PROJECT_TYPES = new Set([
   "Sourcing",
   "Supplier Shortlist",
   "Supplier Verification",
@@ -26,67 +16,78 @@ const VALID_PROJECT_TYPES = [
   "Factory Readiness Review",
   "Managed Sourcing",
   "Other",
-];
+]);
 const MIN_MESSAGE = 30;
 const MAX_MESSAGE = 8000;
 const MAX_QUOTE_LINES = 12;
-const MAX_QUOTE_RECORD_BYTES = 32 * 1024;
 
-function isValidEmail(e) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && e.length <= 254;
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && value.length <= 254;
 }
-function sanitize(s) {
-  return String(s).replace(/[<>]/g, "").trim();
+
+function sanitize(value, maxLength = 8000) {
+  return String(value || "")
+    .replace(/[<>]/g, "")
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "")
+    .trim()
+    .slice(0, maxLength);
 }
+
+function oneLine(value, maxLength) {
+  return sanitize(value, maxLength).replace(/[\r\n]+/g, " ");
+}
+
+function parseBody(req) {
+  if (req.body && typeof req.body === "object") return req.body;
+  if (typeof req.body !== "string") return {};
+  try {
+    return JSON.parse(req.body);
+  } catch {
+    return {};
+  }
+}
+
+function parseQuoteLines(value) {
+  const source = Array.isArray(value)
+    ? value
+    : (() => {
+        try {
+          return JSON.parse(String(value || "[]"));
+        } catch {
+          return [];
+        }
+      })();
+
+  if (!Array.isArray(source)) return [];
+  return source.slice(0, MAX_QUOTE_LINES).map((line, index) => ({
+    line: Number(line?.line) || index + 1,
+    asvPartNumber: oneLine(line?.asvPartNumber, 80),
+    category: oneLine(line?.category, 80),
+    manufacturer: oneLine(line?.manufacturer, 120),
+    customerPartNumber: oneLine(line?.customerPartNumber, 120),
+    description: oneLine(line?.description, 240),
+    quantity: oneLine(line?.quantity, 40),
+    annualVolume: oneLine(line?.annualVolume, 40),
+    targetPrice: oneLine(line?.targetPrice, 80),
+    leadTime: oneLine(line?.leadTime, 80),
+    packaging: oneLine(line?.packaging, 80),
+    referenceDesignator: oneLine(line?.referenceDesignator, 120),
+    sourceCatalog: oneLine(line?.sourceCatalog, 120),
+    family: oneLine(line?.family, 80),
+    packageType: oneLine(line?.packageType, 80),
+    frequency: oneLine(line?.frequency, 80),
+    supplierPartNumber: oneLine(line?.supplierPartNumber, 120),
+    spec: oneLine(line?.spec, 300),
+    notes: oneLine(line?.notes, 360),
+  }));
+}
+
 function csvCell(value) {
-  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+  const safe = String(value ?? "");
+  const protectedValue = /^[=+\-@]/.test(safe) ? `'${safe}` : safe;
+  return `"${protectedValue.replace(/"/g, '""')}"`;
 }
-function parseQuoteLines(raw) {
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.slice(0, MAX_QUOTE_LINES).map((line, index) => ({
-      line: Number(line.line) || index + 1,
-      asvPartNumber: sanitize(line.asvPartNumber || "").slice(0, 80),
-      category: sanitize(line.category || "").slice(0, 80),
-      manufacturer: sanitize(line.manufacturer || "").slice(0, 120),
-      customerPartNumber: sanitize(line.customerPartNumber || "").slice(0, 120),
-      description: sanitize(line.description || "").slice(0, 240),
-      quantity: sanitize(line.quantity || "").slice(0, 40),
-      annualVolume: sanitize(line.annualVolume || "").slice(0, 40),
-      targetPrice: sanitize(line.targetPrice || "").slice(0, 80),
-      leadTime: sanitize(line.leadTime || "").slice(0, 80),
-      bufferPercent: sanitize(line.bufferPercent || "").slice(0, 40),
-      packaging: sanitize(line.packaging || "").slice(0, 80),
-      referenceDesignator: sanitize(line.referenceDesignator || "").slice(
-        0,
-        120,
-      ),
-      sourceCatalog: sanitize(line.sourceCatalog || "").slice(0, 120),
-      family: sanitize(line.family || "").slice(0, 80),
-      packageType: sanitize(line.packageType || "").slice(0, 80),
-      frequency: sanitize(line.frequency || "").slice(0, 80),
-      supplierPartNumber: sanitize(line.supplierPartNumber || "").slice(0, 120),
-      spec: sanitize(line.spec || "").slice(0, 300),
-      notes: sanitize(line.notes || "").slice(0, 360),
-    }));
-  } catch {
-    return [];
-  }
-}
-function parseQuoteRecord(raw) {
-  if (!raw || Buffer.byteLength(raw, "utf8") > MAX_QUOTE_RECORD_BYTES)
-    return null;
-  try {
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
-      return null;
-    return parsed;
-  } catch {
-    return null;
-  }
-}
+
 function quoteLinesToCsv(quoteId, quoteLines) {
   const header = [
     "Quote ID",
@@ -100,7 +101,6 @@ function quoteLinesToCsv(quoteId, quoteLines) {
     "Annual Volume",
     "Target Price",
     "Lead Time Target",
-    "Buffer %",
     "Packaging",
     "Reference Designator",
     "Source Catalog",
@@ -123,7 +123,6 @@ function quoteLinesToCsv(quoteId, quoteLines) {
     line.annualVolume,
     line.targetPrice,
     line.leadTime,
-    line.bufferPercent,
     line.packaging,
     line.referenceDesignator,
     line.sourceCatalog,
@@ -136,157 +135,87 @@ function quoteLinesToCsv(quoteId, quoteLines) {
   ]);
   return [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
 }
-function cleanupUploadedFiles(uploadedFiles) {
-  for (const file of uploadedFiles) {
-    try {
-      fs.unlinkSync(file.filepath);
-    } catch {}
-  }
-}
 
 export default async function handler(req, res) {
+  res.setHeader("Cache-Control", "no-store");
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
-
-  const form = formidable({
-    maxFiles: MAX_FILES,
-    maxFileSize: MAX_FILE_SIZE,
-    multiples: true,
-  });
-
-  let fields, files;
-  try {
-    [fields, files] = await form.parse(req);
-  } catch (err) {
-    return res.status(400).json({ error: err.message || "Invalid form data." });
+  if (
+    !enforceRateLimit(req, res, {
+      name: "contact",
+      limit: 5,
+      windowMs: 10 * 60_000,
+    })
+  ) {
+    return;
+  }
+  if (!String(req.headers["content-type"] || "").startsWith("application/json")) {
+    return res.status(415).json({
+      error:
+        "File uploads are temporarily unavailable. Please paste the important RFQ details into the form.",
+    });
   }
 
-  const get = (k) =>
-    (Array.isArray(fields[k]) ? fields[k][0] : fields[k]) || "";
-
-  const uploadedFiles = files.files
-    ? Array.isArray(files.files)
-      ? files.files
-      : [files.files]
-    : [];
-
-  // Honeypot
-  if (get("_hp_field")) {
-    cleanupUploadedFiles(uploadedFiles);
+  const body = parseBody(req);
+  if (body._hp_field) {
     return res.status(200).json({ success: true });
   }
 
-  const fullName = sanitize(get("fullName"));
-  const company = sanitize(get("company"));
-  const email = sanitize(get("email"));
-  const phone = sanitize(get("phone"));
-  const projectType = get("projectType");
-  const quoteId = sanitize(get("quoteId"));
-  const source = sanitize(get("source")) || "ASIVANTA Website Contact Form";
-  const quoteMode = sanitize(get("quoteMode"));
-  const quoteLines = parseQuoteLines(get("quoteLinesJson"));
-  const quoteRecord = parseQuoteRecord(get("quoteRecordJson"));
-  const message = sanitize(get("message"));
+  const fullName = oneLine(body.fullName, 120);
+  const company = oneLine(body.company, 160);
+  const email = oneLine(body.email, 254);
+  const phone = oneLine(body.phone, 80);
+  const projectType = oneLine(body.projectType, 80);
+  const quoteId = oneLine(body.quoteId, 80);
+  const quoteMode = oneLine(body.quoteMode, 80);
+  const message = sanitize(body.message, MAX_MESSAGE + 1);
+  const quoteLines = parseQuoteLines(body.quoteLines);
 
   const errors = [];
   if (!fullName) errors.push("Full Name is required.");
   if (!company) errors.push("Company Name is required.");
-  if (!email || !isValidEmail(email))
-    errors.push("A valid email address is required.");
-  if (!VALID_PROJECT_TYPES.includes(projectType))
+  if (!isValidEmail(email)) errors.push("A valid email address is required.");
+  if (!VALID_PROJECT_TYPES.has(projectType)) {
     errors.push("Please select a valid project type.");
-  if (!message) errors.push("Message is required.");
-  else if (message.length < MIN_MESSAGE)
+  }
+  if (message.length < MIN_MESSAGE) {
     errors.push(`Message must be at least ${MIN_MESSAGE} characters.`);
-  else if (message.length > MAX_MESSAGE)
+  } else if (message.length > MAX_MESSAGE) {
     errors.push(`Message must not exceed ${MAX_MESSAGE} characters.`);
-
+  }
   if (errors.length > 0) {
-    cleanupUploadedFiles(uploadedFiles);
     return res.status(400).json({ error: errors.join(" ") });
-  }
-
-  // Validate uploaded files
-  if (uploadedFiles.length > MAX_FILES) {
-    cleanupUploadedFiles(uploadedFiles);
-    return res
-      .status(400)
-      .json({ error: `Maximum ${MAX_FILES} files allowed.` });
-  }
-
-  const totalFileSize = uploadedFiles.reduce(
-    (sum, file) => sum + (file.size || 0),
-    0,
-  );
-  if (totalFileSize > MAX_TOTAL_FILE_SIZE) {
-    cleanupUploadedFiles(uploadedFiles);
-    return res.status(400).json({ error: "Total upload size is too large." });
-  }
-
-  for (const file of uploadedFiles) {
-    const originalFilename = file.originalFilename || "";
-    const ext = "." + originalFilename.split(".").pop().toLowerCase();
-    if (!ALLOWED_EXTENSIONS.has(ext)) {
-      cleanupUploadedFiles(uploadedFiles);
-      return res
-        .status(400)
-        .json({ error: `File type ${ext} is not allowed.` });
-    }
-    if (!ALLOWED_MIME_TYPES.has(file.mimetype || "")) {
-      cleanupUploadedFiles(uploadedFiles);
-      return res
-        .status(400)
-        .json({ error: "Uploaded file type is not allowed." });
-    }
   }
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.error("RESEND_API_KEY not set");
-    cleanupUploadedFiles(uploadedFiles);
+    console.error("Email service is not configured.");
     return res.status(500).json({ error: "Email service not configured." });
   }
 
   const toEmail = process.env.CONTACT_TO_EMAIL || "contact@asivanta.com";
   const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
-
-  const fileList =
-    uploadedFiles.length > 0
-      ? uploadedFiles
-          .map(
-            (f) => `- ${f.originalFilename} (${(f.size / 1024).toFixed(0)} KB)`,
-          )
-          .join("\n")
-      : "None";
-
-  const attachments = uploadedFiles.map((f) => ({
-    filename: f.originalFilename,
-    content: fs.readFileSync(f.filepath),
-  }));
-  if (quoteLines.length > 0) {
-    attachments.push({
-      filename: `${quoteId || "asivanta"}-asv-lines.csv`,
-      content: Buffer.from(quoteLinesToCsv(quoteId, quoteLines)),
-    });
-  }
-  if (quoteRecord) {
-    attachments.push({
-      filename: `${quoteId || "asivanta"}-admin-record.json`,
-      content: Buffer.from(JSON.stringify(quoteRecord, null, 2)),
-    });
-  }
+  const attachments =
+    quoteLines.length > 0
+      ? [
+          {
+            filename: `${quoteId || "asivanta"}-quote-lines.csv`,
+            content: Buffer.from(quoteLinesToCsv(quoteId, quoteLines)),
+          },
+        ]
+      : [];
 
   const resend = new Resend(apiKey);
   const subjectPrefix =
     projectType === "Quote / RFQ Comparison"
-      ? "New Asivanta Quote Now RFQ"
+      ? "New Asivanta Quote Request"
       : "New Asivanta Inquiry";
-
   const { error: sendError } = await resend.emails.send({
     from: fromEmail,
     to: [toEmail],
-    subject: `${subjectPrefix}${quoteId ? ` ${quoteId}` : ""} — ${company}`,
+    subject: `${subjectPrefix}${quoteId ? ` ${quoteId}` : ""} - ${company}`,
     text: `NEW ASIVANTA INQUIRY
 ----------------------------------------
 Company:      ${company}
@@ -301,18 +230,13 @@ Quote Lines:  ${quoteLines.length}
 MESSAGE:
 ${message}
 
-FILES:
-${fileList}
-
 Submitted: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" })} KST
-Source: ${source}`,
+Source: ASIVANTA Website`,
     ...(attachments.length > 0 ? { attachments } : {}),
   });
 
-  cleanupUploadedFiles(uploadedFiles);
-
   if (sendError) {
-    console.error("Resend error:", sendError);
+    console.error("Inquiry email could not be sent.");
     return res.status(500).json({
       error:
         "Something went wrong while sending your inquiry. Please try again shortly.",
@@ -336,15 +260,14 @@ Thank you for sending your ASIVANTA quote request.
 Quote ID: ${quoteId || "Not provided"}
 Company: ${company}
 Quote Mode: ${quoteMode || "Not provided"}
-Submitted: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Seoul" })} KST
 
-We received your information and will review the list, uploaded files, and any ASV part numbers generated from the request. If anything is unclear, we will contact you before preparing the quote packet.
+We received your information and will review the submitted part details. If anything is unclear, we will contact you before preparing the quote response.
 
 ASIVANTA Advisory
 contact@asivanta.com`,
     });
     if (ackError) {
-      console.error("Resend acknowledgement error:", ackError);
+      console.error("Customer acknowledgement could not be sent.");
     }
   }
 

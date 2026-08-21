@@ -58,3 +58,6 @@ Thumbs.db
 !/.env.example
 .replit.local
 artifacts/api-server/submissions/
+attached_assets/
+**/submissions/*.json
+**/*contact-submission*.json

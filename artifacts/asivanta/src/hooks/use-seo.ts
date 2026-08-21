@@ -43,13 +43,21 @@ function setCanonical(href: string) {
  * shares the single title shipped in index.html. Also keeps the Open Graph and
  * Twitter card text in sync for link previews.
  */
-export function useSeo(title: string, description: string) {
+export function useSeo(
+  title: string,
+  description: string,
+  options: { index?: boolean } = {},
+) {
   useEffect(() => {
     document.title = title;
 
     const existing =
       document.head.querySelector<HTMLMetaElement>(DESCRIPTION_SELECTOR);
     const previousDescription = existing?.getAttribute("content") ?? null;
+    const previousRobots =
+      document.head
+        .querySelector<HTMLMetaElement>('meta[name="robots"]')
+        ?.getAttribute("content") ?? null;
 
     setMetaByName("description", description);
     setMetaByProperty("og:title", title);
@@ -57,14 +65,21 @@ export function useSeo(title: string, description: string) {
     setMetaByProperty("og:url", window.location.href);
     setMetaByName("twitter:title", title);
     setMetaByName("twitter:description", description);
+    setMetaByName(
+      "robots",
+      options.index === false ? "noindex, nofollow" : "index, follow",
+    );
     setCanonical(`${window.location.origin}${window.location.pathname}`);
 
     return () => {
       if (previousDescription !== null) {
         setMetaByName("description", previousDescription);
       }
+      if (previousRobots !== null) {
+        setMetaByName("robots", previousRobots);
+      }
     };
-  }, [title, description]);
+  }, [title, description, options.index]);
 }
 
 export default useSeo;

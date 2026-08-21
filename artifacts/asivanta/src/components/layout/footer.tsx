@@ -42,7 +42,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="lg:col-span-2 lg:col-start-7">
+          <div className="lg:col-span-2 lg:col-start-8">
             <h4 className="font-semibold mb-6 text-gray-100 tracking-wide uppercase text-xs">
               Advisory
             </h4>
@@ -82,7 +82,7 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <h4 className="font-semibold mb-6 text-gray-100 tracking-wide uppercase text-xs">
               Resources
             </h4>
@@ -130,29 +130,6 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="lg:col-span-2">
-            <h4 className="font-semibold mb-6 text-gray-100 tracking-wide uppercase text-xs">
-              Clients
-            </h4>
-            <ul className="flex flex-col gap-4 text-sm text-gray-400">
-              <li>
-                <Link
-                  href="/portal"
-                  className="group flex items-center gap-2 hover:text-white transition-colors"
-                >
-                  Client Portal
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/login"
-                  className="hover:text-white transition-colors"
-                >
-                  Secure Login
-                </Link>
-              </li>
-            </ul>
-          </div>
         </div>
 
         <div className="pt-8 border-t border-[#1a233a] flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">

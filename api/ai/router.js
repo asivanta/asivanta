@@ -1,6 +1,5 @@
-// Task-based routing: everyday questions go to Grok first, coding questions
-// go to Claude first with Codex (OpenAI) as backup. Bridge (local Gemma) and
-// the rest of the chain are free fallbacks so the chat always answers.
+// Task-based routing keeps the public assistant available when one provider is
+// slow or unavailable.
 const DEFAULT_ROUTE_SIMPLE = "grok,bridge,anthropic,openai";
 const DEFAULT_ROUTE_CODING = "anthropic,openai,grok,bridge";
 const DEFAULT_TIMEOUT_MS = 30000;
@@ -105,17 +104,12 @@ const providers = {
     configured: () =>
       Boolean(
         process.env.AI_BRIDGE_URL ||
-        process.env.AI bridge_URL ||
         process.env.AI_BRIDGE_ALLOW_LOCAL !== "0",
       ),
     model: () => process.env.AI_BRIDGE_MODEL || "gemma-bridge",
     async call({ message, system, history }) {
-      const url =
-        process.env.AI_BRIDGE_URL ||
-        process.env.AI bridge_URL ||
-        "http://127.0.0.1:8787/chat";
-      const token =
-        process.env.AI_BRIDGE_TOKEN || process.env.AI bridge_API_KEY || "";
+      const url = process.env.AI_BRIDGE_URL || "http://127.0.0.1:8787/chat";
+      const token = process.env.AI_BRIDGE_TOKEN || "";
       const response = await fetchWithTimeout(url, {
         method: "POST",
         headers: {
@@ -227,17 +221,6 @@ function routeOrder(intent) {
     .split(",")
     .map((name) => name.trim().toLowerCase())
     .filter((name) => providers[name]);
-}
-
-export function routerStatus() {
-  const chain = (intent) =>
-    routeOrder(intent).map((name) => ({
-      provider: name,
-      model: providers[name].model(),
-      configured: providers[name].configured(),
-      cooling: isOpen(name),
-    }));
-  return { simple: chain("simple"), coding: chain("coding") };
 }
 
 export async function routeChat({ message, system, history = [] }) {

@@ -6,6 +6,7 @@ export default function NotFound() {
   useSeo(
     "Page Not Found | Asivanta",
     "This page does not exist on asivanta.com. Explore our Korea supplier sourcing and verification services, or contact the team directly.",
+    { index: false },
   );
 
   return (
@@ -18,7 +19,8 @@ export default function NotFound() {
           </div>
 
           <p className="mt-4 text-sm text-gray-600">
-            Did you forget to add the page to the router?
+            This page is not available. Return to the ASIVANTA homepage or
+            start a sourcing review.
           </p>
         </CardContent>
       </Card>

@@ -36,7 +36,7 @@ function clientFallback(message: string): ChatMessage {
     return {
       id: Date.now() + 1,
       role: "assistant",
-      text: "For a quote or RFQ, start with Quote Now. You can use the guided ASIVANTA-style component builder, upload a BOM/spec file, or build a part list for ASIVANTA review.",
+      text: "For a quote or RFQ, start with Quote Now. You can use the guided component builder, paste BOM or specification details, or build a part list for ASIVANTA review.",
       links: [{ label: "Start Quote Now", href: "/instant-quote" }],
     };
   }
@@ -55,7 +55,7 @@ function clientFallback(message: string): ChatMessage {
   return {
     id: Date.now() + 1,
     role: "assistant",
-    text: "I can help you find the right ASIVANTA page for supplier sourcing, verification, quote comparison, factory readiness, and client portal access.",
+    text: "I can help you find the right ASIVANTA page for supplier sourcing, verification, quote comparison, factory readiness, and private project questions.",
     links: starterLinks,
   };
 }

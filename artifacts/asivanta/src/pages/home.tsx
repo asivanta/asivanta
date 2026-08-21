@@ -835,7 +835,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 7. CLIENT PORTAL TEASER */}
+      {/* 7. SOURCING WORKSPACE */}
       <section className="relative overflow-hidden border-t border-white/70 bg-[linear-gradient(180deg,#f7fbff_0%,#eef5ff_100%)] py-24">
         {/* Decorative background element */}
         <div className="asv-liquid-sheen absolute inset-0 z-0"></div>
@@ -844,24 +844,24 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold tracking-wider mb-6">
-                <Lock className="h-3 w-3" /> SECURE ACCESS
+                <Lock className="h-3 w-3" /> SOURCING WORKSPACE
               </div>
               <h2 className="text-3xl md:text-5xl font-light text-gray-900 tracking-tight mb-6">
-                Your supply chain, <br />
-                <span className="font-medium text-[#0a1128]">centralized.</span>
+                Your sourcing review, <br />
+                <span className="font-medium text-[#0a1128]">clearly organized.</span>
               </h2>
               <p className="text-lg text-gray-600 font-light leading-relaxed mb-8">
-                Our secure client portal gives you real-time visibility into
-                your Korean sourcing operations. Track supplier interactions,
-                manage documents, and compare quotes in one unified workspace.
+                ASIVANTA organizes supplier findings, quote comparisons,
+                document questions, and next actions into a clear buyer-side
+                review you can use before making a commitment.
               </p>
 
               <div className="grid sm:grid-cols-2 gap-4 mb-8">
                 {[
-                  "Secure File Exchange",
-                  "Centralized Quote Requests",
-                  "Audit Report Archive",
-                  "Project Tracking & Milestones",
+                  "Supplier Findings",
+                  "Structured Quote Requests",
+                  "Document Review Notes",
+                  "Clear Next Actions",
                 ].map((feature, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <CheckIcon />
@@ -872,12 +872,12 @@ export default function Home() {
                 ))}
               </div>
 
-              <Link href="/portal">
+              <Link href="/contact">
                 <Button
                   variant="outline"
                   className="rounded-full h-12 px-6 border-gray-300 text-gray-700 hover:bg-gray-100 hover:-translate-y-0.5 transition-all duration-300"
                 >
-                  Access Client Portal
+                  Start a Sourcing Review
                 </Button>
               </Link>
             </div>
@@ -920,7 +920,7 @@ export default function Home() {
 
                 <div className="absolute inset-0 flex items-center justify-center bg-white/10">
                   <div className="asv-glass-panel flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-gray-800">
-                    <Lock className="h-4 w-4" /> ASIVANTA Portal
+                    <Lock className="h-4 w-4" /> ASIVANTA Review
                   </div>
                 </div>
               </div>
