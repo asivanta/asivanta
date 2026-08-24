@@ -1,199 +1,72 @@
 ﻿import { Link } from "wouter";
-import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
-import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { useSeo } from "@/hooks/use-seo";
-
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-    },
-  },
-};
-
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.07 } },
-};
+import { Navbar } from "@/components/layout/navbar";
+import { PageMeta } from "@/lib/page-meta";
 
 const sections = [
   {
-    title: "1. Who We Are",
-    body: [
-      'ASIVANTA Advisory is a procurement and sourcing advisory firm based in Seoul, South Korea. We provide services to companies seeking to source from Korean and Asian manufacturers. References to "ASIVANTA," "we," "us," or "our" in this policy refer to ASIVANTA Advisory.',
-      "Our contact email for privacy-related matters is: hello@asivanta.com",
+    title: "Information you provide",
+    paragraphs: [
+      "When you send an inquiry, we receive the name, company, email address, sourcing subject, and clarification request that you enter in the form.",
+      "Please do not send confidential drawings, personal identification, payment details, or other sensitive information through the initial inquiry form.",
     ],
   },
   {
-    title: "2. Information We Collect",
-    body: [
-      "We collect information you provide directly to us, including:",
-      "• Name and company name when you submit an inquiry\n• Email address and phone number for communication purposes\n• Project details and sourcing requirements you include in your message\n• Documents or files you voluntarily attach to your inquiry (PDF, XLSX, or image formats)\n• IP address and browser metadata for security and spam prevention purposes",
-      "We do not collect payment information through this website. We do not use tracking cookies, behavioral advertising, or third-party analytics services.",
+    title: "How inquiry information is used",
+    paragraphs: [
+      "We use inquiry information to understand the request, decide whether it fits, reply, and—if work starts—deliver the agreed work.",
+      "Submitting an inquiry does not create an advisory engagement.",
     ],
   },
   {
-    title: "3. How We Use Your Information",
-    body: [
-      "We use the information you submit solely for the following purposes:",
-      "• To respond to your inquiry and provide the advisory services you requested\n• To assess whether your sourcing requirements match our capabilities\n• To communicate with you about an ongoing or prospective engagement\n• To maintain records of client and prospect correspondence\n• To prevent spam and protect the security of our platform",
-      "We do not use your information for marketing to unrelated third parties, automated profiling, or any purpose unrelated to your inquiry.",
+    title: "Service providers and technical data",
+    paragraphs: [
+      "The website hosting and email-delivery providers used to operate this site may process basic technical information and the content needed to transmit an inquiry. Their handling is governed by their own terms and privacy practices.",
+      "Cloudflare may process technical data from the inquiry form's abuse-prevention check for abuse prevention.",
+      "This site does not currently use advertising trackers or behavioral analytics.",
     ],
   },
   {
-    title: "4. How We Share Your Information",
-    body: [
-      "We do not sell, rent, or trade your personal information to any third party.",
-      "We may share your information only in the following limited circumstances:",
-      "• With service providers who support our operations (such as email delivery and database hosting), who are contractually bound to handle your data securely and only for the purpose of providing those services\n• If required by applicable law, court order, or regulatory authority\n• To protect the rights, safety, or property of ASIVANTA, our clients, or the public",
-      "If you are introduced to a prospective supplier as part of an engagement, we will discuss what information is shared with you before doing so. We do not share client details with suppliers without your explicit consent.",
+    title: "Retention",
+    paragraphs: [
+      "We keep inquiry records only as long as needed to respond and, if work starts, to deliver that work. Records may be kept longer where reasonably needed for legal, accounting, security, or dispute purposes.",
     ],
   },
   {
-    title: "5. Data Retention",
-    body: [
-      "We retain contact form submissions for a period of 24 months from the date of submission. If an advisory engagement is initiated, we retain relevant correspondence and documentation for the duration of the engagement plus 36 months.",
-      "You may request deletion of your personal data at any time by contacting us at hello@asivanta.com. We will process deletion requests within 30 days, subject to any legal or contractual retention obligations.",
-    ],
-  },
-  {
-    title: "6. Data Security",
-    body: [
-      "We take reasonable technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. Our platform uses encrypted connections (HTTPS) for all data transmission, and access to stored submissions is restricted to authorized personnel only.",
-      "No method of electronic transmission or storage is completely secure. While we implement industry-standard safeguards, we cannot guarantee absolute security.",
-    ],
-  },
-  {
-    title: "7. Cookies and Tracking",
-    body: [
-      "This website does not use advertising cookies, third-party tracking scripts, or behavioral analytics tools. We may use basic session cookies when they are necessary for site operation. These cookies are not used to track you across other websites.",
-    ],
-  },
-  {
-    title: "8. Your Rights",
-    body: [
-      "Depending on your location, you may have the following rights regarding your personal data:",
-      "• Access: Request a copy of the personal information we hold about you\n• Correction: Request correction of inaccurate or incomplete data\n• Deletion: Request that we delete your personal data, subject to retention obligations\n• Objection: Object to our processing of your data in certain circumstances\n• Portability: Request a copy of your data in a structured, machine-readable format",
-      "To exercise any of these rights, please contact us at hello@asivanta.com. We will respond within 30 days. We may need to verify your identity before processing a request.",
-    ],
-  },
-  {
-    title: "9. International Data Transfers",
-    body: [
-      "ASIVANTA Advisory operates from Seoul, South Korea. If you are located in the European Economic Area, the United Kingdom, or another jurisdiction with data transfer restrictions, please be aware that your information may be processed in South Korea. We take steps to ensure that your information receives an adequate level of protection consistent with applicable data protection law.",
-    ],
-  },
-  {
-    title: "10. Changes to This Policy",
-    body: [
-      "We may update this Privacy Policy from time to time. When we do, we will revise the effective date at the top of this page. We encourage you to review this policy periodically. Continued use of this website after changes are posted constitutes acceptance of the updated policy.",
-    ],
-  },
-  {
-    title: "11. Contact Us",
-    body: [
-      "If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:",
-      "Email: hello@asivanta.com\nLocation: Seoul, South Korea",
+    title: "Your request",
+    paragraphs: [
+      "You may ask about, correct, or request deletion of inquiry information by emailing hello@asivanta.com. A request may be limited where information must be kept for legal or operational reasons.",
     ],
   },
 ];
 
 export default function Privacy() {
-  useSeo(
-    "Privacy Policy | Asivanta",
-    "How Asivanta collects, uses, stores and protects the personal and business information you share with us through this website and our sourcing services.",
-  );
-
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans">
+    <div className="min-h-screen bg-white text-slate-950">
+      <PageMeta page="privacy" />
       <Navbar />
-
-      <section className="pt-32 md:pt-40 pb-24 bg-[#f9fafb]">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <motion.div initial="hidden" animate="visible" variants={stagger}>
-            <motion.div variants={fadeIn} className="mb-4">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Home
-              </Link>
-            </motion.div>
-
-            <motion.h1
-              variants={fadeIn}
-              className="text-4xl md:text-5xl font-light text-[#0F172A] tracking-tight mb-4"
-            >
-              Privacy Policy
-            </motion.h1>
-            <motion.p
-              variants={fadeIn}
-              className="text-sm text-gray-400 font-light mb-2"
-            >
-              Effective date: January 1, 2025
-            </motion.p>
-            <motion.p
-              variants={fadeIn}
-              className="text-lg text-gray-500 font-light max-w-2xl mb-16"
-            >
-              ASIVANTA Advisory is committed to protecting the privacy of
-              everyone who contacts us or uses this website. This policy
-              explains what information we collect, how we use it, and what
-              rights you have.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={stagger}
-            className="space-y-12"
-          >
+      <main className="pt-20">
+        <section className="bg-slate-50 py-20 sm:py-24">
+          <div className="mx-auto max-w-4xl px-5 sm:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Legal</p>
+            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">Privacy Policy</h1>
+            <p className="mt-5 text-sm text-slate-500">Effective August 24, 2026</p>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">This policy explains how Asivanta handles information submitted through asivanta.com.</p>
+          </div>
+        </section>
+        <section className="py-16 sm:py-20">
+          <div className="mx-auto max-w-4xl space-y-12 px-5 sm:px-8">
             {sections.map((section) => (
-              <motion.div key={section.title} variants={fadeIn}>
-                <h2 className="text-xl font-semibold text-[#0F172A] mb-4">
-                  {section.title}
-                </h2>
-                <div className="space-y-4">
-                  {section.body.map((paragraph, i) => (
-                    <p
-                      key={i}
-                      className="text-gray-600 font-light leading-relaxed whitespace-pre-line"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </motion.div>
+              <section key={section.title}>
+                <h2 className="text-2xl font-semibold tracking-tight">{section.title}</h2>
+                <div className="mt-4 space-y-4 text-base leading-7 text-slate-600">{section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+              </section>
             ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.5 }}
-            className="mt-20 pt-10 border-t border-gray-100"
-          >
-            <p className="text-sm text-gray-400 font-light">
-              Questions about this policy?{" "}
-              <a
-                href="mailto:hello@asivanta.com"
-                className="text-blue-600 hover:underline"
-              >
-                hello@asivanta.com
-              </a>
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
+            <div className="border-t border-slate-200 pt-8 text-slate-600">Questions about this policy? <a className="font-semibold text-blue-700 hover:text-blue-900" href="mailto:hello@asivanta.com">hello@asivanta.com</a></div>
+            <Link href="/contact" className="inline-block font-semibold text-blue-700 hover:text-blue-900">Return to Contact</Link>
+          </div>
+        </section>
+      </main>
       <Footer />
     </div>
   );

@@ -1,7 +1,4 @@
 User-agent: *
 Allow: /
 
-Disallow: /shortlist-report
-Disallow: /api/
-
 Sitemap: https://asivanta.com/sitemap.xml

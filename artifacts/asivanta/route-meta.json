@@ -1,0 +1,42 @@
+{
+  "home": {
+    "title": "Asivanta | Buyer-Side Korea Sourcing Advisory",
+    "description": "Seoul-based advisory for overseas buyers reviewing Korean suppliers, RFQs, and open questions before commitment.",
+    "path": "/"
+  },
+  "about": {
+    "title": "About Asivanta | Seoul-Based Sourcing Advisory",
+    "description": "Who Asivanta is: a buyer-side procurement advisory in Seoul. Not a trading company.",
+    "path": "/about"
+  },
+  "report": {
+    "title": "Korea Supplier Shortlist Review | Asivanta",
+    "description": "How Asivanta reviews a defined sourcing request and organizes supplier options, evidence gaps, and next questions.",
+    "path": "/report"
+  },
+  "trust": {
+    "title": "Trust & Assurance | Asivanta",
+    "description": "What a sourcing review can and cannot check before samples, tooling, or payment.",
+    "path": "/trust-assurance"
+  },
+  "insights": {
+    "title": "Insights | Korea Sourcing Guides",
+    "description": "Buyer-side notes on Korean suppliers, documents, RFQs, and pre-commitment checks.",
+    "path": "/insights"
+  },
+  "contact": {
+    "title": "Contact Asivanta",
+    "description": "Send a sourcing inquiry. Email hello@asivanta.com.",
+    "path": "/contact"
+  },
+  "privacy": {
+    "title": "Privacy Policy | Asivanta",
+    "description": "How Asivanta handles inquiry information.",
+    "path": "/privacy"
+  },
+  "terms": {
+    "title": "Terms of Service | Asivanta",
+    "description": "Terms for using asivanta.com and requesting advisory work.",
+    "path": "/terms"
+  }
+}

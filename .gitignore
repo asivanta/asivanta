@@ -52,6 +52,8 @@ Thumbs.db
 .claude/
 .vercel
 
+# Local agent QA artifacts are kept outside the repository.
+
 # --- added 2026-08-04: secret + PII protection ---
 /.env
 /.env.*

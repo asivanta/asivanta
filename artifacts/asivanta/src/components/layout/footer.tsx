@@ -1,159 +1,46 @@
-import React from "react";
-import { Link } from "wouter";
-import logoImage from "../../assets/logo-new-transparent.png";
 import { Mail, MapPin } from "lucide-react";
+import { Link } from "wouter";
 
 export function Footer() {
   return (
-    <footer className="bg-[#0a1128] text-white pt-24 pb-12 border-t border-[#1a233a]">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16">
-          <div className="lg:col-span-5 flex flex-col">
-            <Link href="/" className="mb-8 inline-block">
-              <img
-                src={logoImage}
-                alt="ASIVANTA"
-                className="h-32 w-auto max-w-full object-contain brightness-0 invert opacity-95 md:h-40 lg:h-44"
-              />
+    <footer className="border-t border-slate-800 bg-[#081226] text-white">
+      <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:py-18">
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div>
+            <Link href="/" aria-label="Asivanta home">
+              <span className="text-lg font-semibold tracking-[0.24em] text-white">ASIVANTA</span>
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-sm">
-              Premium sourcing and supply chain advisory for U.S. and global
-              companies working with Korean manufacturers. Bridging capability,
-              culture, and commercial reality.
+            <p className="mt-5 max-w-md text-sm leading-6 text-slate-400">
+              Seoul-based, buyer-side procurement and sourcing advisory for overseas buyers reviewing Korean suppliers, RFQs, documents, and open questions before commitment.
             </p>
-            <div className="flex flex-col gap-4 text-sm text-gray-300">
-              <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
-                <span className="leading-snug">
-                  Seoul, South Korea
-                  <br />
-                  Serving Global Procurement Teams
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-blue-400 shrink-0" />
-                <a
-                  href="mailto:hello@asivanta.com"
-                  className="hover:text-white transition-colors"
-                >
-                  hello@asivanta.com
-                </a>
-              </div>
+            <div className="mt-6 space-y-3 text-sm text-slate-300">
+              <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-blue-400" /> Seoul, South Korea</p>
+              <a href="mailto:hello@asivanta.com" className="flex items-center gap-2 transition hover:text-white"><Mail className="h-4 w-4 text-blue-400" /> hello@asivanta.com</a>
             </div>
           </div>
 
-          <div className="lg:col-span-2 lg:col-start-8">
-            <h4 className="font-semibold mb-6 text-gray-100 tracking-wide uppercase text-xs">
-              Advisory
-            </h4>
-            <ul className="flex flex-col gap-4 text-sm text-gray-400">
-              <li>
-                <a
-                  href="#services"
-                  className="hover:text-white transition-colors"
-                >
-                  Services
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#how-it-works"
-                  className="hover:text-white transition-colors"
-                >
-                  Methodology
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#industries"
-                  className="hover:text-white transition-colors"
-                >
-                  Industries
-                </a>
-              </li>
-              <li>
-                <Link
-                  href="/about"
-                  className="hover:text-white transition-colors"
-                >
-                  About Firm
-                </Link>
-              </li>
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Explore</h2>
+            <ul className="mt-5 space-y-3 text-sm text-slate-300">
+              <li><Link href="/about" className="hover:text-white">About</Link></li>
+              <li><Link href="/report" className="hover:text-white">Services</Link></li>
+              <li><Link href="/insights" className="hover:text-white">Insights</Link></li>
+              <li><Link href="/trust-assurance" className="hover:text-white">Trust & Assurance</Link></li>
+              <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
             </ul>
           </div>
 
-          <div className="lg:col-span-3">
-            <h4 className="font-semibold mb-6 text-gray-100 tracking-wide uppercase text-xs">
-              Resources
-            </h4>
-            <ul className="flex flex-col gap-4 text-sm text-gray-400">
-              <li>
-                <Link
-                  href="/report"
-                  className="hover:text-white transition-colors"
-                >
-                  Shortlist Report
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/insights"
-                  className="hover:text-white transition-colors"
-                >
-                  Insights & Articles
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/insights"
-                  className="hover:text-white transition-colors"
-                >
-                  Risk Reports
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/trust-assurance"
-                  className="hover:text-white transition-colors"
-                >
-                  Trust Assurance
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="hover:text-white transition-colors"
-                >
-                  Contact Us
-                </Link>
-              </li>
+          <div>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Legal</h2>
+            <ul className="mt-5 space-y-3 text-sm text-slate-300">
+              <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
             </ul>
           </div>
-
         </div>
 
-        <div className="pt-8 border-t border-[#1a233a] flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
-          <p>
-            © {new Date().getFullYear()} ASIVANTA Advisory. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6">
-            <a
-              href="mailto:hello@asivanta.com"
-              className="hover:text-white transition-colors flex items-center gap-2"
-            >
-              <Mail className="h-4 w-4" />
-              <span>Contact Us</span>
-            </a>
-            <Link
-              href="/privacy"
-              className="hover:text-white transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-white transition-colors">
-              Terms of Service
-            </Link>
-          </div>
+        <div className="mt-12 border-t border-white/10 pt-6 text-xs text-slate-500">
+          © {new Date().getFullYear()} Asivanta. All rights reserved.
         </div>
       </div>
     </footer>

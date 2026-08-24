@@ -1,360 +1,84 @@
-﻿import { useState } from "react";
+﻿import { ArrowRight, BookOpen, ChevronDown } from "lucide-react";
 import { Link } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, X, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { useSeo } from "@/hooks/use-seo";
+import { Navbar } from "@/components/layout/navbar";
+import { PageMeta } from "@/lib/page-meta";
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-    },
-  },
-};
-
-const stagger = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
-
-const articles = [
+const guides = [
   {
-    id: 1,
-    title: "How to Verify a Korean Supplier Before Commitment",
-    preview: "What to check before you send payment or sign terms.",
-    readTime: "6 min read",
-    date: "March 2026",
-    category: "Supplier Verification",
-    body: [
-      "Sending a wire transfer to a supplier you have never physically visited is one of the highest-risk moments in cross-border sourcing. In Korea, where business culture relies heavily on relationships and trust built over time, foreign buyers are at a structural disadvantage from the start.",
-      "Before committing capital or signing any binding terms, buyers should complete a minimum due-diligence checklist that goes well beyond reviewing a supplier's website or trade-show booth.",
-      "Start with corporate registration verification. Every legitimate Korean manufacturer is registered with the Korean Fair Trade Commission and holds a Business Registration Number. Cross-reference this against publicly available databases. If the supplier cannot or will not provide this, walk away.",
-      "Next, request audited financial statements for the most recent two fiscal years. Korean accounting standards (K-IFRS) are aligned with international norms, making it straightforward to assess solvency, debt ratios, and revenue consistency. A supplier that resists sharing financials is a supplier with something to hide.",
-      "Conduct a physical factory visit — or engage a local advisory firm to do so on your behalf. During the visit, verify production capacity against the supplier's claims. Check equipment age, workforce size, quality management certifications (ISO 9001, IATF 16949 for automotive), and environmental compliance.",
-      "Finally, request customer references from at least two existing export clients. Contact them directly and ask about on-time delivery rates, defect ratios, and responsiveness to quality claims. A supplier with strong references will be happy to share them.",
-      "Verification is not a sign of distrust — it is a standard business practice that reputable Korean manufacturers expect and respect from serious international buyers.",
+    title: "How to review a Korean supplier before commitment",
+    preview: "Separate corporate identity, supplied evidence, and factory reality instead of treating them as one question.",
+    paragraphs: [
+      "Begin with the legal entity name, registration details, addresses, bank beneficiary, and the people communicating with you. Differences are not automatically wrongdoing, but they are questions to resolve before payment.",
+      "Treat certificates, catalogues, references, and website statements as supplied evidence—not final proof. Confirm the issuer, scope, dates, and whether each record belongs to the same entity.",
+      "Desktop checks cannot establish current factory conditions or capacity. Where the decision depends on physical reality, use samples, testing, direct confirmation, a specialist, or an on-site check.",
     ],
   },
   {
-    id: 2,
-    title: "MOQ, Lead Time, and Payment Terms: What Buyers Miss",
-    preview: "Where most sourcing mistakes begin.",
-    readTime: "5 min read",
-    date: "February 2026",
-    category: "Commercial Strategy",
-    body: [
-      "The three variables that derail more sourcing relationships than quality defects combined are minimum order quantities, lead times, and payment terms. Each one is negotiable — but only if you understand how Korean suppliers think about them.",
-      "Minimum Order Quantities (MOQs) in Korea are often higher than buyers expect, particularly for specialty materials and precision components. This is not arbitrary — it reflects setup costs, raw material procurement cycles, and the supplier's own margin structure. Pushing for dramatically lower MOQs without understanding these constraints signals inexperience and erodes trust.",
-      "A more effective approach: negotiate a trial order at a modestly higher unit price, with a written agreement that pricing will step down once volumes reach the supplier's standard MOQ threshold. This gives both parties a low-risk entry point.",
-      "Lead times in Korea are generally reliable by global standards, but they are not infinitely flexible. Most manufacturers plan production 4-8 weeks out. Requesting rush orders repeatedly marks you as a difficult client. Instead, build a rolling forecast relationship: share your projected demand quarterly, and the supplier can pre-position raw materials accordingly.",
-      "Payment terms are where cultural misunderstandings cause the most friction. Korean suppliers strongly prefer T/T (telegraphic transfer) with a deposit structure — typically 30% upfront, 70% before shipment. Letters of Credit (L/C) are accepted but considered slow and bureaucratic. Net-30 or Net-60 terms are rarely offered to new foreign clients.",
-      "The key insight: all three variables are interconnected. A buyer who commits to higher volumes can negotiate better payment terms. A buyer who provides reliable forecasts earns shorter lead times. Approach these as a package, not as isolated line items.",
+    title: "MOQ, lead time, and payment terms: what buyers miss",
+    preview: "Read commercial terms as connected assumptions, not isolated numbers.",
+    paragraphs: [
+      "A minimum order quantity may depend on material purchasing, setup, packaging, or production scheduling. Ask what changes when volume changes rather than comparing the number alone.",
+      "A stated lead time should identify when the clock starts, what buyer inputs are required, and whether it covers production only or also inspection, export, and delivery.",
+      "Payment language should match the named legal entity, currency, milestone, bank beneficiary, and remedy if the scope changes. Escalate legal or trade-finance questions to a qualified specialist.",
     ],
   },
   {
-    id: 3,
-    title: "Reducing Supplier Risk in Korea: A Practical Approach",
-    preview: "How to move from uncertainty to confidence.",
-    readTime: "7 min read",
-    date: "January 2026",
-    category: "Risk Management",
-    body: [
-      "Supplier risk in Korea is not higher or lower than in other manufacturing economies — it is different. Understanding the specific risk profile of Korean suppliers allows buyers to mitigate effectively rather than reactively.",
-      "The first category of risk is financial. Korean manufacturers, particularly mid-sized firms, often carry higher leverage ratios than their Western counterparts. This is partly structural — Korean banks have historically extended generous credit lines to manufacturing firms — but it means that a supplier's apparent stability can mask underlying financial stress. Annual financial reviews should be non-negotiable.",
-      "The second category is operational. Korea's manufacturing sector is highly concentrated geographically. A single natural disaster, labor action, or infrastructure disruption in the Gyeongsang or Chungcheong provinces could affect dozens of suppliers simultaneously. Diversifying across regions — or at minimum, maintaining a qualified backup supplier — is essential.",
-      "The third category is relational. In Korean business culture, relationships carry contractual weight. A supplier who feels disrespected or undervalued may deprioritize your orders in favor of domestic clients or longer-standing partners. This is not malice — it is the natural consequence of a relationship-driven business environment.",
-      'Practical mitigation starts with structured communication. Establish a regular cadence of calls or visits — quarterly at minimum. Assign a dedicated point of contact rather than rotating through procurement staff. Learn the basics of Korean business etiquette: exchanging business cards with both hands, addressing counterparts by title, and understanding that "we will review" often means "no."',
-      "Invest in a local presence or partnership. Having a Korean-speaking representative who can visit factories, attend industry events, and maintain relationships between orders is the single most effective risk-reduction strategy available to foreign buyers.",
-      "Risk is never eliminated — it is managed. The buyers who succeed in Korea are those who treat supplier relationships as long-term investments, not transactional conveniences.",
+    title: "Reducing supplier risk in Korea: a practical approach",
+    preview: "Make the next decision smaller, documented, and proportionate to the evidence.",
+    paragraphs: [
+      "Define the decision first: whether to request a sample, continue discussion, issue tooling, pay a deposit, or place an order. Each step needs a different level of evidence.",
+      "Keep an open-questions list with an owner and source for each answer. A claim repeated in several emails is still one unconfirmed claim if it comes from the same source.",
+      "Use staged commitments where practical. Samples, limited tests, specialist review, and explicit approval gates can expose problems before a larger commitment, but they do not eliminate risk.",
     ],
   },
-];
-
-const featuredArticle = {
-  title: "Korean Automotive Supplier Review Checklist",
-  preview:
-    "Review the exact site, IATF scope, core-tool readiness, capacity, sub-tier controls, material reporting, and launch evidence before nomination or tooling commitment.",
-  readTime: "11 min read",
-  date: "August 2026",
-  category: "Automotive Supplier Quality",
-  href: "/insights/korean-automotive-supplier-review-checklist",
-};
-
-const relatedGuides = [
   {
-    title: "Korea Physical AI R&D Partner Checklist",
-    preview:
-      "Define the Korean partner role, evidence, IP and data questions, pilot result, and next commercial decision before a co-development commitment.",
-    readTime: "10 min read",
-    date: "August 2026",
-    category: "Physical AI & Joint R&D",
-    href: "/insights/korea-physical-ai-rd-partner-checklist",
-  },
-  {
-    title: "Korean Manufacturer or Trading Company? What Each Document Proves",
-    preview:
-      "How to check the legal entity, factory record, manufacturing role, and certificate scope before a sample, tooling payment, or purchase order.",
-    readTime: "9 min read",
-    date: "August 2026",
-    category: "Supplier Verification",
-    href: "/insights/korean-manufacturer-vs-trading-company",
-  },
-  {
-    title: "How Overseas Buyers Should Prepare for Korea Electronics Show 2026",
-    preview:
-      "A buyer-side checklist for supplier shortlisting, comparable RFQs, meeting evidence, and safer post-show decisions.",
-    readTime: "8 min read",
-    date: "August 2026",
-    category: "Trade Show Preparation",
-    href: "/insights/kes-2026-overseas-buyer-checklist",
+    title: "Comparing RFQs before you compare price",
+    preview: "Normalize scope, exclusions, and assumptions before ranking the total.",
+    paragraphs: [
+      "Confirm that each quote covers the same part revision, material, tolerance, finish, inspection basis, packaging, quantity, and delivery term. A lower total may simply contain less scope.",
+      "List exclusions and open items beside the price: tooling ownership, sample cost, testing, certificates, tax, freight, payment milestones, validity, and change handling.",
+      "Do not fill gaps with assumptions. Send the same clarification questions to each supplier and preserve the written answers with the quote version they relate to.",
+    ],
   },
 ];
 
 export default function Insights() {
-  useSeo(
-    "Insights | Korea Sourcing and Supplier Verification Guides",
-    "Practical guides for buyers sourcing from Korea: how to verify a supplier before commitment, what MOQ, lead time and payment terms really mean, and where sourcing goes wrong.",
-  );
-
-  const [activeArticle, setActiveArticle] = useState<number | null>(null);
-  const selected = articles.find((a) => a.id === activeArticle);
-
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans">
+    <div className="min-h-screen bg-white text-slate-950">
+      <PageMeta page="insights" />
       <Navbar />
+      <main className="pt-20">
+        <section className="bg-slate-50 py-20 sm:py-28">
+          <div className="mx-auto max-w-6xl px-5 sm:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Insights</p>
+            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">Korea sourcing guides for pre-commitment questions.</h1>
+            <p className="mt-6 max-w-3xl text-xl leading-8 text-slate-600">Buyer-side notes on suppliers, documents, RFQs, and the boundaries of desktop review.</p>
+          </div>
+        </section>
 
-      <section className="pt-32 md:pt-40 pb-24 bg-[#f9fafb]">
-        <div className="container mx-auto px-6">
-          <motion.div initial="hidden" animate="visible" variants={stagger}>
-            <motion.div variants={fadeIn} className="mb-4">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Home
-              </Link>
-            </motion.div>
-
-            <motion.h1
-              variants={fadeIn}
-              className="text-4xl md:text-5xl font-light text-[#0F172A] tracking-tight mb-4"
-            >
-              Insights
-            </motion.h1>
-            <motion.p
-              variants={fadeIn}
-              className="text-lg text-gray-500 font-light max-w-xl mb-16"
-            >
-              Practical perspectives on sourcing, supplier risk, and Korea
-              market execution.
-            </motion.p>
-          </motion.div>
-
-          <motion.article
-            initial="hidden"
-            animate="visible"
-            variants={fadeIn}
-            className="mb-8 overflow-hidden rounded-3xl bg-[#07172f] text-white shadow-[0_16px_50px_rgba(15,23,42,0.16)]"
-          >
-            <Link
-              href={featuredArticle.href}
-              className="group grid gap-8 p-8 md:grid-cols-[1.25fr_0.75fr] md:p-12"
-            >
-              <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-blue-400/15 px-3 py-1 text-xs font-medium text-blue-200">
-                    {featuredArticle.category}
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    {featuredArticle.date}
-                  </span>
-                </div>
-                <h2 className="mt-6 max-w-3xl text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
-                  {featuredArticle.title}
-                </h2>
-                <p className="mt-5 max-w-2xl text-base leading-7 text-slate-300">
-                  {featuredArticle.preview}
-                </p>
-              </div>
-              <div className="flex items-end justify-between gap-6 md:flex-col md:items-end md:justify-between">
-                <span className="flex items-center gap-2 text-sm text-slate-400">
-                  <Clock className="h-4 w-4" aria-hidden="true" />
-                  {featuredArticle.readTime}
-                </span>
-                <span className="inline-flex items-center gap-2 text-sm font-medium text-blue-300 transition-transform group-hover:translate-x-1">
-                  Read the guide
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </span>
-              </div>
-            </Link>
-          </motion.article>
-
-          <div className="mb-8 grid gap-4 lg:grid-cols-3">
-            {relatedGuides.map((guide) => (
-              <motion.article
-                key={guide.href}
-                initial="hidden"
-                animate="visible"
-                variants={fadeIn}
-                className="overflow-hidden rounded-3xl border border-black/10 bg-white"
-              >
-                <Link
-                  href={guide.href}
-                  className="group flex h-full flex-col justify-between gap-6 p-7 md:p-8"
-                >
-                  <div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-[#0071e3]">
-                        {guide.category}
-                      </span>
-                      <span className="text-xs text-slate-400">
-                        {guide.date}
-                      </span>
-                    </div>
-                    <h2 className="mt-4 text-xl font-semibold leading-tight tracking-tight text-[#0F172A] md:text-2xl">
-                      {guide.title}
-                    </h2>
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-                      {guide.preview}
-                    </p>
-                  </div>
-                  <span className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-[#0071e3] transition-transform group-hover:translate-x-1">
-                    {guide.readTime}
-                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </span>
-                </Link>
-              </motion.article>
+        <section className="py-16 sm:py-20">
+          <div className="mx-auto max-w-5xl space-y-5 px-5 sm:px-8">
+            {guides.map((guide, index) => (
+              <details key={guide.title} className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm open:border-blue-200 sm:p-8">
+                <summary className="flex cursor-pointer list-none items-start gap-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+                  <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700 sm:flex"><BookOpen className="h-5 w-5" /></div>
+                  <div className="flex-1"><p className="text-xs font-semibold uppercase tracking-[0.15em] text-blue-700">Guide 0{index + 1}</p><h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{guide.title}</h2><p className="mt-3 leading-7 text-slate-600">{guide.preview}</p></div>
+                  <ChevronDown className="mt-1 h-5 w-5 shrink-0 text-slate-500 transition group-open:rotate-180" />
+                </summary>
+                <div className="ml-0 mt-7 space-y-4 border-t border-slate-200 pt-7 text-base leading-7 text-slate-600 sm:ml-16">{guide.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+              </details>
             ))}
           </div>
+        </section>
 
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={stagger}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {articles.map((article) => (
-              <motion.article
-                key={article.id}
-                variants={fadeIn}
-                className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col hover:-translate-y-1 hover:shadow-[0_4px_24px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer group"
-                onClick={() => setActiveArticle(article.id)}
-              >
-                <div className="h-1.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]" />
-                <div className="p-8 flex flex-col flex-1">
-                  <div className="flex items-center gap-3 mb-5">
-                    <span className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-2.5 py-1 rounded-full">
-                      {article.category}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {article.date}
-                    </span>
-                  </div>
-                  <h2 className="text-xl font-semibold text-[#0F172A] leading-snug mb-3 group-hover:text-[#3B82F6] transition-colors">
-                    {article.title}
-                  </h2>
-                  <p className="text-gray-500 font-light text-sm leading-relaxed mb-6 flex-1">
-                    {article.preview}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-xs text-gray-400">
-                      <Clock className="h-3.5 w-3.5" />
-                      {article.readTime}
-                    </span>
-                    <span className="text-sm font-medium text-[#3B82F6] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                      Read More <ArrowRight className="h-3.5 w-3.5" />
-                    </span>
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-start justify-center overflow-y-auto py-12 px-4"
-            onClick={() => setActiveArticle(null)}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.97 }}
-              transition={{
-                duration: 0.35,
-                ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-              }}
-              className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="h-1.5 bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] rounded-t-2xl" />
-              <button
-                onClick={() => setActiveArticle(null)}
-                className="absolute top-5 right-5 h-9 w-9 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
-              >
-                <X className="h-4 w-4 text-gray-600" />
-              </button>
-
-              <div className="p-8 md:p-12">
-                <div className="flex items-center gap-3 mb-5">
-                  <span className="text-xs font-medium text-[#3B82F6] bg-blue-50 px-2.5 py-1 rounded-full">
-                    {selected.category}
-                  </span>
-                  <span className="text-xs text-gray-400">{selected.date}</span>
-                  <span className="flex items-center gap-1.5 text-xs text-gray-400">
-                    <Clock className="h-3.5 w-3.5" />
-                    {selected.readTime}
-                  </span>
-                </div>
-
-                <h1 className="text-2xl md:text-3xl font-semibold text-[#0F172A] leading-tight mb-8">
-                  {selected.title}
-                </h1>
-
-                <div className="space-y-5">
-                  {selected.body.map((paragraph, i) => (
-                    <p
-                      key={i}
-                      className="text-gray-600 font-light leading-relaxed text-[15px]"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-
-                <div className="mt-10 pt-8 border-t border-gray-100 flex items-center justify-between">
-                  <Link href="/contact">
-                    <Button className="rounded-full h-11 px-6 hover:-translate-y-0.5 transition-all duration-300">
-                      Get in Touch
-                    </Button>
-                  </Link>
-                  <button
-                    onClick={() => setActiveArticle(null)}
-                    className="text-sm text-gray-400 hover:text-gray-700 transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+        <section className="bg-[#0e2a4d] py-18 text-white">
+          <div className="mx-auto flex max-w-5xl flex-col justify-between gap-8 px-5 py-2 sm:px-8 md:flex-row md:items-center">
+            <div><h2 className="text-3xl font-semibold tracking-tight">Send one supplier, quote, or question.</h2><p className="mt-3 text-slate-300">Tell us what you are evaluating and what remains unclear.</p></div>
+            <Link href="/contact" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 font-semibold text-[#081226] hover:bg-blue-50">Send an inquiry <ArrowRight className="h-4 w-4" /></Link>
+          </div>
+        </section>
+      </main>
       <Footer />
     </div>
   );
