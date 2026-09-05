@@ -59,8 +59,8 @@ export default function Home() {
                 <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 font-semibold text-[#081226] transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300">
                   Send an inquiry <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link href="/insights" className="inline-flex items-center justify-center rounded-full border border-white/25 px-6 py-3.5 font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-300">
-                  Read the guides
+                <Link href="/report" className="inline-flex items-center justify-center rounded-full border border-white/25 px-6 py-3.5 font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                  Read the review framework
                 </Link>
               </div>
             </div>

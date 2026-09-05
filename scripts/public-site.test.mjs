@@ -17,6 +17,7 @@ const publicFiles = [
   "src/pages/report.tsx",
   "src/pages/trust-assurance.tsx",
   "src/pages/insights.tsx",
+  "src/pages/korea-supplier-review-before-commitment.tsx",
   "src/pages/contact.tsx",
   "src/pages/privacy.tsx",
   "src/pages/terms.tsx",
@@ -28,7 +29,7 @@ const publicCopy = () => publicFiles.map((file) => source(file)).join("\n");
 
 test("public routes expose the advisory site and no mock product surfaces", () => {
   const app = source("src", "App.tsx");
-  for (const route of ["/", "/about", "/report", "/trust-assurance", "/insights", "/contact", "/privacy", "/terms"]) {
+  for (const route of ["/", "/about", "/report", "/trust-assurance", "/insights/korea-supplier-review-before-commitment", "/insights", "/contact", "/privacy", "/terms"]) {
     assert.match(app, new RegExp(`path=["']${route.replace("/", "\\/")}["']`));
   }
   for (const route of ["/portal", "/login", "/admin", "/instant-quote", "/quote-now"]) {
@@ -101,7 +102,7 @@ test("public conversion path is an honest inquiry to hello@asivanta.com", () => 
   assert.doesNotMatch(contact, /24[–-]48 hours|response time/i);
 });
 
-test("contact form fails closed around an explicitly rendered Turnstile challenge", () => {
+test("contact form still renders Turnstile and keeps email as an alternative", () => {
   const contact = source("src", "pages", "contact.tsx");
   assert.match(contact, /import\.meta\.env\.VITE_TURNSTILE_SITE_KEY/);
   assert.match(contact, /https:\/\/challenges\.cloudflare\.com\/turnstile\/v0\/api\.js\?render=explicit/);
@@ -109,11 +110,39 @@ test("contact form fails closed around an explicitly rendered Turnstile challeng
   assert.match(contact, /payload\.append\(["']turnstileToken["'],\s*turnstileToken\)/);
   assert.match(contact, /finally\s*{[\s\S]*resetTurnstile\(\)/);
   assert.match(contact, /turnstile\.reset\(/);
-  assert.match(contact, /disabled=\{submitting\s*\|\|\s*!turnstileToken/);
   assert.match(contact, /challengeError[\s\S]*mailto:hello@asivanta\.com/);
   assert.match(contact, /dataset\.turnstileFailed\s*=\s*["']true["']/);
   assert.match(contact, /dataset\.turnstileFailed\s*===\s*["']true["']/);
   assert.doesNotMatch(contact, /1x00000000000000000000AA|2x00000000000000000000AB|3x00000000000000000000FF/);
+});
+
+test("contact form keeps tokenless submission disabled when the abuse-prevention widget is unavailable", () => {
+  const contact = source("src", "pages", "contact.tsx");
+  assert.match(contact, /disabled=\{submitting\s*\|\|\s*!turnstileToken\}/);
+  assert.match(contact, /if \(!turnstileToken\)/);
+  assert.match(contact, /The abuse-prevention check is unavailable[^.]*form cannot be submitted/);
+  assert.match(contact, /Please email[\s\S]*mailto:hello@asivanta\.com[\s\S]*instead/);
+  assert.doesNotMatch(contact, /You can still send|Server-side checks still apply/i);
+  assert.doesNotMatch(contact, /!turnstileToken\s*&&\s*!challengeUnavailable/);
+});
+
+test("one Insights guide is a reachable source-backed article", () => {
+  const app = source("src", "App.tsx");
+  const insights = source("src", "pages", "insights.tsx");
+  const article = source("src", "pages", "korea-supplier-review-before-commitment.tsx");
+  assert.match(app, /path=["']\/insights\/korea-supplier-review-before-commitment["']/);
+  assert.match(insights, /href=["']\/insights\/korea-supplier-review-before-commitment["']/);
+  assert.match(article, /Korea supplier review before commitment/);
+  for (const href of [
+    "https://www.hometax.go.kr",
+    "https://www.iros.go.kr",
+    "https://www.factoryon.go.kr/main/main.do",
+    "https://www.iafcertsearch.org/verify-certificates",
+    "https://iccwbo.org/business-solutions/incoterms-rules/incoterms-2020/",
+  ]) {
+    assert.match(article, new RegExp(href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+  assert.match(article, /does not prove factory reality/i);
 });
 
 test("privacy policy discloses Cloudflare abuse-prevention processing conservatively", () => {
@@ -146,13 +175,14 @@ test("every release URL has unique approved metadata", () => {
     "Korea Supplier Shortlist Review | Asivanta",
     "Trust & Assurance | Asivanta",
     "Insights | Korea Sourcing Guides",
+    "Korea Supplier Review Before Commitment | Asivanta",
     "Contact Asivanta",
     "Privacy Policy | Asivanta",
     "Terms of Service | Asivanta",
   ];
   const titles = Object.values(meta).map((page) => page.title);
   assert.deepEqual(titles, expectedTitles);
-  assert.equal(new Set(titles).size, 8);
+  assert.equal(new Set(titles).size, 9);
 });
 
 test("valid route metadata restores indexable robots directives after a not-found view", () => {
@@ -185,7 +215,7 @@ test("production build emits route-specific non-JavaScript metadata", () => {
 test("crawl controls list only release routes", () => {
   const sitemap = source("public", "sitemap.xml");
   const robots = source("public", "robots.txt");
-  for (const route of ["about", "report", "trust-assurance", "insights", "contact", "privacy", "terms"]) {
+  for (const route of ["about", "report", "trust-assurance", "insights", "insights/korea-supplier-review-before-commitment", "contact", "privacy", "terms"]) {
     assert.match(sitemap, new RegExp(`https:\\/\\/asivanta\\.com\\/${route}`));
   }
   assert.doesNotMatch(sitemap, /portal|login|admin|quote/i);
@@ -310,21 +340,27 @@ test("contact API requires and verifies Turnstile before mail delivery", async (
   const priorFetch = globalThis.fetch;
   const priorConsoleError = console.error;
   const verificationRequests = [];
-  console.error = () => {};
+  const logged = [];
+  console.error = (...args) => {
+    logged.push(args.map(String).join(" "));
+  };
 
   try {
-    delete process.env.RESEND_API_KEY;
+    process.env.RESEND_API_KEY = "test-resend-key";
     delete process.env.TURNSTILE_SECRET_KEY;
     globalThis.fetch = async (...args) => {
       verificationRequests.push(args);
-      return { ok: true, json: async () => ({ success: true }) };
+      throw new Error("No network call is allowed when the Turnstile secret is missing");
     };
 
     const missingSecretResponse = mockResponse();
-    await handler(multipartRequest(validInquiry({ turnstileToken: "configured-token" }), "192.0.2.30"), missingSecretResponse);
+    await handler(multipartRequest(validInquiry({ turnstileToken: "unverified-token" }), "192.0.2.30"), missingSecretResponse);
     assert.equal(missingSecretResponse.statusCode, 503);
-    assert.equal(verificationRequests.length, 0);
+    assert.deepEqual(missingSecretResponse.payload, { error: "The inquiry form is temporarily unavailable. Please email hello@asivanta.com." });
+    assert.equal(verificationRequests.length, 0, "missing Turnstile secret must fail before verification or mail delivery");
+    assert.match(logged.join("\n"), /TURNSTILE_SECRET_KEY not set/);
 
+    delete process.env.RESEND_API_KEY;
     process.env.TURNSTILE_SECRET_KEY = "test-secret";
     const missingTokenResponse = mockResponse();
     await handler(multipartRequest(validInquiry(), "192.0.2.31"), missingTokenResponse);

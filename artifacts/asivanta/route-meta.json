@@ -24,6 +24,11 @@
     "description": "Buyer-side notes on Korean suppliers, documents, RFQs, and pre-commitment checks.",
     "path": "/insights"
   },
+  "supplierReview": {
+    "title": "Korea Supplier Review Before Commitment | Asivanta",
+    "description": "Identity, evidence, RFQ scope, and the next direct checks before samples, deposits, tooling, or a purchase order.",
+    "path": "/insights/korea-supplier-review-before-commitment"
+  },
   "contact": {
     "title": "Contact Asivanta",
     "description": "Send a sourcing inquiry. Email hello@asivanta.com.",

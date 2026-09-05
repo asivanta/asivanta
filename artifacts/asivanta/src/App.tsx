@@ -3,6 +3,7 @@ import About from "@/pages/about";
 import Contact from "@/pages/contact";
 import Home from "@/pages/home";
 import Insights from "@/pages/insights";
+import KoreaSupplierReviewBeforeCommitment from "@/pages/korea-supplier-review-before-commitment";
 import NotFound from "@/pages/not-found";
 import Privacy from "@/pages/privacy";
 import Report from "@/pages/report";
@@ -16,6 +17,10 @@ function Router() {
       <Route path="/about" component={About} />
       <Route path="/report" component={Report} />
       <Route path="/trust-assurance" component={TrustAssurance} />
+      <Route
+        path="/insights/korea-supplier-review-before-commitment"
+        component={KoreaSupplierReviewBeforeCommitment}
+      />
       <Route path="/insights" component={Insights} />
       <Route path="/contact" component={Contact} />
       <Route path="/privacy" component={Privacy} />

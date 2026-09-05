@@ -9,7 +9,8 @@ const initialForm = { fullName: "", company: "", email: "", evaluation: "", mess
 const inputClass = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100";
 const TURNSTILE_SCRIPT_ID = "cloudflare-turnstile-script";
 const TURNSTILE_SCRIPT_URL = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-const CHALLENGE_FALLBACK = "The abuse-prevention check is unavailable. Please email hello@asivanta.com.";
+const CHALLENGE_UNAVAILABLE = "The abuse-prevention check is unavailable, so this form cannot be submitted.";
+const CHALLENGE_EXPIRED = "The abuse-prevention check expired. Please complete it again.";
 
 declare global {
   interface Window {
@@ -38,12 +39,17 @@ export default function Contact() {
 
   const update = (field: keyof typeof form, value: string) => setForm((current) => ({ ...current, [field]: value }));
 
+  const markUnavailable = () => {
+    setTurnstileToken("");
+    setChallengeError(CHALLENGE_UNAVAILABLE);
+  };
+
   useEffect(() => {
     if (submitted) return;
 
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
     if (!siteKey) {
-      setChallengeError(CHALLENGE_FALLBACK);
+      markUnavailable();
       return;
     }
 
@@ -62,24 +68,23 @@ export default function Contact() {
           },
           "error-callback": () => {
             if (cancelled) return;
-            setTurnstileToken("");
-            setChallengeError(CHALLENGE_FALLBACK);
+            markUnavailable();
           },
           "expired-callback": () => {
             if (cancelled) return;
             setTurnstileToken("");
-            setChallengeError("The abuse-prevention check expired. Please complete it again or email hello@asivanta.com.");
+            setChallengeError(CHALLENGE_EXPIRED);
           },
         });
       } catch {
-        setChallengeError(CHALLENGE_FALLBACK);
+        markUnavailable();
       }
     };
 
     let script = document.getElementById(TURNSTILE_SCRIPT_ID) as HTMLScriptElement | null;
     const handleScriptError = () => {
       if (script) script.dataset.turnstileFailed = "true";
-      if (!cancelled) setChallengeError(CHALLENGE_FALLBACK);
+      if (!cancelled) markUnavailable();
     };
     const handleScriptLoad = () => {
       if (!window.turnstile) {
@@ -125,14 +130,14 @@ export default function Contact() {
     try {
       window.turnstile.reset(widgetId);
     } catch {
-      setChallengeError(CHALLENGE_FALLBACK);
+      markUnavailable();
     }
   };
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!turnstileToken) {
-      setError(CHALLENGE_FALLBACK);
+      setError("Please complete the abuse-prevention check before sending your inquiry.");
       return;
     }
     setError("");
@@ -217,14 +222,14 @@ export default function Contact() {
                     {!challengeError && !turnstileToken && <p className="mt-2 text-sm text-slate-600" aria-live="polite">Complete the abuse-prevention check to enable sending.</p>}
                     {challengeError && (
                       <div className="mt-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">
-                        {challengeError} <a className="font-semibold underline" href="mailto:hello@asivanta.com">Email hello@asivanta.com</a>.
+                        {challengeError} Please email <a className="font-semibold underline" href="mailto:hello@asivanta.com">hello@asivanta.com</a> instead.
                       </div>
                     )}
                   </div>
 
                   {error && <div className="flex gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert"><AlertCircle className="h-5 w-5 shrink-0" />{error}</div>}
 
-                  <button type="submit" disabled={submitting || !turnstileToken || Boolean(challengeError)} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#081226] px-6 py-3.5 font-semibold text-white transition hover:bg-[#102b52] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
+                  <button type="submit" disabled={submitting || !turnstileToken} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#081226] px-6 py-3.5 font-semibold text-white transition hover:bg-[#102b52] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto">
                     {submitting ? "Sending…" : "Send inquiry"} {!submitting && <ArrowRight className="h-4 w-4" />}
                   </button>
                 </form>

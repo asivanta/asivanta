@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,9 +33,11 @@ export async function generateStaticPages() {
   ]);
   const manifest = JSON.parse(manifestText);
 
-  await Promise.all(Object.values(manifest).map((meta) => {
+  await Promise.all(Object.values(manifest).map(async (meta) => {
     const output = meta.path === "/" ? "index.html" : `${meta.path.slice(1)}.html`;
-    return writeFile(join(outputRoot, output), renderRouteHtml(template, meta));
+    const outputPath = join(outputRoot, output);
+    await mkdir(dirname(outputPath), { recursive: true });
+    return writeFile(outputPath, renderRouteHtml(template, meta));
   }));
 
   const notFoundMeta = {

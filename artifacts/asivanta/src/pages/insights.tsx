@@ -4,16 +4,12 @@ import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 import { PageMeta } from "@/lib/page-meta";
 
+const featuredGuide = {
+  title: "How to review a Korean supplier before commitment",
+  preview: "Separate corporate identity, supplied evidence, RFQ scope, and the next direct checks instead of treating them as one question.",
+};
+
 const guides = [
-  {
-    title: "How to review a Korean supplier before commitment",
-    preview: "Separate corporate identity, supplied evidence, and factory reality instead of treating them as one question.",
-    paragraphs: [
-      "Begin with the legal entity name, registration details, addresses, bank beneficiary, and the people communicating with you. Differences are not automatically wrongdoing, but they are questions to resolve before payment.",
-      "Treat certificates, catalogues, references, and website statements as supplied evidence—not final proof. Confirm the issuer, scope, dates, and whether each record belongs to the same entity.",
-      "Desktop checks cannot establish current factory conditions or capacity. Where the decision depends on physical reality, use samples, testing, direct confirmation, a specialist, or an on-site check.",
-    ],
-  },
   {
     title: "MOQ, lead time, and payment terms: what buyers miss",
     preview: "Read commercial terms as connected assumptions, not isolated numbers.",
@@ -59,11 +55,25 @@ export default function Insights() {
 
         <section className="py-16 sm:py-20">
           <div className="mx-auto max-w-5xl space-y-5 px-5 sm:px-8">
+            <article className="rounded-3xl border border-blue-200 bg-white p-6 shadow-sm sm:p-8">
+              <Link href="/insights/korea-supplier-review-before-commitment" className="flex items-start gap-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
+                <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700 sm:flex"><BookOpen className="h-5 w-5" /></div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-blue-700">Guide 01 · Full article</p>
+                  <h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{featuredGuide.title}</h2>
+                  <p className="mt-3 leading-7 text-slate-600">{featuredGuide.preview}</p>
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">
+                    Read the full guide <ArrowRight className="h-4 w-4" />
+                  </span>
+                </div>
+              </Link>
+            </article>
+
             {guides.map((guide, index) => (
               <details key={guide.title} className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm open:border-blue-200 sm:p-8">
                 <summary className="flex cursor-pointer list-none items-start gap-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">
                   <div className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700 sm:flex"><BookOpen className="h-5 w-5" /></div>
-                  <div className="flex-1"><p className="text-xs font-semibold uppercase tracking-[0.15em] text-blue-700">Guide 0{index + 1}</p><h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{guide.title}</h2><p className="mt-3 leading-7 text-slate-600">{guide.preview}</p></div>
+                  <div className="flex-1"><p className="text-xs font-semibold uppercase tracking-[0.15em] text-blue-700">Guide 0{index + 2}</p><h2 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">{guide.title}</h2><p className="mt-3 leading-7 text-slate-600">{guide.preview}</p></div>
                   <ChevronDown className="mt-1 h-5 w-5 shrink-0 text-slate-500 transition group-open:rotate-180" />
                 </summary>
                 <div className="ml-0 mt-7 space-y-4 border-t border-slate-200 pt-7 text-base leading-7 text-slate-600 sm:ml-16">{guide.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>

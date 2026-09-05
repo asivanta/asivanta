@@ -66,6 +66,22 @@ export default function Report() {
         </section>
 
         <section className="py-20">
+          <div className="mx-auto max-w-6xl px-5 sm:px-8">
+            <h2 className="text-3xl font-semibold tracking-tight">Sample review outline (for process clarity)</h2>
+            <p className="mt-4 max-w-3xl text-slate-600">Use this structure as a reference only; this is not a real client case.</p>
+            <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-7 sm:p-8">
+              <ol className="space-y-4 text-slate-700">
+                <li><strong>1) Scope and decision:</strong> what is being reviewed and what will happen after this review.</li>
+                <li><strong>2) Materials reviewed:</strong> supplier data, RFQs, quotes, documents, and contact records.</li>
+                <li><strong>3) Evidence check:</strong> which items appear consistent, uncertain, or unverified.</li>
+                <li><strong>4) Risk flags:</strong> quality, schedule, compliance, communication, and hidden assumptions.</li>
+                <li><strong>5) Recommendation:</strong> what to confirm next and what to escalate before commitment.</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20">
           <div className="mx-auto flex max-w-6xl flex-col justify-between gap-8 px-5 sm:px-8 md:flex-row md:items-center">
             <div><h2 className="text-3xl font-semibold tracking-tight">Send one defined sourcing question.</h2><p className="mt-3 text-slate-600">Tell us what you are evaluating and what needs clarification.</p></div>
             <Link href="/contact" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#081226] px-6 py-3.5 font-semibold text-white hover:bg-[#102b52]">Send an inquiry <ArrowRight className="h-4 w-4" /></Link>
